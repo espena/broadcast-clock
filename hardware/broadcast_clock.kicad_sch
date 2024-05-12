@@ -3997,7 +3997,7 @@
     (property "Value" "Active GPS antenna 3.3V" (at 72.898 73.406 0)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Footprint" "" (at 83.82 87.63 0)
+    (property "Footprint" "Connector_espena:DC-Power-Jack_DC044_5.5mm_2.1mm" (at 83.82 87.63 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 76.2 105.41 0)
