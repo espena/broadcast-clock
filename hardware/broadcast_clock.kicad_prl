@@ -16,8 +16,8 @@
     },
     "selection_filter": {
       "dimensions": false,
-      "footprints": false,
-      "graphics": true,
+      "footprints": true,
+      "graphics": false,
       "keepouts": false,
       "lockedItems": false,
       "otherItems": false,
@@ -64,8 +64,14 @@
       39,
       40
     ],
-    "visible_layers": "00cd0f0_80000001",
-    "zone_display_mode": 0
+    "visible_layers": "000d0f0_80000005",
+    "zone_display_mode": 1
+  },
+  "git": {
+    "repo_password": "",
+    "repo_type": "",
+    "repo_username": "",
+    "ssh_key": ""
   },
   "meta": {
     "filename": "broadcast_clock.kicad_prl",
