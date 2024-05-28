@@ -1678,13 +1678,13 @@
 		)
 		(symbol "power_espena:+3.3V_GPS"
 			(power)
+			(pin_numbers hide)
 			(pin_names
-				(offset 0)
-			)
+				(offset 0) hide)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "#PWR_GPS"
+			(property "Reference" "#PWR"
 				(at 0 -3.81 0)
 				(effects
 					(font
@@ -1719,7 +1719,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "Power symbol creates a global label with name \"+3.3V\""
+			(property "Description" "Power symbol creates a global label with name \"+3.3V_GPS\""
 				(at 0 0 0)
 				(effects
 					(font
@@ -1776,10 +1776,10 @@
 				)
 			)
 			(symbol "+3.3V_GPS_1_1"
-				(pin power_out line
+				(pin power_in line
 					(at 0 0 90)
-					(length 0) hide
-					(name "+3.3V_GPS"
+					(length 0)
+					(name "~"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -3306,7 +3306,7 @@
 			)
 		)
 		(property "Value" "LEA-M8T"
-			(at 116.205 49.53 0)
+			(at 115.57 48.26 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3777,7 +3777,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "f7e5c2de-7ce7-48e6-a5aa-58143a058e2a")
-		(property "Reference" "#PWR025"
+		(property "Reference" "#PWR_GPS025"
 			(at 138.43 39.37 0)
 			(effects
 				(font
@@ -3812,7 +3812,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
+		(property "Description" "Power symbol creates a global label with name \"PWR_GPS\""
 			(at 138.43 35.56 0)
 			(effects
 				(font
@@ -3827,7 +3827,7 @@
 		(instances
 			(project "broadcast_clock"
 				(path "/40ecfd14-7e3d-4342-87f4-c464dfcd4cdf/44042a18-1807-43f0-b837-7920df2598a1"
-					(reference "#PWR025")
+					(reference "#PWR_GPS025")
 					(unit 1)
 				)
 			)

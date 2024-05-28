@@ -1236,13 +1236,13 @@
 		)
 		(symbol "power_espena:+3.3V_LED"
 			(power)
+			(pin_numbers hide)
 			(pin_names
-				(offset 0)
-			)
+				(offset 0) hide)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "#PWR_LED"
+			(property "Reference" "#PWR"
 				(at 0 -3.81 0)
 				(effects
 					(font
@@ -1277,7 +1277,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "Power symbol creates a global label with name \"+3.3V\""
+			(property "Description" "Power symbol creates a global label with name \"+3.3V _LED\""
 				(at 0 0 0)
 				(effects
 					(font
@@ -1334,10 +1334,10 @@
 				)
 			)
 			(symbol "+3.3V_LED_1_1"
-				(pin power_out line
+				(pin power_in line
 					(at 0 0 90)
-					(length 0) hide
-					(name "+3.3V_LED"
+					(length 0)
+					(name "~"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -7346,7 +7346,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
+		(property "Description" "Power symbol creates a global label with name \"PWR_LED\""
 			(at 81.28 100.33 0)
 			(effects
 				(font
@@ -7377,7 +7377,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "04ff7dbd-7025-45b8-8e37-8080bc22ab27")
-		(property "Reference" "#PWR0218"
+		(property "Reference" "#PWR_LED0218"
 			(at 95.25 60.96 0)
 			(effects
 				(font
@@ -7412,7 +7412,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
+		(property "Description" "Power symbol creates a global label with name \"PWR_LED\""
 			(at 95.25 57.15 0)
 			(effects
 				(font
@@ -7427,7 +7427,7 @@
 		(instances
 			(project "broadcast_clock"
 				(path "/40ecfd14-7e3d-4342-87f4-c464dfcd4cdf/425f15d8-7995-473a-916f-1acbbdb328a4/80bf7467-8bed-48f3-ab7b-174979e1b2eb"
-					(reference "#PWR0218")
+					(reference "#PWR_LED0218")
 					(unit 1)
 				)
 			)
@@ -7952,7 +7952,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "6a8fe4ff-6970-4165-ab03-bc1cd8a01601")
-		(property "Reference" "#PWR0220"
+		(property "Reference" "#PWR_LED0220"
 			(at 204.47 60.96 0)
 			(effects
 				(font
@@ -7987,7 +7987,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
+		(property "Description" "Power symbol creates a global label with name \"PWR_LED\""
 			(at 204.47 57.15 0)
 			(effects
 				(font
@@ -8002,7 +8002,7 @@
 		(instances
 			(project "broadcast_clock"
 				(path "/40ecfd14-7e3d-4342-87f4-c464dfcd4cdf/425f15d8-7995-473a-916f-1acbbdb328a4/80bf7467-8bed-48f3-ab7b-174979e1b2eb"
-					(reference "#PWR0220")
+					(reference "#PWR_LED0220")
 					(unit 1)
 				)
 			)
@@ -8359,7 +8359,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "8d30edf8-7fe7-47c5-a915-ba287c0b4be9")
-		(property "Reference" "#PWR050"
+		(property "Reference" "#PWR_LED050"
 			(at 223.52 106.68 0)
 			(effects
 				(font
@@ -8394,7 +8394,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
+		(property "Description" "Power symbol creates a global label with name \"PWR_LED\""
 			(at 223.52 102.87 0)
 			(effects
 				(font
@@ -8409,7 +8409,7 @@
 		(instances
 			(project "broadcast_clock"
 				(path "/40ecfd14-7e3d-4342-87f4-c464dfcd4cdf/425f15d8-7995-473a-916f-1acbbdb328a4/80bf7467-8bed-48f3-ab7b-174979e1b2eb"
-					(reference "#PWR050")
+					(reference "#PWR_LED050")
 					(unit 1)
 				)
 			)

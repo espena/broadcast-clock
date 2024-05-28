@@ -180,6 +180,7 @@
       ],
       "track_widths": [
         0.0,
+        0.1,
         0.15,
         0.3
       ],
@@ -213,6 +214,10 @@
         {
           "diameter": 0.0,
           "drill": 0.0
+        },
+        {
+          "diameter": 0.25,
+          "drill": 0.15
         },
         {
           "diameter": 0.35,
@@ -515,7 +520,7 @@
     "classes": [
       {
         "bus_width": 12,
-        "clearance": 0.15,
+        "clearance": 0.127,
         "diff_pair_gap": 0.15,
         "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.15,
@@ -593,6 +598,14 @@
       {
         "netclass": "Default",
         "pattern": "Net-(U10*)"
+      },
+      {
+        "netclass": "PowerDC",
+        "pattern": "+3.3V_LED"
+      },
+      {
+        "netclass": "PowerDC",
+        "pattern": "+3.3V_MCU"
       }
     ]
   },
