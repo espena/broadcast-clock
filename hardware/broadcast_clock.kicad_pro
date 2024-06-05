@@ -614,10 +614,10 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "",
+      "plot": "plot/v0/",
       "pos_files": "",
       "specctra_dsn": "",
-      "step": "",
+      "step": "broadcast_clock.step",
       "svg": "",
       "vrml": ""
     },

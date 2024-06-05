@@ -9247,7 +9247,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Package_SO_espena:HTSSOP-28-1EP_4.4x9.7mm_P0.65mm_EP3.4x9.5mm_Mask2.4x6.17mm_ThermalVias"
+		(property "Footprint" "Package_SO:HTSSOP-28-1EP_4.4x9.7mm_P0.65mm_EP3.4x9.5mm_Mask2.4x6.17mm_ThermalVias"
 			(at 192.405 50.165 0)
 			(effects
 				(font
@@ -10699,7 +10699,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Package_SO_espena:HTSSOP-28-1EP_4.4x9.7mm_P0.65mm_EP3.4x9.5mm_Mask2.4x6.17mm_ThermalVias"
+		(property "Footprint" "Package_SO:HTSSOP-28-1EP_4.4x9.7mm_P0.65mm_EP3.4x9.5mm_Mask2.4x6.17mm_ThermalVias"
 			(at 253.365 50.165 0)
 			(effects
 				(font
@@ -11331,7 +11331,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Package_SO_espena:HTSSOP-28-1EP_4.4x9.7mm_P0.65mm_EP3.4x9.5mm_Mask2.4x6.17mm_ThermalVias"
+		(property "Footprint" "Package_SO:HTSSOP-28-1EP_4.4x9.7mm_P0.65mm_EP3.4x9.5mm_Mask2.4x6.17mm_ThermalVias"
 			(at 70.485 50.165 0)
 			(effects
 				(font
@@ -12236,7 +12236,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Package_SO_espena:HTSSOP-28-1EP_4.4x9.7mm_P0.65mm_EP3.4x9.5mm_Mask2.4x6.17mm_ThermalVias"
+		(property "Footprint" "Package_SO:HTSSOP-28-1EP_4.4x9.7mm_P0.65mm_EP3.4x9.5mm_Mask2.4x6.17mm_ThermalVias"
 			(at 131.445 50.165 0)
 			(effects
 				(font
@@ -13609,7 +13609,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Package_SO_espena:HTSSOP-28-1EP_4.4x9.7mm_P0.65mm_EP3.4x9.5mm_Mask2.4x6.17mm_ThermalVias"
+		(property "Footprint" "Package_SO:HTSSOP-28-1EP_4.4x9.7mm_P0.65mm_EP3.4x9.5mm_Mask2.4x6.17mm_ThermalVias"
 			(at 108.585 144.145 0)
 			(effects
 				(font
