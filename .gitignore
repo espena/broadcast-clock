@@ -2,6 +2,7 @@
 datasheets
 firmware/build
 hardware/broascast_clock-backups
+drawings/blender
 drawings/*.stl
 drawings/*.wrl
 drawings/*.stp
