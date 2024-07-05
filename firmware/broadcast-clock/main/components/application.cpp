@@ -11,3 +11,8 @@ application::
 ~application() {
 
 }
+
+void application::
+init() {
+    m_clock_face.init();
+}

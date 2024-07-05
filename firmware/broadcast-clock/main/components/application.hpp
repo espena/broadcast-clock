@@ -13,6 +13,7 @@ namespace espena::broadcast_clock {
 
         application();
         ~application();
+        void init();
 
     };
 

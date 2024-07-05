@@ -9,6 +9,12 @@ namespace espena::broadcast_clock {
 
         dial m_dial;
 
+    public:
+
+        clock_face();
+        ~clock_face();
+        void init();
+
     };
 
 }
