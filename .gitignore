@@ -1,6 +1,6 @@
 .DS_Store
 datasheets
-firmware/build
+firmware/broadcast-clock/build
 hardware/broascast_clock-backups
 drawings/blender
 drawings/*.stl
