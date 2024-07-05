@@ -1,2 +1,8 @@
 .DS_Store
 datasheets
+firmware/build
+hardware/broascast_clock-backups
+drawings/*.stl
+drawings/*.wrl
+drawings/*.stp
+drawings/*.step
