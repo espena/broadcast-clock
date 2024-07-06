@@ -1,4 +1,5 @@
 #include "wifi.hpp"
+#include "../secrets.hpp"
 #include <memory.h>
 #include <esp_wifi.h>
 #include <time.h>
@@ -158,8 +159,8 @@ init_wifi() {
                                          &instance_got_ip );
     wifi_config_t wifi_config;
     memset( &wifi_config, 0x00, sizeof( wifi_config_t ) );
-    strncpy( reinterpret_cast<char *>( wifi_config.sta.ssid ), "ssid_name", sizeof( wifi_config.sta.ssid ) );
-    strncpy( reinterpret_cast<char *>( wifi_config.sta.password ), "password", sizeof( wifi_config.sta.password ) );
+    strncpy( reinterpret_cast<char *>( wifi_config.sta.ssid ), WIFI_SSID, sizeof( wifi_config.sta.ssid ) );
+    strncpy( reinterpret_cast<char *>( wifi_config.sta.password ), WIFI_PASSWORD, sizeof( wifi_config.sta.password ) );
     wifi_config.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
     wifi_config.sta.sae_pwe_h2e = WPA3_SAE_PWE_UNSPECIFIED;
 
