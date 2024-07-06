@@ -15,4 +15,5 @@ clock_face::
 void clock_face::
 init() {
     m_dial.init();
+    m_dotmatrix.init();
 }

@@ -38,7 +38,13 @@ namespace espena::broadcast_clock {
 
         void on_message( dial_task_message msg, void *arg );
 
+        void update();
+
         void on_init();
+
+        void init_gpio();
+
+        void component_loop();
 
     public:
 
