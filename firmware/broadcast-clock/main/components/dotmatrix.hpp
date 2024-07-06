@@ -30,6 +30,7 @@ namespace espena::broadcast_clock {
         enum class dotmatrix_task_message {
             init,
             enable,
+            test,
             disable
         };
 
@@ -42,18 +43,21 @@ namespace espena::broadcast_clock {
 
         void on_message( dotmatrix_task_message msg, void *arg );
 
-        void update();
-        void transmit( uint8_t command, uint8_t data );
-
         void on_init();
+        void on_test();
+
         void init_spi();
         void init_display();
+
+        void update();
+        void transmit( uint8_t command, uint8_t data );
 
     public:
 
         dotmatrix();
         ~dotmatrix();
         void init();
+        void test();
 
     };
 

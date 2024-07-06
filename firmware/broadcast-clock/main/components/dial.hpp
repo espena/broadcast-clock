@@ -17,8 +17,7 @@ namespace espena::broadcast_clock {
 
         typedef struct dial_task_params_struct {
             dial *instance;
-            StackType_t *stack_buffer;
-            StaticTask_t task_buffer;
+            TaskHandle_t task_handle;
         } dial_task_params;
 
         dial_task_params m_task_params;

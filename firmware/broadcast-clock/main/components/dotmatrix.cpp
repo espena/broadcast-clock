@@ -28,7 +28,7 @@ dotmatrix() : m_current_hour( 0 ),
                       m_component_name,
                       m_component_stack_size,
                       &m_task_params,
-                      4 | portPRIVILEGE_BIT,
+                      8,
                       m_task_params.stack_buffer,
                       &m_task_params.task_buffer );
 }
@@ -41,6 +41,12 @@ broadcast_clock::dotmatrix::
 void broadcast_clock::dotmatrix::
 init() {
   dotmatrix_task_queue_item item = { dotmatrix_task_message::init, nullptr };
+  xQueueSend( m_task_queue, &item, 10 );
+}
+
+void broadcast_clock::dotmatrix::
+test() {
+  dotmatrix_task_queue_item item = { dotmatrix_task_message::test, nullptr };
   xQueueSend( m_task_queue, &item, 10 );
 }
 
@@ -75,6 +81,9 @@ on_message( dotmatrix_task_message msg, void *arg ) {
     case dotmatrix_task_message::enable:
 
       break;
+    case dotmatrix_task_message::test:
+      on_test();
+      break;
     case dotmatrix_task_message::disable:
 
       break;
@@ -101,10 +110,15 @@ update() {
 
 void broadcast_clock::dotmatrix::
 on_init() {
-  ESP_LOGI( m_component_name, "Initializing dot matrix display" );
+  ESP_LOGI( m_component_name, "Initializing" );
   init_spi();
   init_display();
-  update();
+}
+
+void broadcast_clock::dotmatrix::
+on_test() {
+  // Test mode
+  transmit( 0x07u, 0x01u );
 }
 
 void broadcast_clock::dotmatrix::
@@ -133,4 +147,5 @@ void broadcast_clock::dotmatrix::
 init_display() {
   // Normal mode
   transmit( 0x04u, 0x01u | ( ( m_current_hour / 10 ) & 0x0f ) );
+  update();
 }
