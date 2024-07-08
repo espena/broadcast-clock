@@ -17,4 +17,8 @@
 #define DISP_SPI_MOSI GPIO_NUM_13
 #define DISP_SPI_MISO GPIO_NUM_12
 
+// I2C GPIO mapping
+#define I2C_SCL GPIO_NUM_22
+#define I2C_SDA GPIO_NUM_21
+
 #endif // GPIO_MAPPING_HPP

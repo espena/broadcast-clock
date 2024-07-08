@@ -3,23 +3,26 @@
 
 #include "wifi.hpp"
 #include "clock_face.hpp"
+#include <driver/i2c_master.h>
 
 namespace espena::broadcast_clock {
 
-    class application {
+  class application {
 
-        wifi m_wifi;
-        clock_face m_clock_face;
+    wifi m_wifi;        
+    clock_face m_clock_face;
+    i2c_master_bus_handle_t m_i2c_bus;
 
-    public:
+  public:
 
-        application();
-        ~application();
-        void init();
-        void init_nvs();
-        void init_timezone();
+    application();
+    ~application();
+    void init();
+    void init_nvs();
+    void init_timezone();
+    void init_i2c();
 
-    };
+  };
 
 }
 

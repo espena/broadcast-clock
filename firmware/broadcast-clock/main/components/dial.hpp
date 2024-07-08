@@ -24,8 +24,7 @@ namespace espena::broadcast_clock {
 
         enum class dial_task_message {
             init,
-            enable,
-            disable
+            ambient_light_level
         };
 
         typedef struct dial_task_queue_item_struct {
@@ -37,9 +36,11 @@ namespace espena::broadcast_clock {
 
         void on_message( dial_task_message msg, void *arg );
 
-        void update();
-
         void on_init();
+
+        void on_ambient_light_level( uint16_t lux );
+
+        void update();
 
         void init_gpio();
 
@@ -50,6 +51,7 @@ namespace espena::broadcast_clock {
         dial();
         ~dial();
         void init();
+        void set_ambient_light_level( uint16_t lux );
     };
 
 }

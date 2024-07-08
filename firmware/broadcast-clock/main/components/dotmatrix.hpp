@@ -12,8 +12,11 @@ namespace espena::broadcast_clock {
         static const char *m_component_name;
         static const size_t m_component_stack_size = 4096;
 
+        bool m_test_mode;
+        
         uint8_t m_current_hour;
         uint8_t m_current_minute;
+        uint8_t m_current_second;
 
         QueueHandle_t m_task_queue;
 
@@ -50,7 +53,10 @@ namespace espena::broadcast_clock {
         void init_display();
 
         void update();
-        void transmit( uint8_t command, uint8_t data );
+        void transmit( uint8_t u1_command, 
+                       uint8_t u1_data,
+                       uint8_t u2_command,
+                       uint8_t u2_data );
 
     public:
 

@@ -45,7 +45,7 @@ namespace espena::broadcast_clock {
       void *arg;
     } wifi_task_queue_item;
 
-    static void on_sync( struct timeval *now );
+    static void on_ntp_sync( struct timeval *now );
     
     static void on_event( void *arg,
                           esp_event_base_t event_base,

@@ -16,6 +16,7 @@ const char *broadcast_clock::dotmatrix::m_component_name = "dotmatrix";
 broadcast_clock::dotmatrix::
 dotmatrix() : m_current_hour( 0 ),
               m_current_minute( 0 ),
+              m_current_second( 0 ),
               m_task_queue( nullptr ),
               m_spi( nullptr ) {
     
@@ -63,9 +64,14 @@ task_loop( void *arg ) {
     time_t now = time( NULL );
     struct tm timeinfo;
     localtime_r( &now, &timeinfo );
-    if( inst->m_current_hour != timeinfo.tm_hour || inst->m_current_minute != timeinfo.tm_min ) {
+    
+    if( inst->m_current_hour != timeinfo.tm_hour || 
+        inst->m_current_minute != timeinfo.tm_min ||
+        inst->m_current_second != timeinfo.tm_sec ) {
+
         inst->m_current_hour = timeinfo.tm_hour;
         inst->m_current_minute = timeinfo.tm_min;
+        inst->m_current_second = timeinfo.tm_sec;
         inst->update();
     }
   }
@@ -91,21 +97,27 @@ on_message( dotmatrix_task_message msg, void *arg ) {
 }
 
 void broadcast_clock::dotmatrix::
-transmit( uint8_t command, uint8_t data ) {
+transmit( uint8_t u1_command,
+          uint8_t u1_data,
+          uint8_t u2_command,
+          uint8_t u2_data ) {
+
   spi_transaction_t t;
   memset( &t, 0x00, sizeof( spi_transaction_t ) );
-  uint16_t cmd = data << 8 | command;
-  t.length = 16;
-  t.tx_buffer = &cmd;  
+  uint16_t u1 = u1_data << 8 | u1_command;
+  uint16_t u2 = u2_data << 8 | u2_command;
+  uint32_t payload = u1 << 16 | u2;
+  t.length = 32;
+  t.tx_buffer = &payload;
   ESP_ERROR_CHECK( spi_device_transmit( m_spi, &t ) );
 }
 
 void broadcast_clock::dotmatrix::
 update() {
-  transmit( 0x60u, 0x30u | ( ( m_current_hour / 10 ) & 0x0f ) );
-  transmit( 0x61u, 0x30u | ( ( m_current_hour % 10 ) & 0x0f ) );
-  transmit( 0x62u, 0x30u | ( ( m_current_minute / 10 ) & 0x0f ) );
-  transmit( 0x63u, 0x30u | ( ( m_current_minute % 10 ) & 0x0f ) );
+  transmit( 0x60u, 0x30u | ( ( m_current_hour / 10 ) & 0x0f ), 0x60u, 0x30u | ( ( m_current_second / 10 ) & 0x0f ) );
+  transmit( 0x61u, 0x30u | ( ( m_current_hour % 10 ) & 0x0f ), 0x61u, 0x30u | ( ( m_current_second % 10 ) & 0x0f ) );
+  transmit( 0x62u, 0x30u | ( ( m_current_minute / 10 ) & 0x0f ), 0x62u, ' ' );
+  transmit( 0x63u, 0x30u | ( ( m_current_minute % 10 ) & 0x0f ), 0x63u, ' ' );
 }
 
 void broadcast_clock::dotmatrix::
@@ -118,7 +130,8 @@ on_init() {
 void broadcast_clock::dotmatrix::
 on_test() {
   // Test mode
-  transmit( 0x07u, 0x01u );
+  m_test_mode = true;
+  transmit( 0x07u, 0x01u, 0x07u, 0x01u );
 }
 
 void broadcast_clock::dotmatrix::
@@ -130,7 +143,7 @@ init_spi() {
   buscfg.sclk_io_num = DISP_SPI_CLK;
   buscfg.quadwp_io_num = -1;
   buscfg.quadhd_io_num = -1;
-  buscfg.max_transfer_sz = 16;
+  buscfg.max_transfer_sz = 32;
 
   spi_device_interface_config_t devcfg;
   memset( &devcfg, 0x00, sizeof( spi_device_interface_config_t ) );
@@ -146,6 +159,6 @@ init_spi() {
 void broadcast_clock::dotmatrix::
 init_display() {
   // Normal mode
-  transmit( 0x04u, 0x01u | ( ( m_current_hour / 10 ) & 0x0f ) );
+  transmit( 0x04u, 0x01u, 0x04u, 0x01u );
   update();
 }

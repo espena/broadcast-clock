@@ -42,6 +42,13 @@ init() {
 }
 
 void broadcast_clock::dial::
+set_ambient_light_level( uint16_t lux ) {
+  static uint16_t current_lux = lux;
+  dial_task_queue_item item = { dial_task_message::ambient_light_level, &current_lux };
+  xQueueSend( m_task_queue, &item, 1000 );
+}
+
+void broadcast_clock::dial::
 task_loop( void *arg ) {
   ESP_LOGI( m_component_name, "Entering task loop" );
   dial_task_params *params = static_cast<dial_task_params *>( arg );
@@ -63,33 +70,40 @@ on_message( dial_task_message msg, void *arg ) {
     case dial_task_message::init:
       on_init();
       break;
-    case dial_task_message::enable:
-
-      break;
-    case dial_task_message::disable:
-
+    case dial_task_message::ambient_light_level:
+      on_ambient_light_level( *static_cast<uint16_t *>( arg ) );
       break;
   }
 }
 
 void broadcast_clock::dial::
+on_init() {
+  ESP_LOGI( m_component_name, "Initializing" );
+  init_gpio();
+  update();
+  component_loop();
+}
+
+void broadcast_clock::dial::
+on_ambient_light_level( uint16_t lux ) {
+  ESP_LOGI( m_component_name, "Ambient light: %d", lux );
+}
+
+void broadcast_clock::dial::
 update() {
 
+  gpio_set_level( DIAL_VPRG, 0 );
   gpio_set_level( DIAL_SOUT, 0 );
   gpio_set_level( DIAL_GSCLK, 0 );
   gpio_set_level( DIAL_XLAT, 0 );
   gpio_set_level( DIAL_SCLK, 0 );
-
-  gpio_set_level( DIAL_VPRG, 1 );
-  utils::micro_delay();
-  gpio_set_level( DIAL_VPRG, 0 );
 
   for( int i = 0; i < 5; i++ ) {
     for( int j = 0; j < 16; j++ ) {
       const int led_id = 60 - ( ( ( i * 16 ) + j ) - 20 );
       for( int k = 0; k < 12; k++ ) {
         utils::micro_delay();
-        if( k == 11 && led_id > m_current_seconds ) {
+        if( k == 11 && ( led_id <= m_current_seconds || led_id >= 60 ) ) {
           gpio_set_level( DIAL_SOUT, 1 );
         }
         else {
@@ -123,9 +137,9 @@ init_gpio() {
   ledc_timer_config_t timer_conf;
   memset( &timer_conf, 0x00, sizeof( ledc_timer_config_t ) );
   timer_conf.speed_mode = LEDC_LOW_SPEED_MODE;
-  timer_conf.duty_resolution = LEDC_TIMER_13_BIT;
+  timer_conf.duty_resolution = LEDC_TIMER_2_BIT;
   timer_conf.timer_num = LEDC_TIMER_0;
-  timer_conf.freq_hz = 4000;
+  timer_conf.freq_hz = 10000;
   timer_conf.clk_cfg = LEDC_AUTO_CLK;
   ESP_ERROR_CHECK( ledc_timer_config( &timer_conf ) );
 
@@ -140,16 +154,8 @@ init_gpio() {
   ledc_conf.hpoint = 0;
   ESP_ERROR_CHECK( ledc_channel_config( &ledc_conf ) );
 
-  ESP_ERROR_CHECK( ledc_set_duty( LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 4096 ) );
+  ESP_ERROR_CHECK( ledc_set_duty( LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 1 ) );
   ESP_ERROR_CHECK( ledc_update_duty( LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0 ) );
-}
-
-void broadcast_clock::dial::
-on_init() {
-  ESP_LOGI( m_component_name, "Initializing" );
-  init_gpio();
-  update();
-  component_loop();
 }
 
 void broadcast_clock::dial::

@@ -129,7 +129,7 @@ on_init_ntp() {
   config.renew_servers_after_new_IP = true;
   config.index_of_first_server = 0;
   config.ip_event_to_renew = IP_EVENT_STA_GOT_IP;
-  config.sync_cb = &wifi::on_sync;
+  config.sync_cb = &wifi::on_ntp_sync;
   esp_netif_sntp_init( &config );
   esp_netif_sntp_start();
   esp_netif_sntp_sync_wait( 500 );
@@ -173,7 +173,7 @@ init_wifi() {
 }
 
 void broadcast_clock::wifi::
-on_sync( struct timeval *now ) {
+on_ntp_sync( struct timeval *now ) {
     ESP_LOGI( m_component_name, "Time synchronized" );
     /*
     struct tm timeinfo;
