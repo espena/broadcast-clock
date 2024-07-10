@@ -14,7 +14,8 @@ using namespace espena;
 const char *broadcast_clock::dotmatrix::m_component_name = "dotmatrix";
 
 broadcast_clock::dotmatrix::
-dotmatrix() : m_current_hour( 0 ),
+dotmatrix() : m_brightness( 0x00 ),
+              m_current_hour( 0 ),
               m_current_minute( 0 ),
               m_current_second( 0 ),
               m_task_queue( nullptr ),
@@ -42,6 +43,14 @@ broadcast_clock::dotmatrix::
 void broadcast_clock::dotmatrix::
 init() {
   dotmatrix_task_queue_item item = { dotmatrix_task_message::init, nullptr };
+  xQueueSend( m_task_queue, &item, 10 );
+}
+
+void broadcast_clock::dotmatrix::
+set_ambient_light_level( uint16_t lux ) {
+  static uint16_t current_lux = 0;
+  current_lux = lux;
+  dotmatrix_task_queue_item item = { dotmatrix_task_message::ambient_light_level, &current_lux };
   xQueueSend( m_task_queue, &item, 10 );
 }
 
@@ -84,14 +93,11 @@ on_message( dotmatrix_task_message msg, void *arg ) {
     case dotmatrix_task_message::init:
       on_init();
       break;
-    case dotmatrix_task_message::enable:
-
+    case dotmatrix_task_message::ambient_light_level:
+      on_ambient_light_level( *static_cast<uint16_t *>( arg ) );
       break;
     case dotmatrix_task_message::test:
       on_test();
-      break;
-    case dotmatrix_task_message::disable:
-
       break;
   }
 }
@@ -118,6 +124,8 @@ update() {
   transmit( 0x61u, 0x30u | ( ( m_current_hour % 10 ) & 0x0f ), 0x61u, 0x30u | ( ( m_current_second % 10 ) & 0x0f ) );
   transmit( 0x62u, 0x30u | ( ( m_current_minute / 10 ) & 0x0f ), 0x62u, ' ' );
   transmit( 0x63u, 0x30u | ( ( m_current_minute % 10 ) & 0x0f ), 0x63u, ' ' );
+  transmit( 0x01u, m_brightness, 0x01u, m_brightness );
+  transmit( 0x02u, m_brightness, 0x02u, m_brightness );
 }
 
 void broadcast_clock::dotmatrix::
@@ -125,6 +133,26 @@ on_init() {
   ESP_LOGI( m_component_name, "Initializing" );
   init_spi();
   init_display();
+}
+
+void broadcast_clock::dotmatrix::
+on_ambient_light_level( int threshold ) {
+  uint8_t brightness = 0x00;
+  switch( threshold ) {
+    case 1:
+      brightness = 0x00u;
+      break;
+    case 2:
+      brightness = 0x33u;
+      break;
+    case 3:
+      brightness = 0x55u;
+      break;
+    case 4:
+      brightness = 0x77u;
+      break;
+  }
+  m_brightness = brightness;
 }
 
 void broadcast_clock::dotmatrix::

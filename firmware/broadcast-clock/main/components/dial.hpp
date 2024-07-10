@@ -3,17 +3,22 @@
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
+#include <vector>
+#include <esp_timer.h>
 
 namespace espena::broadcast_clock {
 
     class dial {
 
         static const char *m_component_name;
-        static const size_t m_component_stack_size = 4096;
+        static const size_t m_component_stack_size = 8192;
         
+        esp_timer_handle_t m_refresh_timer;
+
         QueueHandle_t m_task_queue;
 
         int m_current_seconds;
+        int m_brightness_bit;
 
         typedef struct dial_task_params_struct {
             dial *instance;
@@ -34,17 +39,17 @@ namespace espena::broadcast_clock {
 
         static void task_loop( void *arg );
 
+        static void on_refresh_timer( void *arg );
+
         void on_message( dial_task_message msg, void *arg );
-
         void on_init();
+        void on_ambient_light_level( int threshold );
 
-        void on_ambient_light_level( uint16_t lux );
-
+        void refresh();
         void update();
 
         void init_gpio();
-
-        void component_loop();
+        void init_refresh_timer();
 
     public:
 

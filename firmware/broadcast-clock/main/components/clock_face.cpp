@@ -10,9 +10,10 @@ const char *broadcast_clock::clock_face::m_component_name = "clock_face";
 broadcast_clock::clock_face::
 clock_face() : m_task_queue( nullptr ),
                m_i2c_bus( nullptr ),
-               m_ambient_sensor_interval_timer( nullptr ) {
+               m_ambient_sensor_interval_timer( nullptr ),
+               m_threshold( 0 ) {
 
-  m_task_queue = xQueueCreate( 10, sizeof( clock_face_task_queue_item ) );
+  m_task_queue = xQueueCreate( 100, sizeof( clock_face_task_queue_item ) );
 
   m_task_params.instance = this;
   m_task_params.stack_buffer = ( StackType_t * ) heap_caps_malloc( m_component_stack_size,
@@ -21,7 +22,7 @@ clock_face() : m_task_queue( nullptr ),
                       m_component_name,
                       m_component_stack_size,
                       &m_task_params,
-                      3,
+                      15,
                       m_task_params.stack_buffer,
                       &m_task_params.task_buffer );
 }
@@ -72,7 +73,7 @@ on_ambient_sensor_interval( void* arg ) {
 void broadcast_clock::clock_face::
 init( i2c_master_bus_handle_t i2c_bus ) {
   static i2c_master_bus_handle_t current_i2c_bus = i2c_bus;
-  dial_task_queue_item item = { dial_task_message::init, &current_i2c_bus };
+  clock_face_task_queue_item item = { clock_face_task_message::init, &current_i2c_bus };
   xQueueSend( m_task_queue, &item, 10 );
 }
 
@@ -84,11 +85,38 @@ init_ambient_sensor_interval_timer() {
   timer_args.arg = this;
   timer_args.name = m_component_name;
   ESP_ERROR_CHECK( esp_timer_create( &timer_args, &m_ambient_sensor_interval_timer ) );
-  ESP_ERROR_CHECK( esp_timer_start_periodic( m_ambient_sensor_interval_timer, 500000 ) );
+  ESP_ERROR_CHECK( esp_timer_start_periodic( m_ambient_sensor_interval_timer, 1000000 ) );
+}
+
+void broadcast_clock::clock_face::
+lux2threshold( uint16_t lux ) {
+  static float hysteresis = 1.0;
+  int threshold = 1;
+  if( lux > ( 60000 * hysteresis ) ) {
+    threshold = 4;
+  }
+  else if( lux > ( 20000 * hysteresis) ) {
+    threshold = 3;
+  }
+  else if( lux > ( 1000 * hysteresis ) ) {
+    threshold = 2;
+  }
+  else {
+    threshold = 1;
+  }
+  if( m_threshold == threshold  ) {
+    hysteresis = 1.0;
+  }
+  else {
+    hysteresis = m_threshold < threshold ? 0.9 : 1.1;
+  }
+  m_threshold = threshold;
 }
 
 void broadcast_clock::clock_face::
 check_ambient_light() {
   uint16_t lux = m_ambient_sensor.read();
-  m_dial.set_ambient_light_level( lux );
+  lux2threshold( lux );
+  m_dial.set_ambient_light_level( m_threshold );
+  m_dotmatrix.set_ambient_light_level( m_threshold );
 }

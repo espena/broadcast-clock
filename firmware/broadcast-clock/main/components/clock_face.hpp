@@ -12,7 +12,7 @@ namespace espena::broadcast_clock {
   class clock_face {
 
     static const char *m_component_name;
-    static const int m_component_stack_size = 512;
+    static const int m_component_stack_size = 2048;
 
     QueueHandle_t m_task_queue;
 
@@ -47,6 +47,9 @@ namespace espena::broadcast_clock {
     dial m_dial;
     dotmatrix m_dotmatrix;
     ambient_sensor m_ambient_sensor;
+
+    int m_threshold;
+    void lux2threshold( uint16_t lux );
 
   public:
 

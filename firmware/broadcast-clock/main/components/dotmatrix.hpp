@@ -14,6 +14,8 @@ namespace espena::broadcast_clock {
 
         bool m_test_mode;
         
+        uint8_t m_brightness;
+
         uint8_t m_current_hour;
         uint8_t m_current_minute;
         uint8_t m_current_second;
@@ -32,9 +34,8 @@ namespace espena::broadcast_clock {
 
         enum class dotmatrix_task_message {
             init,
-            enable,
-            test,
-            disable
+            ambient_light_level,
+            test
         };
 
         typedef struct dotmatrix_task_queue_item_struct {
@@ -47,7 +48,9 @@ namespace espena::broadcast_clock {
         void on_message( dotmatrix_task_message msg, void *arg );
 
         void on_init();
+        void on_ambient_light_level( int threshold );
         void on_test();
+
 
         void init_spi();
         void init_display();
@@ -64,6 +67,7 @@ namespace espena::broadcast_clock {
         ~dotmatrix();
         void init();
         void test();
+        void set_ambient_light_level( uint16_t lux );
 
     };
 
