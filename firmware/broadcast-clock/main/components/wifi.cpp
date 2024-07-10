@@ -11,12 +11,16 @@
 
 using namespace espena;
 
+broadcast_clock::wifi *broadcast_clock::wifi::m_app_instance = nullptr;
+
 const char *broadcast_clock::wifi::m_component_name = "wifi";
+const esp_event_base_t broadcast_clock::wifi::m_event_base = "broadcast_clock_wifi_event";
 
 broadcast_clock::wifi::
 wifi() : m_task_queue( nullptr ),
          m_current_mode( mode::station ) {
 
+  m_app_instance = this;
   m_task_queue = xQueueCreate( 10, sizeof( wifi_task_queue_item ) );
 
   m_task_params.instance = this;
@@ -52,7 +56,6 @@ on_event( void *arg,
           esp_event_base_t event_base,
           int32_t event_id,
           void *event_data ) {
-  static int retries = 0;
   wifi *instance = static_cast<wifi *>( arg );
   if( event_base == WIFI_EVENT ) {
     switch( event_id ) {
@@ -60,14 +63,10 @@ on_event( void *arg,
         esp_wifi_connect();
         break;
       case WIFI_EVENT_STA_DISCONNECTED:
-        if( retries++ < 100 ) {
-          vTaskDelay( 1000 / portTICK_PERIOD_MS );
-          esp_wifi_connect();
-          ESP_LOGI( m_component_name, "Retry connection to network %d of %d", retries, 100 );
-        }
-        else {
-          ESP_LOGE( m_component_name, "Unable to connect to WiFi network" );
-        }
+        // Retry forever
+        vTaskDelay( 1000 / portTICK_PERIOD_MS );
+        esp_wifi_connect();
+        ESP_LOGI( m_component_name, "Retry connection to network" );
         break;
     }
   }
@@ -76,7 +75,6 @@ on_event( void *arg,
       case IP_EVENT_STA_GOT_IP:
         ip_event_got_ip_t *e = static_cast<ip_event_got_ip_t *>( event_data );
         ESP_LOGI( m_component_name, "Got ip:" IPSTR, IP2STR( &( e->ip_info.ip ) ) );
-        retries = 0;
         instance->init_ntp();
         break;
     }
@@ -174,16 +172,17 @@ init_wifi() {
 
 void broadcast_clock::wifi::
 on_ntp_sync( struct timeval *now ) {
-    ESP_LOGI( m_component_name, "Time synchronized" );
-    /*
+  ESP_LOGI( m_component_name, "Time synchronized" );
+  if( m_app_instance && m_app_instance->m_event_loop_handle ) {
     struct tm timeinfo;
-    localtime_r( static_cast<time_t *>( now ), &timeinfo );
-    ESP_LOGI( m_component_name, "Time synchronized: %d-%d-%d %d:%d:%d",
-              timeinfo.tm_year + 1900,
-              timeinfo.tm_mon + 1,
-              timeinfo.tm_mday,
-              timeinfo.tm_hour,
-              timeinfo.tm_min,
-              timeinfo.tm_sec );
-    */
+    memset( &timeinfo, 0x00, sizeof( struct tm ) );
+    time_t epoch = static_cast<time_t>( now->tv_sec );
+    localtime_r( &epoch, &timeinfo );
+    esp_event_post_to( m_app_instance->m_event_loop_handle,
+                       broadcast_clock::wifi::m_event_base,
+                       broadcast_clock::wifi::WIFI_EVENT_NTP_SYNC,
+                       &timeinfo,
+                       sizeof( timeinfo ),
+                       10 );
+  }
 }

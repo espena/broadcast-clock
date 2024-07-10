@@ -5,6 +5,7 @@
 #include "dotmatrix.hpp"
 #include "ambient_sensor.hpp"
 #include <driver/i2c_master.h>
+#include <esp_event.h>
 #include <esp_timer.h>
 
 namespace espena::broadcast_clock {
@@ -15,6 +16,8 @@ namespace espena::broadcast_clock {
     static const int m_component_stack_size = 2048;
 
     QueueHandle_t m_task_queue;
+
+    esp_event_loop_handle_t m_event_loop_handle;
 
     typedef struct clock_face_task_params_struct {
         clock_face *instance;
@@ -35,7 +38,13 @@ namespace espena::broadcast_clock {
 
     static void task_loop( void *arg );
 
+    static void wifi_event_handler( void *handler_arg,
+                                    esp_event_base_t event_base,
+                                    int32_t event_id,
+                                    void *event_params );
+
     void on_message( clock_face_task_message msg, void *arg );
+    void on_ntp_sync();
     void on_init( i2c_master_bus_handle_t i2c_bus );
 
     static void on_ambient_sensor_interval( void* arg );
@@ -57,6 +66,7 @@ namespace espena::broadcast_clock {
     ~clock_face();
     void init( i2c_master_bus_handle_t i2c_bus );
     void init_ambient_sensor_interval_timer();
+    void set_event_loop_handle( esp_event_loop_handle_t h ) { m_event_loop_handle = h; };
 
   };
 

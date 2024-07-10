@@ -1,4 +1,6 @@
 #include "clock_face.hpp"
+#include "wifi.hpp"
+#include <string>
 #include <memory.h>
 #include <esp_timer.h>
 #include <esp_log.h>
@@ -9,6 +11,7 @@ const char *broadcast_clock::clock_face::m_component_name = "clock_face";
 
 broadcast_clock::clock_face::
 clock_face() : m_task_queue( nullptr ),
+               m_event_loop_handle( nullptr ),
                m_i2c_bus( nullptr ),
                m_ambient_sensor_interval_timer( nullptr ),
                m_threshold( 0 ) {
@@ -57,11 +60,44 @@ on_message( clock_face_task_message msg, void *arg ) {
 void broadcast_clock::clock_face::
 on_init( i2c_master_bus_handle_t i2c_bus ) {
   ESP_LOGI( m_component_name, "Initializing" );
-  m_dial.init();
+  if( m_event_loop_handle ) {
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::wifi::m_event_base,
+                                     broadcast_clock::wifi::WIFI_EVENT_NTP_SYNC,
+                                     wifi_event_handler,
+                                     this );
+  }
+
   m_dotmatrix.init();
   m_i2c_bus = i2c_bus;
   m_ambient_sensor.init( m_i2c_bus );
   init_ambient_sensor_interval_timer();
+}
+
+void broadcast_clock::clock_face::
+wifi_event_handler( void *handler_arg,
+                    esp_event_base_t event_base,
+                    int32_t event_id,
+                    void *event_params )
+{
+  const std::string source = ( char * ) event_base;
+  if( source == broadcast_clock::wifi::m_event_base ) {
+    broadcast_clock::clock_face *instance = static_cast<broadcast_clock::clock_face *>( handler_arg );
+    switch( event_id ) {
+      case broadcast_clock::wifi::WIFI_EVENT_NTP_SYNC:
+        instance->on_ntp_sync();
+        break;
+    }
+  }
+}
+
+void broadcast_clock::clock_face::
+on_ntp_sync() {
+  m_dial.init();
+  esp_event_handler_unregister_with( m_event_loop_handle,
+                                     broadcast_clock::wifi::m_event_base,
+                                     broadcast_clock::wifi::WIFI_EVENT_NTP_SYNC,
+                                     wifi_event_handler );
 }
 
 void broadcast_clock::clock_face::

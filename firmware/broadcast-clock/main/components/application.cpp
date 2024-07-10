@@ -9,7 +9,16 @@
 using namespace espena::broadcast_clock;
 
 application::
-application() : m_i2c_bus( nullptr ) {
+application() : m_i2c_bus( nullptr ),
+                m_event_loop_handle( nullptr ) {
+  esp_event_loop_args_t loop_args = {
+    .queue_size = 1000,
+    .task_name = "event_loop",
+    .task_priority = uxTaskPriorityGet( NULL ),
+    .task_stack_size = 4096,
+    .task_core_id = tskNO_AFFINITY
+  };
+  esp_event_loop_create( &loop_args, &m_event_loop_handle );
   
 }
 
@@ -20,12 +29,18 @@ application::
 
 void application::
 init() {
+
     init_nvs();
     init_timezone();
     init_i2c();
+
     esp_netif_init();
     esp_event_loop_create_default();
+
+    m_wifi.set_event_loop_handle( m_event_loop_handle );
     m_wifi.init( wifi::mode::station );
+
+    m_clock_face.set_event_loop_handle( m_event_loop_handle );
     m_clock_face.init( m_i2c_bus );
 }
 

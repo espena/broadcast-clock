@@ -7,12 +7,16 @@
 #include <freertos/queue.h>
 #include <esp_wifi.h>
 #include <esp_log.h>
+#include <esp_event.h>
 
 namespace espena::broadcast_clock {
 
   class wifi {
 
   public:
+
+    static const esp_event_base_t m_event_base;
+    static const uint32_t WIFI_EVENT_NTP_SYNC = 0x01u;
 
     enum class mode {
       station,
@@ -21,10 +25,13 @@ namespace espena::broadcast_clock {
 
   private:
 
+    static wifi *m_app_instance;
+
     static const char *m_component_name;
     static const size_t m_component_stack_size = 32768;
 
     QueueHandle_t m_task_queue;
+    esp_event_loop_handle_t m_event_loop_handle;
 
     mode m_current_mode;
 
@@ -66,7 +73,9 @@ namespace espena::broadcast_clock {
 
     wifi();
     ~wifi();
+
     void init( mode m = mode::station );
+    void set_event_loop_handle( esp_event_loop_handle_t h ) { m_event_loop_handle = h; };
 
   };
 

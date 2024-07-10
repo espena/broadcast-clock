@@ -9,9 +9,11 @@ namespace espena::broadcast_clock {
 
   class application {
 
-    wifi m_wifi;        
+    wifi m_wifi;
     clock_face m_clock_face;
     i2c_master_bus_handle_t m_i2c_bus;
+
+    esp_event_loop_handle_t m_event_loop_handle;
 
   public:
 
