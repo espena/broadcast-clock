@@ -1,7 +1,9 @@
 .DS_Store
 datasheets
+3d
+drawings/complete_assembly*
 firmware/broadcast-clock/build
-hardware/broascast_clock-backups
+hardware/broadcast_clock-backups
 drawings/blender
 drawings/*.stl
 drawings/*.wrl
