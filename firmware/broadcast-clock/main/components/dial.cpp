@@ -81,6 +81,9 @@ void broadcast_clock::dial::
 on_init() {
   ESP_LOGI( m_component_name, "Initializing" );
   init_gpio();
+  gpio_set_level( DIAL_BLANK, 1 );
+  utils::micro_delay();
+  gpio_set_level( DIAL_BLANK, 0 );
   init_refresh_timer();
 }
 

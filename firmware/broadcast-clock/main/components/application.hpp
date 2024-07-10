@@ -3,17 +3,32 @@
 
 #include "wifi.hpp"
 #include "clock_face.hpp"
+#include <esp_timer.h>
 #include <driver/i2c_master.h>
 
 namespace espena::broadcast_clock {
 
   class application {
 
+    static const char *m_component_name;
+
+    esp_timer_handle_t m_ap_duration_timer;
+
     wifi m_wifi;
     clock_face m_clock_face;
     i2c_master_bus_handle_t m_i2c_bus;
 
     esp_event_loop_handle_t m_event_loop_handle;
+
+    static void wifi_event_handler( void *handler_arg,
+                                    esp_event_base_t event_base,
+                                    int32_t event_id,
+                                    void *event_params );
+
+    static void on_ap_duration_timeout( void *arg );
+
+    void on_enter_config_mode();
+    void on_leave_config_mode();
 
   public:
 
@@ -23,6 +38,7 @@ namespace espena::broadcast_clock {
     void init_nvs();
     void init_timezone();
     void init_i2c();
+    void init_ap_duration_timeout();
 
   };
 

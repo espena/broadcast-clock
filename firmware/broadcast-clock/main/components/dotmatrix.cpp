@@ -107,15 +107,16 @@ transmit( uint8_t u1_command,
           uint8_t u1_data,
           uint8_t u2_command,
           uint8_t u2_data ) {
-
-  spi_transaction_t t;
-  memset( &t, 0x00, sizeof( spi_transaction_t ) );
-  uint16_t u1 = u1_data << 8 | u1_command;
-  uint16_t u2 = u2_data << 8 | u2_command;
-  uint32_t payload = u1 << 16 | u2;
-  t.length = 32;
-  t.tx_buffer = &payload;
-  ESP_ERROR_CHECK( spi_device_transmit( m_spi, &t ) );
+  if( m_spi ) {
+    spi_transaction_t t;
+    memset( &t, 0x00, sizeof( spi_transaction_t ) );
+    uint16_t u1 = u1_data << 8 | u1_command;
+    uint16_t u2 = u2_data << 8 | u2_command;
+    uint32_t payload = u1 << 16 | u2;
+    t.length = 32;
+    t.tx_buffer = &payload;
+    ESP_ERROR_CHECK( spi_device_transmit( m_spi, &t ) );
+  }
 }
 
 void broadcast_clock::dotmatrix::
