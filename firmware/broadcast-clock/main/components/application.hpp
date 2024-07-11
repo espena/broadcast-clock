@@ -3,6 +3,7 @@
 
 #include "wifi.hpp"
 #include "clock_face.hpp"
+#include "captive_portal_dns.hpp"
 #include <esp_timer.h>
 #include <driver/i2c_master.h>
 
@@ -15,6 +16,7 @@ namespace espena::broadcast_clock {
     esp_timer_handle_t m_ap_duration_timer;
 
     wifi m_wifi;
+    captive_portal_dns m_captive_portal_dns;
     clock_face m_clock_face;
     i2c_master_bus_handle_t m_i2c_bus;
 

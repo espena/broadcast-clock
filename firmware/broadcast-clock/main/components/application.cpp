@@ -97,11 +97,14 @@ on_enter_config_mode() {
     ESP_ERROR_CHECK( esp_timer_stop( m_ap_duration_timer ) );
     ESP_ERROR_CHECK( esp_timer_delete( m_ap_duration_timer ) );
     m_ap_duration_timer = nullptr;
+    m_captive_portal_dns.init();
+    m_captive_portal_dns.start();
   }
 }
 
 void application::
 on_leave_config_mode() {
+  m_captive_portal_dns.stop();
   m_wifi.init( wifi::mode::station );
 }
 

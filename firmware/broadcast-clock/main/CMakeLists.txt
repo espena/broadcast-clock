@@ -3,6 +3,7 @@ idf_component_register( SRCS "app_main.cpp"
                              "components/clock_face.cpp"
                              "components/ambient_sensor.cpp"
                              "components/wifi.cpp"
+                             "components/captive_portal_dns.cpp"
                              "components/dial.cpp"
                              "components/dotmatrix.cpp"
                         INCLUDE_DIRS "." )
