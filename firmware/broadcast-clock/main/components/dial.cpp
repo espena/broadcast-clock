@@ -111,6 +111,7 @@ refresh() {
   struct tm timeinfo;
   localtime_r( &now, &timeinfo );
   gpio_set_level( DIAL_BLANK, 1 );
+  utils::micro_delay();
   if( m_current_seconds != timeinfo.tm_sec ) {
       m_current_seconds = timeinfo.tm_sec;
       update();
