@@ -49,6 +49,12 @@ init() {
 }
 
 void broadcast_clock::dotmatrix::
+start() {
+  dotmatrix_task_queue_item item = { dotmatrix_task_message::start, nullptr };
+  xQueueSend( m_task_queue, &item, 10 );
+}
+
+void broadcast_clock::dotmatrix::
 set_ambient_light_level( uint16_t lux ) {
   static uint16_t current_lux = 0;
   current_lux = lux;
@@ -108,6 +114,9 @@ on_message( dotmatrix_task_message msg, void *arg ) {
     case dotmatrix_task_message::init:
       on_init();
       break;
+    case dotmatrix_task_message::start:
+      on_start();
+      break;
     case dotmatrix_task_message::display:
       on_display( static_cast<display_message *>( arg ) );
       break;
@@ -139,7 +148,7 @@ transmit( uint8_t u1_command,
 
 void broadcast_clock::dotmatrix::
 update() {
-  if( !m_message_mode ) {
+  if( !m_message_mode && !m_init_mode ) {
     transmit( 0x60u, 0x30u | ( ( m_current_hour / 10 ) & 0x0f ), 0x60u, 0x30u | ( ( m_current_second / 10 ) & 0x0f ) );
     transmit( 0x61u, 0x30u | ( ( m_current_hour % 10 ) & 0x0f ), 0x61u, 0x30u | ( ( m_current_second % 10 ) & 0x0f ) );
     transmit( 0x62u, 0x30u | ( ( m_current_minute / 10 ) & 0x0f ), 0x62u, ' ' );
@@ -154,6 +163,14 @@ on_init() {
   ESP_LOGI( m_component_name, "Initializing" );
   init_spi();
   init_display();
+  m_init_mode = true;
+  display_message msg = { "  ", "Init", "  " };
+  set_text( &msg );
+}
+
+void broadcast_clock::dotmatrix::
+on_start() {
+  m_init_mode = false;
 }
 
 void broadcast_clock::dotmatrix::
@@ -179,7 +196,15 @@ on_ambient_light_level( int threshold ) {
 void broadcast_clock::dotmatrix::
 on_display( display_message *msg ) {
   m_message_mode = ( msg == nullptr ) ? false : true;
-  if( m_message_mode &&
+  if( m_message_mode ) {
+    set_text( msg );
+  }
+}
+
+void broadcast_clock::dotmatrix::
+set_text( display_message *msg ) {
+
+  if( msg &&
       strlen( msg->top ) == 2 &&
       strlen( msg->middle ) == 4 &&
       strlen( msg->bottom ) == 2 ) {

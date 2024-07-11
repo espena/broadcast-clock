@@ -167,6 +167,7 @@ on_init( wifi::mode m ) {
 void broadcast_clock::wifi::
 on_init_ntp() {
   ESP_LOGI( m_component_name, "Initializing NTP" );
+  esp_netif_sntp_deinit();
   esp_sntp_config_t config;
   memset( &config, 0x00, sizeof( esp_sntp_config_t ) );
   config.start = true;
@@ -179,6 +180,7 @@ on_init_ntp() {
   esp_netif_sntp_init( &config );
   esp_netif_sntp_start();
   esp_netif_sntp_sync_wait( 500 );
+  sntp_set_sync_interval( 300000 );
 }
 
 void broadcast_clock::wifi::

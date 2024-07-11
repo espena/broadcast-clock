@@ -111,7 +111,10 @@ wifi_event_handler( void *handler_arg,
 
 void broadcast_clock::clock_face::
 on_ntp_sync() {
+
   m_dial.init();
+  m_dotmatrix.start();
+
   esp_event_handler_unregister_with( m_event_loop_handle,
                                      broadcast_clock::wifi::m_event_base,
                                      broadcast_clock::wifi::WIFI_EVENT_NTP_SYNC,
