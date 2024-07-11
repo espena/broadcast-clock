@@ -47,6 +47,9 @@ namespace espena::broadcast_clock {
     void on_ntp_sync();
     void on_init( i2c_master_bus_handle_t i2c_bus );
 
+    void on_enter_config_mode();
+    void on_leave_config_mode();
+
     static void on_ambient_sensor_interval( void* arg );
     void check_ambient_light();
 

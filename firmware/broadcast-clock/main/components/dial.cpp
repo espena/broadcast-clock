@@ -166,7 +166,7 @@ init_gpio() {
   timer_conf.speed_mode = LEDC_LOW_SPEED_MODE;
   timer_conf.duty_resolution = LEDC_TIMER_2_BIT;
   timer_conf.timer_num = LEDC_TIMER_0;
-  timer_conf.freq_hz = 15000;
+  timer_conf.freq_hz = 20000;
   timer_conf.clk_cfg = LEDC_AUTO_CLK;
   ESP_ERROR_CHECK( ledc_timer_config( &timer_conf ) );
   ledc_channel_config_t ledc_conf;

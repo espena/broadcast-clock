@@ -66,6 +66,18 @@ on_init( i2c_master_bus_handle_t i2c_bus ) {
                                      broadcast_clock::wifi::WIFI_EVENT_NTP_SYNC,
                                      wifi_event_handler,
                                      this );
+
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::wifi::m_event_base,
+                                     broadcast_clock::wifi::ENTER_CONFIG_MODE,
+                                     wifi_event_handler,
+                                     this );
+
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::wifi::m_event_base,
+                                     broadcast_clock::wifi::LEAVE_CONFIG_MODE,
+                                     wifi_event_handler,
+                                     this );
   }
 
   m_dotmatrix.init();
@@ -87,6 +99,12 @@ wifi_event_handler( void *handler_arg,
       case broadcast_clock::wifi::WIFI_EVENT_NTP_SYNC:
         instance->on_ntp_sync();
         break;
+      case broadcast_clock::wifi::ENTER_CONFIG_MODE:
+        instance->on_enter_config_mode();
+        break;
+      case broadcast_clock::wifi::LEAVE_CONFIG_MODE:
+        instance->on_leave_config_mode();
+        break;
     }
   }
 }
@@ -98,6 +116,17 @@ on_ntp_sync() {
                                      broadcast_clock::wifi::m_event_base,
                                      broadcast_clock::wifi::WIFI_EVENT_NTP_SYNC,
                                      wifi_event_handler );
+}
+
+void broadcast_clock::clock_face::
+on_leave_config_mode() {
+  m_dotmatrix.display( nullptr );
+}
+
+void broadcast_clock::clock_face::
+on_enter_config_mode() {
+  broadcast_clock::dotmatrix::display_message msg = { "  ", "Conf", "  " };
+  m_dotmatrix.display( &msg );
 }
 
 void broadcast_clock::clock_face::

@@ -9,10 +9,21 @@ namespace espena::broadcast_clock {
 
     class dotmatrix {
 
+    public:
+
+        typedef struct display_message_struct {
+            const char *top;
+            const char *middle;
+            const char *bottom;
+        } display_message;
+
+    private:
+
         static const char *m_component_name;
         static const size_t m_component_stack_size = 4096;
 
         bool m_test_mode;
+        bool m_message_mode;
         
         uint8_t m_brightness;
 
@@ -35,6 +46,7 @@ namespace espena::broadcast_clock {
         enum class dotmatrix_task_message {
             init,
             ambient_light_level,
+            display,
             test
         };
 
@@ -49,6 +61,7 @@ namespace espena::broadcast_clock {
 
         void on_init();
         void on_ambient_light_level( int threshold );
+        void on_display( display_message *msg );
         void on_test();
 
 
@@ -65,9 +78,13 @@ namespace espena::broadcast_clock {
 
         dotmatrix();
         ~dotmatrix();
+
         void init();
         void test();
+
         void set_ambient_light_level( uint16_t lux );
+
+        void display( display_message *msg );
 
     };
 

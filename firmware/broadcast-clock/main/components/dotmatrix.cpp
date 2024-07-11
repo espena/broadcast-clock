@@ -1,6 +1,7 @@
 #include "dotmatrix.hpp"
 #include "../gpio_mapping.hpp"
 #include <memory.h>
+#include <string.h>
 #include <time.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -14,7 +15,8 @@ using namespace espena;
 const char *broadcast_clock::dotmatrix::m_component_name = "dotmatrix";
 
 broadcast_clock::dotmatrix::
-dotmatrix() : m_brightness( 0x00 ),
+dotmatrix() : m_message_mode( false ),
+              m_brightness( 0x00 ),
               m_current_hour( 0 ),
               m_current_minute( 0 ),
               m_current_second( 0 ),
@@ -55,6 +57,20 @@ set_ambient_light_level( uint16_t lux ) {
 }
 
 void broadcast_clock::dotmatrix::
+display( display_message *msg ) {
+  static display_message current_msg;
+  if( msg == nullptr ) {
+    dotmatrix_task_queue_item item = { dotmatrix_task_message::display, nullptr };
+    xQueueSend( m_task_queue, &item, 10 );
+  }
+  else {
+    memcpy( &current_msg, msg, sizeof( display_message ) );
+    dotmatrix_task_queue_item item = { dotmatrix_task_message::display, &current_msg };
+    xQueueSend( m_task_queue, &item, 10 );
+  }
+}
+
+void broadcast_clock::dotmatrix::
 test() {
   dotmatrix_task_queue_item item = { dotmatrix_task_message::test, nullptr };
   xQueueSend( m_task_queue, &item, 10 );
@@ -88,10 +104,12 @@ task_loop( void *arg ) {
 
 void broadcast_clock::dotmatrix::
 on_message( dotmatrix_task_message msg, void *arg ) {
-  dotmatrix_task_queue_item *item = nullptr;
   switch( msg ) {
     case dotmatrix_task_message::init:
       on_init();
+      break;
+    case dotmatrix_task_message::display:
+      on_display( static_cast<display_message *>( arg ) );
       break;
     case dotmatrix_task_message::ambient_light_level:
       on_ambient_light_level( *static_cast<uint16_t *>( arg ) );
@@ -121,10 +139,12 @@ transmit( uint8_t u1_command,
 
 void broadcast_clock::dotmatrix::
 update() {
-  transmit( 0x60u, 0x30u | ( ( m_current_hour / 10 ) & 0x0f ), 0x60u, 0x30u | ( ( m_current_second / 10 ) & 0x0f ) );
-  transmit( 0x61u, 0x30u | ( ( m_current_hour % 10 ) & 0x0f ), 0x61u, 0x30u | ( ( m_current_second % 10 ) & 0x0f ) );
-  transmit( 0x62u, 0x30u | ( ( m_current_minute / 10 ) & 0x0f ), 0x62u, ' ' );
-  transmit( 0x63u, 0x30u | ( ( m_current_minute % 10 ) & 0x0f ), 0x63u, ' ' );
+  if( !m_message_mode ) {
+    transmit( 0x60u, 0x30u | ( ( m_current_hour / 10 ) & 0x0f ), 0x60u, 0x30u | ( ( m_current_second / 10 ) & 0x0f ) );
+    transmit( 0x61u, 0x30u | ( ( m_current_hour % 10 ) & 0x0f ), 0x61u, 0x30u | ( ( m_current_second % 10 ) & 0x0f ) );
+    transmit( 0x62u, 0x30u | ( ( m_current_minute / 10 ) & 0x0f ), 0x62u, ' ' );
+    transmit( 0x63u, 0x30u | ( ( m_current_minute % 10 ) & 0x0f ), 0x63u, ' ' );
+  }
   transmit( 0x01u, m_brightness, 0x01u, m_brightness );
   transmit( 0x02u, m_brightness, 0x02u, m_brightness );
 }
@@ -154,6 +174,20 @@ on_ambient_light_level( int threshold ) {
       break;
   }
   m_brightness = brightness;
+}
+
+void broadcast_clock::dotmatrix::
+on_display( display_message *msg ) {
+  m_message_mode = ( msg == nullptr ) ? false : true;
+  if( m_message_mode &&
+      strlen( msg->top ) == 2 &&
+      strlen( msg->middle ) == 4 &&
+      strlen( msg->bottom ) == 2 ) {
+    transmit( 0x60u, msg->middle[ 0 ], 0x60u, msg->top[ 0 ] );
+    transmit( 0x61u, msg->middle[ 1 ], 0x61u, msg->top[ 1 ] );
+    transmit( 0x62u, msg->middle[ 2 ], 0x62u, msg->bottom[ 0 ] );
+    transmit( 0x63u, msg->middle[ 3 ], 0x62u, msg->bottom[ 1 ] );
+  }
 }
 
 void broadcast_clock::dotmatrix::
