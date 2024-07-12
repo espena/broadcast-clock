@@ -1,5 +1,7 @@
 #include "application.hpp"
 #include "clock_face.hpp"
+#include "captive_portal_dns.hpp"
+#include "captive_portal_http.hpp"
 #include "../gpio_mapping.hpp"
 #include <string>
 #include <memory.h>
@@ -99,12 +101,15 @@ on_enter_config_mode() {
     m_ap_duration_timer = nullptr;
     m_captive_portal_dns.init();
     m_captive_portal_dns.start();
+    m_captive_portal_http.init();
+    m_captive_portal_http.start();
   }
 }
 
 void application::
 on_leave_config_mode() {
   m_captive_portal_dns.stop();
+  m_captive_portal_http.stop();
   m_wifi.init( wifi::mode::station );
 }
 

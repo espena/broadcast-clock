@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Broadcast Clock configuration</title>
+    <style>
+      html, body {
+        font-family: Arial, sans-serif;
+        padding: 0.5em;
+        margin: 0;
+        background-color: #eee;
+      }
+      body>div {
+        max-width: 40em;
+        margin: auto;
+        border: 1em solid #000;
+        background-color: #fff;
+        padding: 1em;
+      }
+      form legend {
+        font-size: 1.1em;
+        font-weight: bold;
+        color: #800;
+      }
+      fieldset {
+        margin-bottom: 1em;
+      }
+      .actions {
+        text-align: right;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <h1>Broadcast clock</h1>
+      <h2>Control Panel</h2>
+      <form>
+        <fieldset>
+          <legend>Time settings</legend>
+          <label for="time_zone">Time zone:</label>
+            <select name="time_zone" id="time_zone">
+              <option value="CET-1CEST,M3.5.0,M10.5.0/3">Central European Time (CET)</option>
+              <option value="EST5EDT,M3.2.0,M11.1.0">Eastern Standard Time (EST)</option>
+              <option value="PST8PDT,M3.2.0,M11.1.0">Pacific Standard Time (PST)</option>
+              <option value="GMT0BST,M3.5.0/1,M10.5.0">Greenwich Mean Time (GMT)</option>
+              <option value="EET-2EEST,M3.5.0/3,M10.5.0/4">Eastern European Time (EET)</option>
+              <option value="MSK-3">Moscow Standard Time (MSK)</option>
+              <option value="JST-9">Japan Standard Time (JST)</option>
+              <option value="AEST-10AEDT,M10.1.0,M4.1.0/3">Australian Eastern Standard Time (AEST)</option>
+              <option value="NZST-12NZDT,M9.5.0,M4.1.0/3">New Zealand Standard Time (NZST)</option>
+              <option value="IST-5:30">Indian Standard Time (IST)</option>
+              <option value="CST6CDT,M3.2.0,M11.1.0">Central Standard Time (CST)</option>
+              <option value="MST7MDT,M3.2.0,M11.1.0">Mountain Standard Time (MST)</option>
+              <option value="HST10HDT,M3.2.0,M11.1.0">Hawaii Standard Time (HST)</option>
+              <option value="AKST9AKDT,M3.2.0,M11.1.0">Alaska Standard Time (AKST)</option>
+              <option value="WET0WEST,M3.5.0/1,M10.5.0">Western European Time (WET)</option>
+              <option value="ART-3">Argentina Time (ART)</option>
+              <option value="BRT-3">Brasília Time (BRT)</option>
+              <option value="CLT-4">Chile Standard Time (CLT)</option>
+              <option value="COT-5">Colombia Time (COT)</option>
+              <option value="WAT-1">West Africa Time (WAT)</option>
+              <option value="CAT-2">Central Africa Time (CAT)</option>
+              <option value="EAT-3">East Africa Time (EAT)</option>
+              <option value="SAST-2">South Africa Standard Time (SAST)</option>
+              <option value="KST-9">Korea Standard Time (KST)</option>
+              <option value="HKT-8">Hong Kong Time (HKT)</option>
+              <option value="SGT-8">Singapore Time (SGT)</option>
+              <option value="AWST-8">Australian Western Standard Time (AWST)</option>
+              <option value="ACST-9:30ACDT,M10.1.0,M4.1.0/3">Australian Central Standard Time (ACST)</option>
+            </select>
+        </fieldset>
+        <fieldset>
+          <legend>Display settings</legend>
+          <label for="clock_format">Clock format:</label>
+            <select name="clock_format" id="clock_format">
+              <option value="24h">24-hour format</option>
+              <option value="12h">12-hour format</option>
+            </select>
+        </fieldset>
+        <fieldset class="actions">
+          <input type="submit" value="Save settings">
+        </fieldset>
+      </form>
+    </div>
+  </body>
+</html>
