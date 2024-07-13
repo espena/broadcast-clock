@@ -55,5 +55,6 @@ read() {
                                                 buf_lux_val,
                                                 sizeof( buf_lux_val ),
                                                 -1 ) );
+  ESP_LOGI( m_component_name, "Reading ALS: %d", ( buf_lux_val[ 0 ] << 8 ) | buf_lux_val[ 1 ] );
   return ( buf_lux_val[ 0 ] << 8 ) | buf_lux_val[ 1 ];
 }

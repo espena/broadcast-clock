@@ -7,7 +7,7 @@
     <title>Broadcast Clock configuration</title>
     <style>
       * {
-        box-sizing:content-box;
+        box-sizing: border-box;
       }
       html, body {
         font-family: Arial, sans-serif;
@@ -16,13 +16,26 @@
         color: #000;
         background-color: #ddd;
       }
+      h1, h2 {
+        margin: 0;
+      }
+      h1 {
+        font-size: 1.65em;
+      }
+      h2 {
+        border-bottom: solid 1px #ddd;
+        font-size: 1em;
+        padding-bottom: 0.25em;
+      }
       form {
         margin-top: 3em;
         position: relative;
+        height: 330px;
       }
       form legend {
         box-sizing: border-box;
-        font-size: 1.1em;
+        display: block;
+        font-size: 1em;
         font-weight: bold;
         display: block;
         position: absolute;
@@ -31,10 +44,13 @@
         width: 8em;
         height: 2em;
         border-radius: 5px 5px 0 0;
-        background-color: #fff;
+        background-color: #eee;
         cursor: pointer;
-        box-shadow: 0px 0px 9px -3px rgba(0,0,0,0.75);
+        border-style: solid solid none solid;
+        border-width: 1px;
+        border-color: #aaa;
       }
+      form .time { z-index: 1; }
       form .time legend { left: 0; }
       form .display legend { left: 8em; }
       form .wifi legend { left: 16em; }
@@ -49,8 +65,16 @@
         padding: 1em 1em 0.75em 1em;
         margin-bottom: 1em;
         background-color: #fff;
-        border: none;
-        box-shadow: 0px 0px 9px -3px rgba(0,0,0,0.75);
+        border-style: solid;
+        border-width: 1px;
+        border-color: #aaa;
+        z-index: 0;
+      }
+      fieldset.active {
+        z-index: 1;
+      }
+      fieldset.active legend {
+        background-color: #fff;
       }
       fieldset>div>label {
         display: inline-block;
@@ -70,7 +94,10 @@
         min-width: 5em;
         text-align: right;
       }
-      select,
+      input[type="text"],
+      input[type="password"] {
+        display: block;
+      }
       input[type="text"],
       input[type="password"] {
         padding: 1em;
@@ -80,17 +107,23 @@
         margin-right: 2em;
       }
       input[type="submit"] {
-        display: inline-block;
+        display: block;
+        position: absolute;
+        top: auto;
+        right: 1px;
+        bottom: 0;
+        left: auto;
         padding: 1em 2em;
+        cursor: pointer;
       }
       .actions {
         text-align: right;
       }
       body>div {
-        max-width: 40em;
+        width: 100%;
+        max-width: 70em;
         height: 30em;
-        margin: 4em auto;
-        border: 2em solid #000;
+        margin: auto;
         background-color: #fff;
         padding: 1em;
       }
@@ -99,9 +132,9 @@
   <body>
     <div>
       <h1>Broadcast clock</h1>
-      <h2>Configuration</h2>
+      <h2>Configuration and settings</h2>
       <form>
-        <fieldset class="time">
+        <fieldset class="time active">
           <legend>Time</legend>
           <div>
             <label for="time_zone">Time zone</label>
@@ -200,9 +233,7 @@
             </div>
           </div>
         </fieldset>
-        <fieldset class="actions">
-          <input type="submit" value="Save settings">
-        </fieldset>
+        <input type="submit" value="Save settings">
       </form>
     </div>
     <script>
@@ -210,9 +241,9 @@
       tabs.forEach( ( tab ) => {
         tab.addEventListener( 'click', ( event ) => {
           tabs.forEach( ( tab ) => {
-            tab.style.zIndex = 0;
+            tab.classList.remove( 'active' );
           } );
-          tab.style.zIndex = 1;
+          tab.classList.add( 'active' );
         } )
       } );
     </script>

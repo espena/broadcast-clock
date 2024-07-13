@@ -94,7 +94,7 @@ on_ambient_light_level( int threshold ) {
       m_brightness_bit = 7;
       break;
     case 2:
-      m_brightness_bit = 4;
+      m_brightness_bit = 3;
       break;
     case 3:
       m_brightness_bit = 2;
