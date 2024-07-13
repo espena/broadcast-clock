@@ -169,8 +169,11 @@ lux2threshold( uint16_t lux ) {
   else if( lux > ( 1000 * hysteresis ) ) {
     threshold = 2;
   }
-  else {
+  else if ( lux > ( 100 * hysteresis ) ) {
     threshold = 1;
+  }
+  else {
+    threshold = 0;
   }
   if( m_threshold == threshold  ) {
     hysteresis = 1.0;

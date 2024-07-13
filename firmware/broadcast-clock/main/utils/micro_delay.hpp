@@ -13,7 +13,6 @@ namespace espena::utils {
     __asm__ __volatile__ ("nop");
     __asm__ __volatile__ ("nop");
     __asm__ __volatile__ ("nop");
-    __asm__ __volatile__ ("nop");
   }
 }
 

@@ -6,83 +6,215 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Broadcast Clock configuration</title>
     <style>
+      * {
+        box-sizing:content-box;
+      }
       html, body {
         font-family: Arial, sans-serif;
         padding: 0.5em;
         margin: 0;
-        background-color: #eee;
+        color: #000;
+        background-color: #ddd;
       }
-      body>div {
-        max-width: 40em;
-        margin: auto;
-        border: 1em solid #000;
-        background-color: #fff;
-        padding: 1em;
+      form {
+        margin-top: 3em;
+        position: relative;
       }
       form legend {
+        box-sizing: border-box;
         font-size: 1.1em;
         font-weight: bold;
-        color: #800;
+        display: block;
+        position: absolute;
+        padding: 0.5em 1em;
+        top: -2em;
+        width: 8em;
+        height: 2em;
+        border-radius: 5px 5px 0 0;
+        background-color: #fff;
+        cursor: pointer;
+        box-shadow: 0px 0px 9px -3px rgba(0,0,0,0.75);
       }
+      form .time legend { left: 0; }
+      form .display legend { left: 8em; }
+      form .wifi legend { left: 16em; }
+      form .ntp legend { left: 24em; }
       fieldset {
+        position: absolute;
+        height: 270px;
+        top: 0;
+        right: 0;
+        bottom: auto;
+        left: 0;
+        padding: 1em 1em 0.75em 1em;
         margin-bottom: 1em;
+        background-color: #fff;
+        border: none;
+        box-shadow: 0px 0px 9px -3px rgba(0,0,0,0.75);
+      }
+      fieldset>div>label {
+        display: inline-block;
+        min-width: 6.5em;
+        margin-bottom: 0.5em;
+        font-weight: bold;
+      }
+      fieldset>div {
+        margin-bottom: 1em;
+      }
+      fieldset>div>div {
+        padding-top: 0.5em;
+        padding-bottom: 0.5em;
+      }
+      fieldset>div>div>label {
+        display: inline-block;
+        min-width: 5em;
+        text-align: right;
+      }
+      select,
+      input[type="text"],
+      input[type="password"] {
+        padding: 1em;
+        width: 40em;
+      }
+      input[type="radio"] {
+        margin-right: 2em;
+      }
+      input[type="submit"] {
+        display: inline-block;
+        padding: 1em 2em;
       }
       .actions {
         text-align: right;
+      }
+      body>div {
+        max-width: 40em;
+        height: 30em;
+        margin: 4em auto;
+        border: 2em solid #000;
+        background-color: #fff;
+        padding: 1em;
       }
     </style>
   </head>
   <body>
     <div>
       <h1>Broadcast clock</h1>
-      <h2>Control Panel</h2>
+      <h2>Configuration</h2>
       <form>
-        <fieldset>
-          <legend>Time settings</legend>
-          <label for="time_zone">Time zone:</label>
-            <select name="time_zone" id="time_zone">
-              <option value="CET-1CEST,M3.5.0,M10.5.0/3">Central European Time (CET)</option>
-              <option value="EST5EDT,M3.2.0,M11.1.0">Eastern Standard Time (EST)</option>
-              <option value="PST8PDT,M3.2.0,M11.1.0">Pacific Standard Time (PST)</option>
-              <option value="GMT0BST,M3.5.0/1,M10.5.0">Greenwich Mean Time (GMT)</option>
-              <option value="EET-2EEST,M3.5.0/3,M10.5.0/4">Eastern European Time (EET)</option>
-              <option value="MSK-3">Moscow Standard Time (MSK)</option>
-              <option value="JST-9">Japan Standard Time (JST)</option>
-              <option value="AEST-10AEDT,M10.1.0,M4.1.0/3">Australian Eastern Standard Time (AEST)</option>
-              <option value="NZST-12NZDT,M9.5.0,M4.1.0/3">New Zealand Standard Time (NZST)</option>
-              <option value="IST-5:30">Indian Standard Time (IST)</option>
-              <option value="CST6CDT,M3.2.0,M11.1.0">Central Standard Time (CST)</option>
-              <option value="MST7MDT,M3.2.0,M11.1.0">Mountain Standard Time (MST)</option>
-              <option value="HST10HDT,M3.2.0,M11.1.0">Hawaii Standard Time (HST)</option>
-              <option value="AKST9AKDT,M3.2.0,M11.1.0">Alaska Standard Time (AKST)</option>
-              <option value="WET0WEST,M3.5.0/1,M10.5.0">Western European Time (WET)</option>
-              <option value="ART-3">Argentina Time (ART)</option>
-              <option value="BRT-3">Brasília Time (BRT)</option>
-              <option value="CLT-4">Chile Standard Time (CLT)</option>
-              <option value="COT-5">Colombia Time (COT)</option>
-              <option value="WAT-1">West Africa Time (WAT)</option>
-              <option value="CAT-2">Central Africa Time (CAT)</option>
-              <option value="EAT-3">East Africa Time (EAT)</option>
-              <option value="SAST-2">South Africa Standard Time (SAST)</option>
-              <option value="KST-9">Korea Standard Time (KST)</option>
-              <option value="HKT-8">Hong Kong Time (HKT)</option>
-              <option value="SGT-8">Singapore Time (SGT)</option>
-              <option value="AWST-8">Australian Western Standard Time (AWST)</option>
-              <option value="ACST-9:30ACDT,M10.1.0,M4.1.0/3">Australian Central Standard Time (ACST)</option>
-            </select>
+        <fieldset class="time">
+          <legend>Time</legend>
+          <div>
+            <label for="time_zone">Time zone</label>
+            <input type="text" list="tz_list" name="time_zone" id="time_zone" />
+            <datalist id="tz_list">
+              <option value="CET-1CEST,M3.5.0,M10.5.0/3">
+              <option value="EST5EDT,M3.2.0,M11.1.0">
+              <option value="PST8PDT,M3.2.0,M11.1.0">
+              <option value="GMT0BST,M3.5.0/1,M10.5.0">
+              <option value="EET-2EEST,M3.5.0/3,M10.5.0/4">
+              <option value="MSK-3">
+              <option value="JST-9">
+              <option value="AEST-10AEDT,M10.1.0,M4.1.0/3">
+              <option value="NZST-12NZDT,M9.5.0,M4.1.0/3">
+              <option value="IST-5:30">
+              <option value="CST6CDT,M3.2.0,M11.1.0">
+              <option value="MST7MDT,M3.2.0,M11.1.0">
+              <option value="HST10HDT,M3.2.0,M11.1.0">
+              <option value="AKST9AKDT,M3.2.0,M11.1.0">
+              <option value="WET0WEST,M3.5.0/1,M10.5.0">
+              <option value="ART-3">
+              <option value="BRT-3">
+              <option value="CLT-4">
+              <option value="COT-5">
+              <option value="WAT-1">
+              <option value="CAT-2">
+              <option value="EAT-3">
+              <option value="SAST-2">
+              <option value="KST-9">
+              <option value="HKT-8">
+              <option value="SGT-8">
+              <option value="AWST-8">
+              <option value="ACST-9:30ACDT,M10.1.0,M4.1.0/3">
+            </datalist>
+          </div>
         </fieldset>
-        <fieldset>
-          <legend>Display settings</legend>
-          <label for="clock_format">Clock format:</label>
-            <select name="clock_format" id="clock_format">
-              <option value="24h">24-hour format</option>
-              <option value="12h">12-hour format</option>
-            </select>
+        <fieldset class="display">
+          <legend>Display</legend>
+          <div>
+            <label>Dial style</label>
+            <div>
+              <label for="countup">Countup</label><input type="radio" value="u" name="dial_style" id="countup" />
+              <label for="countdown">Countdown</label><input type="radio" value="d" name="dial_style" id="countdown" />
+            </div>
+          </div>
+          <div>
+            <label>Time format</label>
+            <div>
+              <label for="12h">12 hour</label><input type="radio" value="12h" name="time_format" id="12h" />
+              <label for="24h">24 hour</label><input type="radio" value="24h" name="time_format" id="24h" />
+            </div>
+          </div>
+        </fieldset>
+        <fieldset class="wifi">
+          <legend>Wifi</legend>
+          <div>
+            <label for="ssid">Network</label>
+            <input type="text" name="ssid" list="ssid_list" id="ssid">
+            <datalist id="ssid_list">
+              <option __ssid_selected__ value="MyNetwork">
+              <option __ssid_selected__ value="AnotherNetwork">
+            </datalist>
+          </div>
+          <div>
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password">
+          </div>
+        </fieldset>
+        <fieldset class="ntp">
+          <legend>Time server</legend>
+          <div>
+            <label for="ntp">NTP pool</label>
+            <input type="text" name="ntp" list="ntp_list" id="ntp">
+            <datalist id="ntp_list">
+              <option value="pool.ntp.org">
+              <option value="time.google.com">
+              <option value="time.windows.com">
+              <option value="time.apple.com">
+              <option value="time.nist.gov">
+              <option value="ntp.ubuntu.com">
+              <option value="europe.pool.ntp.org">
+              <option value="north-america.pool.ntp.org">
+              <option value="asia.pool.ntp.org">
+              <option value="oceania.pool.ntp.org">
+              <option value="south-america.pool.ntp.org">
+              <option value="africa.pool.ntp.org">
+            </datalist>
+          </div>
+          <div>
+            <label>Update interval</label>
+            <div>
+              <label for="5min">5 minutes</label><input type="radio" value="5min" name="time_format" id="5min" />
+              <label for="15min">15 minutes</label><input type="radio" value="15min" name="time_format" id="15min" />
+              <label for="30min">30 minutes</label><input type="radio" value="30min" name="time_format" id="30min" />
+              <label for="60min">60 minutes</label><input type="radio" value="60min" name="time_format" id="60min" />
+            </div>
+          </div>
         </fieldset>
         <fieldset class="actions">
           <input type="submit" value="Save settings">
         </fieldset>
       </form>
     </div>
+    <script>
+      var tabs = document.querySelectorAll( 'form fieldset' );
+      tabs.forEach( ( tab ) => {
+        tab.addEventListener( 'click', ( event ) => {
+          tabs.forEach( ( tab ) => {
+            tab.style.zIndex = 0;
+          } );
+          tab.style.zIndex = 1;
+        } )
+      } );
+    </script>
   </body>
 </html>

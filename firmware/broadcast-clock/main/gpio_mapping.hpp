@@ -10,6 +10,7 @@
 #define DIAL_DCPRG  GPIO_NUM_23
 #define DIAL_VPRG   GPIO_NUM_19
 #define DIAL_BLANK  GPIO_NUM_18
+#define DIAL_XERR   GPIO_NUM_39
 
 // Dot matrix GPIO mapping
 #define DISP_SPI_CS GPIO_NUM_15
