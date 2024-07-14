@@ -6,6 +6,6 @@ Digital precision studio/broadcast clock with WiFi configuration, NTP and GPS ti
 
 The enclosure is an 25x25 cm [IKEA "Sannahed"](https://www.ikea.com/us/en/p/sannahed-frame-black-60459118/) photo frame, which is deep enough to contain the circuitry. I replaced the provided plexi glass with a dark acrylic glass plate.
 
-When powered on, the clock will expose an administration wifi network for 30 seconds. Connecting to the network from a smart phone, tablet or PC will bring up the clock's control panel.
+There are no traditional buttons to control the clock. Instead, it has a built-in web configurator. When powered on, the clock will expose an administration wifi network for 30 seconds. Connecting to the network brings up the clock's control panel.
 
 The display brightness auto-adjusts to ambient light conditions (can be overridden in the control panel).
