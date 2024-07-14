@@ -88,10 +88,10 @@ void broadcast_clock::dial::
 on_ambient_light_level( int threshold ) {
   switch( threshold ) {
     case 0:
-      m_brightness_bit = 9;
+      m_brightness_bit = 7;
       break;
     case 1:
-      m_brightness_bit = 7;
+      m_brightness_bit = 5;
       break;
     case 2:
       m_brightness_bit = 3;
