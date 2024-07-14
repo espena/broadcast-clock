@@ -1,5 +1,5 @@
-#ifndef __captive_portal_http_hpp__
-#define __captive_portal_http_hpp__
+#ifndef __CAPTIVE_PORTAL_HTTP_HPP__
+#define __CAPTIVE_PORTAL_HTTP_HPP__
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
@@ -21,8 +21,6 @@ namespace espena::broadcast_clock {
     httpd_handle_t m_server;
 
     httpd_config_t m_cfg = HTTPD_DEFAULT_CONFIG();
-
-    //event::event_dispatcher m_event_dispatcher;
 
     std::string m_json_network_list;
 
@@ -86,4 +84,4 @@ namespace espena::broadcast_clock {
 
 }; // namespace espena::broadcast_clock
 
-#endif // __captive_portal_http_hpp__
+#endif // __CAPTIVE_PORTAL_HTTP_HPP__

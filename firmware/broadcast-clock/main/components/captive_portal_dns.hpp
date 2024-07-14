@@ -1,5 +1,5 @@
-#ifndef __captive_portal_dns_hpp__
-#define __captive_portal_dns_hpp__
+#ifndef __CAPTIVE_PORTAL_DNS_HPP__
+#define __CAPTIVE_PORTAL_DNS_HPP__
 
 #include <string>
 #include <freertos/FreeRTOS.h>
@@ -128,6 +128,6 @@ namespace espena::broadcast_clock {
       void stop();
   };
 
-}; // namespace espena::components
+}; // espena::broadcast_clock
 
-#endif // __captive_portal_dns_hpp__
+#endif // __CAPTIVE_PORTAL_DNS_HPP__
