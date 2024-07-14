@@ -10,11 +10,28 @@
         box-sizing: border-box;
       }
       html, body {
+        box-sizing: border-box;
         font-family: Arial, sans-serif;
-        padding: 0.5em;
+        padding: 0;
         margin: 0;
         color: #000;
-        background-color: #ddd;
+        background-color: #fff;
+        position: relative;
+      }
+      body>div {
+        height: 30em;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: auto;
+        left: 0;
+        padding: 0 10px;
+        margin: 0 !important;
+        background-color: #fff;
+      }
+      header {
+        display: block;
+        padding: 10px 0;
       }
       h1, h2 {
         margin: 0;
@@ -23,26 +40,28 @@
         font-size: 1.65em;
       }
       h2 {
-        border-bottom: solid 1px #ddd;
         font-size: 1em;
-        padding-bottom: 0.25em;
+        padding-bottom: 5px;
       }
-      form {
-        margin-top: 3em;
+      .form {
+        margin: 40px 0 0 0;
+        padding: 0;
         position: relative;
         height: 330px;
+
       }
       form legend {
         box-sizing: border-box;
         display: block;
-        font-size: 1em;
-        font-weight: bold;
+        font-size: 13px;
+        font-weight: normal;
         display: block;
+        text-align: center;
         position: absolute;
-        padding: 0.5em 1em;
-        top: -2em;
-        width: 8em;
-        height: 2em;
+        padding: 5px;
+        top: -25px;
+        width: 50px;
+        height: 26px;
         border-radius: 5px 5px 0 0;
         background-color: #eee;
         cursor: pointer;
@@ -52,35 +71,56 @@
       }
       form .time { z-index: 1; }
       form .time legend { left: 0; }
-      form .display legend { left: 8em; }
-      form .wifi legend { left: 16em; }
-      form .ntp legend { left: 24em; }
+      form .display legend { left: 50px; }
+      form .wifi legend { left: 100px; }
+      form .ntp legend { left: 150px; }
       fieldset {
+        display: block;
         position: absolute;
         height: 270px;
         top: 0;
         right: 0;
         bottom: auto;
         left: 0;
+        border-radius: 3px;
         padding: 1em 1em 0.75em 1em;
-        margin-bottom: 1em;
         background-color: #fff;
         border-style: solid;
         border-width: 1px;
         border-color: #aaa;
         z-index: 0;
       }
+      fieldset.actions {
+        padding: 0 5px;
+        border: none;
+      }
       fieldset.active {
         z-index: 1;
       }
       fieldset.active legend {
         background-color: #fff;
+        height: 26px;
+      }
+      fieldset label {
+        font-size: 13px;
+        position: relative;
+        top: -2px;
+      }
+      fieldset span>label {
+        display: inline-block;
+        min-width: 6.5em;
+        margin-bottom: 0.5em;
+        text-align: right;
       }
       fieldset>div>label {
         display: inline-block;
         min-width: 6.5em;
         margin-bottom: 0.5em;
         font-weight: bold;
+      }
+      fieldset span {
+        display: block;
+        float: left;
       }
       fieldset>div {
         margin-bottom: 1em;
@@ -100,141 +140,138 @@
       }
       input[type="text"],
       input[type="password"] {
-        padding: 1em;
-        width: 40em;
+        padding: 5px;
       }
       input[type="radio"] {
-        margin-right: 2em;
+        /*margin-right: 2em;*/
       }
       input[type="submit"] {
         display: block;
-        position: absolute;
-        top: auto;
-        right: 1px;
-        bottom: 0;
-        left: auto;
-        padding: 1em 2em;
+        margin: 280px 0 0 10px;
+        float: right;
+        padding: 5px 10px;
         cursor: pointer;
+        border-radius: 5px;
+        border: solid 1px #ccc; 
       }
       .actions {
         text-align: right;
-      }
-      body>div {
-        width: 100%;
-        max-width: 70em;
-        height: 30em;
-        margin: auto;
-        background-color: #fff;
-        padding: 1em;
       }
     </style>
   </head>
   <body>
     <div>
-      <h1>Broadcast clock</h1>
-      <h2>Configuration and settings</h2>
-      <form>
-        <fieldset class="time active">
-          <legend>Time</legend>
-          <div>
-            <label for="time_zone">Time zone</label>
-            <input type="text" list="tz_list" name="time_zone" id="time_zone" />
-            <datalist id="tz_list">
-              <option value="CET-1CEST,M3.5.0,M10.5.0/3">
-              <option value="EST5EDT,M3.2.0,M11.1.0">
-              <option value="PST8PDT,M3.2.0,M11.1.0">
-              <option value="GMT0BST,M3.5.0/1,M10.5.0">
-              <option value="EET-2EEST,M3.5.0/3,M10.5.0/4">
-              <option value="MSK-3">
-              <option value="JST-9">
-              <option value="AEST-10AEDT,M10.1.0,M4.1.0/3">
-              <option value="NZST-12NZDT,M9.5.0,M4.1.0/3">
-              <option value="IST-5:30">
-              <option value="CST6CDT,M3.2.0,M11.1.0">
-              <option value="MST7MDT,M3.2.0,M11.1.0">
-              <option value="HST10HDT,M3.2.0,M11.1.0">
-              <option value="AKST9AKDT,M3.2.0,M11.1.0">
-              <option value="WET0WEST,M3.5.0/1,M10.5.0">
-              <option value="ART-3">
-              <option value="BRT-3">
-              <option value="CLT-4">
-              <option value="COT-5">
-              <option value="WAT-1">
-              <option value="CAT-2">
-              <option value="EAT-3">
-              <option value="SAST-2">
-              <option value="KST-9">
-              <option value="HKT-8">
-              <option value="SGT-8">
-              <option value="AWST-8">
-              <option value="ACST-9:30ACDT,M10.1.0,M4.1.0/3">
-            </datalist>
-          </div>
-        </fieldset>
-        <fieldset class="display">
-          <legend>Display</legend>
-          <div>
-            <label>Dial style</label>
+      <header>
+        <h1>Broadcast clock</h1>
+        <h2>Configuration and settings</h2>
+      </header>
+      <div class="form">
+        <form method="post" action="control_panel.html">
+          <fieldset class="time active">
+            <legend>Time</legend>
             <div>
-              <label for="countup">Countup</label><input type="radio" value="u" name="dial_style" id="countup" />
-              <label for="countdown">Countdown</label><input type="radio" value="d" name="dial_style" id="countdown" />
+              <label for="time_zone">Time zone</label>
+              <input type="text" list="tz_list" name="time_zone" id="time_zone" />
+              <datalist id="tz_list">
+                <option value="CET-1CEST,M3.5.0,M10.5.0/3">
+                <option value="EST5EDT,M3.2.0,M11.1.0">
+                <option value="PST8PDT,M3.2.0,M11.1.0">
+                <option value="GMT0BST,M3.5.0/1,M10.5.0">
+                <option value="EET-2EEST,M3.5.0/3,M10.5.0/4">
+                <option value="MSK-3">
+                <option value="JST-9">
+                <option value="AEST-10AEDT,M10.1.0,M4.1.0/3">
+                <option value="NZST-12NZDT,M9.5.0,M4.1.0/3">
+                <option value="IST-5:30">
+                <option value="CST6CDT,M3.2.0,M11.1.0">
+                <option value="MST7MDT,M3.2.0,M11.1.0">
+                <option value="HST10HDT,M3.2.0,M11.1.0">
+                <option value="AKST9AKDT,M3.2.0,M11.1.0">
+                <option value="WET0WEST,M3.5.0/1,M10.5.0">
+                <option value="ART-3">
+                <option value="BRT-3">
+                <option value="CLT-4">
+                <option value="COT-5">
+                <option value="WAT-1">
+                <option value="CAT-2">
+                <option value="EAT-3">
+                <option value="SAST-2">
+                <option value="KST-9">
+                <option value="HKT-8">
+                <option value="SGT-8">
+                <option value="AWST-8">
+                <option value="ACST-9:30ACDT,M10.1.0,M4.1.0/3">
+              </datalist>
             </div>
-          </div>
-          <div>
-            <label>Time format</label>
+            </fieldset>
+          <fieldset class="display">
+            <legend>Clock</legend>
             <div>
-              <label for="12h">12 hour</label><input type="radio" value="12h" name="time_format" id="12h" />
-              <label for="24h">24 hour</label><input type="radio" value="24h" name="time_format" id="24h" />
+              <label>Dial style</label>
+              <div>
+                <label for="countup">Count up</label><input type="radio" value="u" name="dial_style" id="countup" />
+                <label for="countdown">Count down</label><input type="radio" value="d" name="dial_style" id="countdown" />
+              </div>
             </div>
-          </div>
-        </fieldset>
-        <fieldset class="wifi">
-          <legend>Wifi</legend>
-          <div>
-            <label for="ssid">Network</label>
-            <input type="text" name="ssid" list="ssid_list" id="ssid">
-            <datalist id="ssid_list">
-              <option __ssid_selected__ value="MyNetwork">
-              <option __ssid_selected__ value="AnotherNetwork">
-            </datalist>
-          </div>
-          <div>
-            <label for="password">Password</label>
-            <input type="password" name="password" id="password">
-          </div>
-        </fieldset>
-        <fieldset class="ntp">
-          <legend>Time server</legend>
-          <div>
-            <label for="ntp">NTP pool</label>
-            <input type="text" name="ntp" list="ntp_list" id="ntp">
-            <datalist id="ntp_list">
-              <option value="pool.ntp.org">
-              <option value="time.google.com">
-              <option value="time.windows.com">
-              <option value="time.apple.com">
-              <option value="time.nist.gov">
-              <option value="ntp.ubuntu.com">
-              <option value="europe.pool.ntp.org">
-              <option value="north-america.pool.ntp.org">
-              <option value="asia.pool.ntp.org">
-              <option value="oceania.pool.ntp.org">
-              <option value="south-america.pool.ntp.org">
-              <option value="africa.pool.ntp.org">
-            </datalist>
-          </div>
-          <div>
-            <label>Update interval</label>
             <div>
-              <label for="5min">5 minutes</label><input type="radio" value="5min" name="time_format" id="5min" />
-              <label for="15min">15 minutes</label><input type="radio" value="15min" name="time_format" id="15min" />
-              <label for="30min">30 minutes</label><input type="radio" value="30min" name="time_format" id="30min" />
-              <label for="60min">60 minutes</label><input type="radio" value="60min" name="time_format" id="60min" />
+              <label>Time format</label>
+              <div>
+                <label for="12h">12 hour</label><input type="radio" value="12h" name="time_format" id="12h" />
+                <label for="24h">24 hour</label><input type="radio" value="24h" name="time_format" id="24h" />
+              </div>
             </div>
-          </div>
-        </fieldset>
-        <input type="submit" value="Save settings">
-      </form>
+          </fieldset>
+          <fieldset class="wifi">
+            <legend>Wifi</legend>
+            <div>
+              <label for="ssid">Network</label>
+              <input type="text" name="ssid" list="ssid_list" id="ssid">
+              <datalist id="ssid_list">
+                <option __ssid_selected__ value="MyNetwork">
+                <option __ssid_selected__ value="AnotherNetwork">
+              </datalist>
+            </div>
+            <div>
+              <label for="password">Password</label>
+              <input type="password" name="password" id="password">
+            </div>
+          </fieldset>
+          <fieldset class="ntp">
+            <legend>NTP</legend>
+            <div>
+              <label for="ntp">NTP pool</label>
+              <input type="text" name="ntp" list="ntp_list" id="ntp">
+              <datalist id="ntp_list">
+                <option value="pool.ntp.org">
+                <option value="time.google.com">
+                <option value="time.windows.com">
+                <option value="time.apple.com">
+                <option value="time.nist.gov">
+                <option value="ntp.ubuntu.com">
+                <option value="europe.pool.ntp.org">
+                <option value="north-america.pool.ntp.org">
+                <option value="asia.pool.ntp.org">
+                <option value="oceania.pool.ntp.org">
+                <option value="south-america.pool.ntp.org">
+                <option value="africa.pool.ntp.org">
+              </datalist>
+            </div>
+            <div>
+              <label>Update interval</label>
+              <div>
+                <span><label for="5min">5 minutes</label><input type="radio" value="5min" name="time_format" id="5min" /></span>
+                <span><label for="15min">15 minutes</label><input type="radio" value="15min" name="time_format" id="15min" /></span>
+                <span><label for="30min">30 minutes</label><input type="radio" value="30min" name="time_format" id="30min" /></span>
+                <span><label for="60min">60 minutes</label><input type="radio" value="60min" name="time_format" id="60min" /></span>
+              </div>
+            </div>
+          </fieldset>
+          <fieldset class="actions">
+            <input type="submit" value="Save">
+            <input type="submit" value="Cancel">
+          </fieldset>
+        </form>
+      </div>
     </div>
     <script>
       var tabs = document.querySelectorAll( 'form fieldset' );
