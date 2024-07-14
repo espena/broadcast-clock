@@ -177,11 +177,13 @@ void broadcast_clock::dotmatrix::
 on_ambient_light_level( int threshold ) {
   uint8_t brightness = 0x00;
   switch( threshold ) {
+    case 0:
+      // fallthru
     case 1:
       brightness = 0x00u;
       break;
     case 2:
-      brightness = 0x33u;
+      brightness = 0x22u;
       break;
     case 3:
       brightness = 0x55u;
