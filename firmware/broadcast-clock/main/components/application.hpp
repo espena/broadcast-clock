@@ -2,6 +2,7 @@
 #define __APPLICATION_HPP__
 
 #include "wifi.hpp"
+#include "configuration.hpp"
 #include "clock_face.hpp"
 #include "captive_portal_dns.hpp"
 #include "captive_portal_http.hpp"
@@ -16,6 +17,8 @@ namespace espena::broadcast_clock {
     static const char *m_component_name;
 
     esp_timer_handle_t m_ap_duration_timer;
+
+    configuration m_configuration;
 
     wifi m_wifi;
     captive_portal_dns m_captive_portal_dns;

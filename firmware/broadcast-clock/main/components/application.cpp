@@ -130,8 +130,10 @@ on_enter_config_mode() {
 
 void application::
 on_save_config( std::string post_data ) {
-  switch_to_station_mode();
   ESP_LOGI( "application", "Save config: %s", post_data.c_str() );
+  switch_to_station_mode();
+  m_configuration.update( post_data );
+  init_timezone();
 }
 
 void application::
@@ -160,7 +162,10 @@ init_nvs() {
 
 void application::
 init_timezone() {
-  setenv( "TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 1 );
+  //setenv( "TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 1 );
+  std::string timezone = m_configuration.get_str( "time_zone" );
+  ESP_LOGI( "application", "Setting timezone to %s", timezone.c_str() );
+  setenv( "TZ", timezone.c_str(), 1 );
   tzset();
 }
 
