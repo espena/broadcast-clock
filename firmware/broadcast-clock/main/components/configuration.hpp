@@ -1,0 +1,6 @@
+#ifndef __CONFIGURATION_HPP__
+#define __CONFIGURATION_HPP__
+
+
+
+#endif // __CONFIGURATION_HPP__

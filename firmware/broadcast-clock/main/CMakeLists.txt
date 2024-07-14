@@ -1,5 +1,6 @@
 idf_component_register( SRCS "app_main.cpp"
                              "components/application.cpp"
+                             "components/configuration.cpp"
                              "components/clock_face.cpp"
                              "components/ambient_sensor.cpp"
                              "components/wifi.cpp"
