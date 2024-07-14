@@ -6,8 +6,8 @@
 
 The enclosure is an 25x25 cm [IKEA "Sannahed"](https://www.ikea.com/us/en/p/sannahed-frame-black-60459118/) photo frame, which is deep enough to contain the circuitry. I replaced the provided plexi glass with a dark acrylic glass plate.
 
-There are no traditional buttons to control the clock. Instead, it has a browser based web configurator. When powered on, the clock will expose a dedicated administration wifi network for 30 seconds. Connect to the network to access the clock's control panel.
+There are no traditional buttons to control the clock. Instead, it has a browser based web configurator. When powered on, the clock will expose a dedicated wifi network for 30 seconds. Connect to the network in order to access the clock's control panel.
 
 The clock supports time synchronization over the web (NTP) or via a range of GNSS satellite systems (GPS/QZSS, GLONASS, BeiDou, Galileo).
 
-The display brightness auto-adjusts to ambient light conditions (can be overridden in the control panel).
+Display brightness auto-adjusts to ambient light conditions. This can be overridden in the control panel.
