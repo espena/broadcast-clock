@@ -10,4 +10,4 @@ There are no traditional buttons to control the clock. Instead, it has a browser
 
 The clock supports time synchronization over the web (NTP) or via a range of GNSS satellite systems (GPS/QZSS, GLONASS, BeiDou, Galileo).
 
-Display brightness auto-adjusts to ambient light conditions. This can be overridden in the control panel.
+LED brightness auto-adjusts to ambient light conditions. This can be overridden in the control panel.
