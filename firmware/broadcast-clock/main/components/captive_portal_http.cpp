@@ -37,22 +37,6 @@ broadcast_clock::captive_portal_http::captive_portal_http() : m_message_queue( n
 
 }
 
-void broadcast_clock::captive_portal_http::set_event_loop_handle( esp_event_loop_handle_t esp_event_loop_handle ) {
-  //m_event_dispatcher.set_event_loop_handle( esp_event_loop_handle );
-}
-
-void broadcast_clock::captive_portal_http::add_event_listener( int32_t event_id,
-                                                               esp_event_handler_t event_handler,
-                                                               void *instance )
-{
-  /*
-  m_event_dispatcher.add_event_listener( m_event_base,
-                                         event_id,
-                                         event_handler,
-                                         instance );
-  */
-}
-
 void broadcast_clock::captive_portal_http::enqueue_simple_message( captive_portal_http_task_message msg ) {
   captive_portal_http_task_queue_item item = { msg, nullptr };
   xQueueSend( m_message_queue, &item, 10 );
@@ -88,17 +72,27 @@ on_request( httpd_req_t *req ) {
   ESP_LOGI( m_component_name, "Request for %s", req->uri );
 
   std::string uri( req->uri );
-  if( uri == "/ssid_list" ) {
 
+  if( uri == "/control_panel.html" && req->content_len > 0 && m_event_loop_handle ) {
+
+    static std::string post_data;
+    post_data.resize( req->content_len + 1 );
+    httpd_req_recv( req, &post_data[ 0 ], req->content_len );
+    esp_event_post_to( m_event_loop_handle,
+                        m_event_base,
+                        EVENT_SAVE,
+                        post_data.c_str(),
+                        post_data.length(),
+                        portMAX_DELAY );
   }
-  else {
-    ESP_LOGI( m_component_name, "Respond with control panel" );
-    httpd_resp_set_status( req, "302 Found" ); 
-    httpd_resp_set_type( req, "text/html; charset=is08859-1;" );
-    const char *buf = ( char * ) broadcast_clock::resources::html::control_panel_html_start;
-    const size_t buf_len = broadcast_clock::resources::html::control_panel_html_end - broadcast_clock::resources::html::control_panel_html_start;
-    httpd_resp_send( req, buf, buf_len );
-  }
+
+  ESP_LOGI( m_component_name, "Respond with control panel" );
+  httpd_resp_set_status( req, "302 Found" ); 
+  httpd_resp_set_type( req, "text/html; charset=is08859-1;" );
+  const char *buf = ( char * ) broadcast_clock::resources::html::control_panel_html_start;
+  const size_t buf_len = broadcast_clock::resources::html::control_panel_html_end - broadcast_clock::resources::html::control_panel_html_start;
+  httpd_resp_send( req, buf, buf_len );
+
   return ESP_OK;
 }
 
@@ -136,10 +130,10 @@ void broadcast_clock::captive_portal_http::start_sync() {
 
   httpd_uri_t location;
 
-  location.uri = "/ssid_auth",
-  location.method = HTTP_POST,
+  location.uri = "/control_panel.html",
   location.handler = request_handler,
   location.user_ctx = this;
+  location.method = HTTP_POST,
 
   httpd_register_uri_handler( m_server, &location );
 

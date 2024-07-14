@@ -42,6 +42,13 @@ init() {
     esp_netif_init();
     esp_event_loop_create_default();
 
+    m_captive_portal_http.set_event_loop_handle( m_event_loop_handle );
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::captive_portal_http::m_event_base,
+                                     broadcast_clock::captive_portal_http::EVENT_SAVE,
+                                     wifi_event_handler,
+                                     this );
+
     m_wifi.set_event_loop_handle( m_event_loop_handle );
     m_wifi.init( wifi::mode::access_point );
 
@@ -80,6 +87,14 @@ wifi_event_handler( void *handler_arg,
         break;
     }
   }
+  else if( source == broadcast_clock::captive_portal_http::m_event_base ) {
+    broadcast_clock::application *instance = static_cast<broadcast_clock::application *>( handler_arg );
+    switch( event_id ) {
+      case broadcast_clock::captive_portal_http::EVENT_SAVE:
+        instance->on_save_config( std::string( ( char * ) event_params ) );
+        break;
+    }
+  }
 }
 
 void application::
@@ -91,6 +106,13 @@ init_ap_duration_timeout() {
   timer_args.name = m_component_name;
   ESP_ERROR_CHECK( esp_timer_create( &timer_args, &m_ap_duration_timer ) );
   ESP_ERROR_CHECK( esp_timer_start_once( m_ap_duration_timer, 30000000 ) );
+}
+
+void application::
+switch_to_station_mode() {
+  m_captive_portal_dns.stop();
+  m_captive_portal_http.stop();
+  m_wifi.init( wifi::mode::station );
 }
 
 void application::
@@ -107,10 +129,14 @@ on_enter_config_mode() {
 }
 
 void application::
+on_save_config( std::string post_data ) {
+  switch_to_station_mode();
+  ESP_LOGI( "application", "Save config: %s", post_data.c_str() );
+}
+
+void application::
 on_leave_config_mode() {
-  m_captive_portal_dns.stop();
-  m_captive_portal_http.stop();
-  m_wifi.init( wifi::mode::station );
+  switch_to_station_mode();
 }
 
 void application::

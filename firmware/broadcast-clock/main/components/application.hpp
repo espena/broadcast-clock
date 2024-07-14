@@ -5,6 +5,7 @@
 #include "clock_face.hpp"
 #include "captive_portal_dns.hpp"
 #include "captive_portal_http.hpp"
+#include <string>
 #include <esp_timer.h>
 #include <driver/i2c_master.h>
 
@@ -31,7 +32,10 @@ namespace espena::broadcast_clock {
 
     static void on_ap_duration_timeout( void *arg );
 
+    void switch_to_station_mode();
+
     void on_enter_config_mode();
+    void on_save_config( std::string post_data );
     void on_leave_config_mode();
 
   public:

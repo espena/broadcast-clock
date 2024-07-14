@@ -1,9 +1,11 @@
 #ifndef __CAPTIVE_PORTAL_HTTP_HPP__
 #define __CAPTIVE_PORTAL_HTTP_HPP__
 
+#include <string>
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <esp_http_server.h>
+#include <esp_event.h>
 
 namespace espena::broadcast_clock {
 
@@ -14,11 +16,21 @@ namespace espena::broadcast_clock {
 
   class captive_portal_http {
 
+  public:
+
+    static const esp_event_base_t m_event_base;
+    static const uint32_t EVENT_SAVE = 0x01u;
+    static const uint32_t EVENT_CANCEL = 0x02u;
+
+  private:
+
     static const char *m_component_name;
     static const size_t m_component_stack_size = 4096;
 
     QueueHandle_t m_message_queue;
     httpd_handle_t m_server;
+
+    esp_event_loop_handle_t m_event_loop_handle;
 
     httpd_config_t m_cfg = HTTPD_DEFAULT_CONFIG();
 
@@ -59,18 +71,7 @@ namespace espena::broadcast_clock {
 
     public:
 
-      static const esp_event_base_t m_event_base;
-
-      enum class event {
-        base = 0x9000,
-        ssid_select
-      };
-
-      void set_event_loop_handle( esp_event_loop_handle_t esp_event_loop_handle );
-
-      void add_event_listener( int32_t event_id,
-                               esp_event_handler_t event_handler,
-                               void *instance );
+      void set_event_loop_handle( esp_event_loop_handle_t h ) { m_event_loop_handle = h; };
 
       captive_portal_http();
 
