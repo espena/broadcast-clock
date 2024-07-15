@@ -110,3 +110,8 @@ get_str( std::string key ) {
   }
   return "";
 }
+
+int broadcast_clock::configuration::
+get_int( std::string key ) {
+  return atoi( get_str( key ).c_str() );
+}

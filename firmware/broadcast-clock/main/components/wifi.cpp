@@ -172,7 +172,7 @@ on_init_ntp() {
   configuration *appconf = configuration::get_instance();
   memset( ntpserv, 0x00, sizeof( ntpserv ) );
   strncpy( ntpserv, appconf->get_str( "ntp" ).c_str(), sizeof( ntpserv ) );
-  const int upint = atoi( appconf->get_str( "update_interval" ).c_str() );
+  const int upint = appconf->get_int( "update_interval" );
   ESP_LOGI( m_component_name, "NTP server(s): %s, Update interval: %d ms", ntpserv, upint );
   esp_sntp_config_t config;
   memset( &config, 0x00, sizeof( esp_sntp_config_t ) );

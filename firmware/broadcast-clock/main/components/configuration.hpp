@@ -28,6 +28,7 @@ namespace espena::broadcast_clock {
     static configuration *get_instance() { return m_instance ? m_instance : new configuration(); };
 
     ::std::string get_str( ::std::string key );
+    int get_int( ::std::string key );
 
     void update( ::std::string data );
     void parse();
