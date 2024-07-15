@@ -85,6 +85,12 @@ on_init( i2c_master_bus_handle_t i2c_bus ) {
                                      broadcast_clock::captive_portal_http::EVENT_SAVE,
                                      wifi_event_handler,
                                      this );
+
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::captive_portal_http::m_event_base,
+                                     broadcast_clock::captive_portal_http::EVENT_CANCEL,
+                                     wifi_event_handler,
+                                     this );
   }
 
   m_dotmatrix.init();
@@ -116,7 +122,8 @@ wifi_event_handler( void *handler_arg,
   }
   else if( source == broadcast_clock::captive_portal_http::m_event_base ) {
     broadcast_clock::clock_face *instance = static_cast<broadcast_clock::clock_face *>( handler_arg );
-    dotmatrix::display_message save_msg = { "  ", "Save", "  " };
+    const static dotmatrix::display_message save_msg = { "  ", "Save", "  " };
+    const static dotmatrix::display_message exit_msg = { "  ", "Exit", "  " };
     switch( event_id ) {
       case broadcast_clock::captive_portal_http::EVENT_SAVE:
         instance->on_leave_config_mode();
@@ -124,7 +131,7 @@ wifi_event_handler( void *handler_arg,
         break;
       case broadcast_clock::captive_portal_http::EVENT_CANCEL:
         instance->on_leave_config_mode();
-        instance->m_dotmatrix.display( nullptr );
+        instance->m_dotmatrix.display( &exit_msg );
         break;
     }
   }

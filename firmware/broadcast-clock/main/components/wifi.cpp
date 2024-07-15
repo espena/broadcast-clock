@@ -1,4 +1,5 @@
 #include "wifi.hpp"
+#include "configuration.hpp"
 #include "../secrets.hpp"
 #include <memory.h>
 #include <esp_wifi.h>
@@ -120,7 +121,6 @@ task_loop( void *arg ) {
 
 void broadcast_clock::wifi::
 on_message( wifi_task_message msg, void *arg ) {
-  wifi_task_queue_item *item = nullptr;
   switch( msg ) {
     case wifi_task_message::init:
       on_init( *( static_cast<mode *>( arg ) ) );
@@ -166,21 +166,26 @@ on_init( wifi::mode m ) {
 
 void broadcast_clock::wifi::
 on_init_ntp() {
+  static char ntpserv[ 1024 ];
   ESP_LOGI( m_component_name, "Initializing NTP" );
   esp_netif_sntp_deinit();
+  configuration *appconf = configuration::get_instance();
+  memset( ntpserv, 0x00, sizeof( ntpserv ) );
+  strncpy( ntpserv, appconf->get_str( "ntp" ).c_str(), sizeof( ntpserv ) );
+  const int upint = atoi( appconf->get_str( "update_interval" ).c_str() );
+  ESP_LOGI( m_component_name, "NTP server(s): %s, Update interval: %d ms", ntpserv, upint );
   esp_sntp_config_t config;
   memset( &config, 0x00, sizeof( esp_sntp_config_t ) );
   config.start = true;
   config.num_of_servers = 1;
-  config.servers[ 0 ] = "pool.ntp.org";
+  config.servers[ 0 ] = ntpserv;
   config.renew_servers_after_new_IP = true;
   config.index_of_first_server = 0;
   config.ip_event_to_renew = IP_EVENT_STA_GOT_IP;
   config.sync_cb = &wifi::on_ntp_sync;
-  esp_netif_sntp_init( &config );
-  esp_netif_sntp_start();
-  esp_netif_sntp_sync_wait( 500 );
-  sntp_set_sync_interval( 300000 );
+  ESP_ERROR_CHECK( esp_netif_sntp_init( &config ) );
+  ESP_ERROR_CHECK( esp_netif_sntp_start() );
+  sntp_set_sync_interval( upint );
 }
 
 void broadcast_clock::wifi::
@@ -222,10 +227,21 @@ init_wifi() {
                                          &wifi::on_event,
                                          this,
                                          &instance_got_ip );
+    
+    
     wifi_config_t wifi_config;
     memset( &wifi_config, 0x00, sizeof( wifi_config_t ) );
-    strncpy( reinterpret_cast<char *>( wifi_config.sta.ssid ), WIFI_SSID, sizeof( wifi_config.sta.ssid ) );
-    strncpy( reinterpret_cast<char *>( wifi_config.sta.password ), WIFI_PASSWORD, sizeof( wifi_config.sta.password ) );
+
+    broadcast_clock::configuration *c = broadcast_clock::configuration::get_instance();
+
+    strncpy( reinterpret_cast<char *>( wifi_config.sta.ssid ),
+             c->get_str( "ssid" ).c_str(),
+             sizeof( wifi_config.sta.ssid ) );
+
+    strncpy( reinterpret_cast<char *>( wifi_config.sta.password ),
+             c->get_str( "password" ).c_str(),
+             sizeof( wifi_config.sta.password ) );
+
     wifi_config.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
     wifi_config.sta.sae_pwe_h2e = WPA3_SAE_PWE_UNSPECIFIED;
 

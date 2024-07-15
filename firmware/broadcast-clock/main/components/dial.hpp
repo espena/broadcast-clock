@@ -1,6 +1,7 @@
 #ifndef __DIAL_HPP__
 #define __DIAL_HPP__
 
+#include "configuration.hpp"
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <vector>
@@ -12,6 +13,8 @@ namespace espena::broadcast_clock {
 
         static const char *m_component_name;
         static const size_t m_component_stack_size = 8192;
+        
+        configuration *m_config;
         
         esp_timer_handle_t m_refresh_timer;
 

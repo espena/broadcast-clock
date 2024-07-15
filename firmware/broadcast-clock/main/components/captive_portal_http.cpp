@@ -10,6 +10,7 @@
 #include "esp_http_server.h"
 
 #include "captive_portal_http.hpp"
+#include "configuration.hpp"
 
 using namespace espena;
 
@@ -74,30 +75,24 @@ on_request( httpd_req_t *req ) {
   std::string uri( req->uri );
 
   if( uri == "/control_panel.html" && req->content_len > 0 && m_event_loop_handle ) {
-
     static std::string post_data;
     post_data.resize( req->content_len + 1 );
     httpd_req_recv( req, &post_data[ 0 ], req->content_len );
     esp_event_post_to( m_event_loop_handle,
                         m_event_base,
-                        EVENT_SAVE,
+                        post_data.find( "action=Save" ) != std::string::npos ? EVENT_SAVE : EVENT_CANCEL,
                         post_data.c_str(),
                         post_data.length(),
                         portMAX_DELAY );
   }
-
-  ESP_LOGI( m_component_name, "Respond with control panel" );
   httpd_resp_set_status( req, "302 Found" ); 
   httpd_resp_set_type( req, "text/html; charset=is08859-1;" );
-  const char *buf = ( char * ) broadcast_clock::resources::html::control_panel_html_start;
-  const size_t buf_len = broadcast_clock::resources::html::control_panel_html_end - broadcast_clock::resources::html::control_panel_html_start;
-  httpd_resp_send( req, buf, buf_len );
-
+  std::string html = create_html_response();
+  httpd_resp_send( req, html.c_str(), html.length() );
   return ESP_OK;
 }
 
 void broadcast_clock::captive_portal_http::on_message( captive_portal_http_task_message msg, void *arg ) {
-  captive_portal_http_task_queue_item *item = nullptr;
   switch( msg ) {
     case captive_portal_http_task_message::set_network_list:
       m_json_network_list = static_cast<char *>( arg );
@@ -146,6 +141,87 @@ void broadcast_clock::captive_portal_http::start_sync() {
 
   ESP_LOGI( m_component_name, "HTTP server running" );
   
+}
+
+std::string broadcast_clock::captive_portal_http::create_html_response() {
+
+  const char *buf = ( char * ) broadcast_clock::resources::html::control_panel_html_start;
+  const size_t buf_len = broadcast_clock::resources::html::control_panel_html_end - broadcast_clock::resources::html::control_panel_html_start;
+
+  broadcast_clock::configuration *cnf = broadcast_clock::configuration::get_instance();
+
+  bool is_ele = false;
+  bool is_tag = false;
+  bool is_sel = false;
+
+  std::string ele;
+  std::string tag;
+  std::string sel;
+  std::string htm;
+
+  for( size_t i = 0; i < buf_len; i++ ) {
+    const unsigned char c = buf[ i ];
+    if( c == '<' ) {
+      is_ele = true;
+      ele.clear();
+      htm += c;
+    }
+    else if( c == '>' ) {
+      is_ele = false;
+      htm += c;
+    }
+    else if( is_ele && c == ' ' ) {
+      is_ele = false;
+      htm += c;
+    }
+    else if( is_ele && c == '/' ) {
+      is_ele = false;
+      ele.clear();
+      htm += c;
+    }
+    else if( c == '|' ) {
+      if( is_tag ) {
+        if( is_sel ) {
+          htm += cnf->get_str( tag ) == sel ? ( ele == "option" ? "selected" : "checked" ) : "";
+        }
+        else {
+          htm += cnf->get_str( tag );
+        }
+        is_tag = false;
+        is_sel = false;
+      }
+      else {
+        is_tag = true;
+        tag.clear();
+        sel.clear();
+      }
+    }
+    else if( c == ':' ) {
+      if( is_tag ) {
+        is_sel = true;
+      }
+      else {
+        htm += c;
+      }
+    }
+    else {
+      if( is_tag ) {
+        if( is_sel ) {
+          sel += c;
+        }
+        else {
+          tag += c;
+        }
+      }
+      else {
+        if( is_ele ) {
+          ele += c;
+        }
+        htm += c;
+      }
+    }
+  }
+  return htm;
 }
 
 void broadcast_clock::captive_portal_http::stop_sync() {

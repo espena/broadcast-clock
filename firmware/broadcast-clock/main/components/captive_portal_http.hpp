@@ -65,6 +65,8 @@ namespace espena::broadcast_clock {
 
     void enqueue_simple_message( captive_portal_http_task_message msg );
 
+    std::string create_html_response();
+
     void init_sync();
     void start_sync();
     void stop_sync();

@@ -90,7 +90,7 @@ namespace espena::broadcast_clock {
 
         void set_ambient_light_level( uint16_t lux );
 
-        void display( display_message *msg );
+        void display( const display_message *msg );
 
     };
 

@@ -15,7 +15,8 @@ using namespace espena::broadcast_clock;
 const char *application::m_component_name = "application";
 
 application::
-application() : m_i2c_bus( nullptr ),
+application() : m_configuration( nullptr ),
+                m_i2c_bus( nullptr ),
                 m_event_loop_handle( nullptr ) {
   esp_event_loop_args_t loop_args = {
     .queue_size = 1000,
@@ -36,6 +37,8 @@ void application::
 init() {
 
     init_nvs();
+    m_configuration = broadcast_clock::configuration::get_instance();
+
     init_timezone();
     init_i2c();
 
@@ -46,6 +49,12 @@ init() {
     esp_event_handler_register_with( m_event_loop_handle,
                                      broadcast_clock::captive_portal_http::m_event_base,
                                      broadcast_clock::captive_portal_http::EVENT_SAVE,
+                                     wifi_event_handler,
+                                     this );
+
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::captive_portal_http::m_event_base,
+                                     broadcast_clock::captive_portal_http::EVENT_CANCEL,
                                      wifi_event_handler,
                                      this );
 
@@ -93,6 +102,9 @@ wifi_event_handler( void *handler_arg,
       case broadcast_clock::captive_portal_http::EVENT_SAVE:
         instance->on_save_config( std::string( ( char * ) event_params ) );
         break;
+      case broadcast_clock::captive_portal_http::EVENT_CANCEL:
+        instance->on_cancel_config( std::string( ( char * ) event_params ) );
+        break;
     }
   }
 }
@@ -132,7 +144,14 @@ void application::
 on_save_config( std::string post_data ) {
   ESP_LOGI( "application", "Save config: %s", post_data.c_str() );
   switch_to_station_mode();
-  m_configuration.update( post_data );
+  m_configuration->update( post_data );
+  init_timezone();
+}
+
+void application::
+on_cancel_config( std::string post_data ) {
+  switch_to_station_mode();
+  m_configuration->update( post_data );
   init_timezone();
 }
 
@@ -163,7 +182,7 @@ init_nvs() {
 void application::
 init_timezone() {
   //setenv( "TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 1 );
-  std::string timezone = m_configuration.get_str( "time_zone" );
+  std::string timezone = m_configuration->get_str( "time_zone" );
   ESP_LOGI( "application", "Setting timezone to %s", timezone.c_str() );
   setenv( "TZ", timezone.c_str(), 1 );
   tzset();

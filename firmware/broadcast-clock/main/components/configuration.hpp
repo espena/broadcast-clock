@@ -13,13 +13,19 @@ namespace espena::broadcast_clock {
     ::std::string m_data;
     ::std::map<std::string, std::string> m_values;
 
+    static const char *m_nvs_namespace;
+    static configuration *m_instance;
+
     void read_from_nvs();
     void save_to_nvs();
 
+    configuration();
+
   public:
 
-    configuration();
     ~configuration();
+
+    static configuration *get_instance() { return m_instance ? m_instance : new configuration(); };
 
     ::std::string get_str( ::std::string key );
 

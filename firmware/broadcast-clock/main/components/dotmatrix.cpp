@@ -63,7 +63,7 @@ set_ambient_light_level( uint16_t lux ) {
 }
 
 void broadcast_clock::dotmatrix::
-display( display_message *msg ) {
+display( const display_message *msg ) {
   static display_message current_msg;
   if( msg == nullptr ) {
     dotmatrix_task_queue_item item = { dotmatrix_task_message::display, nullptr };

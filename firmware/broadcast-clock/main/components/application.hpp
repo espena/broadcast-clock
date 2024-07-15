@@ -18,7 +18,7 @@ namespace espena::broadcast_clock {
 
     esp_timer_handle_t m_ap_duration_timer;
 
-    configuration m_configuration;
+    configuration *m_configuration;
 
     wifi m_wifi;
     captive_portal_dns m_captive_portal_dns;
@@ -39,6 +39,7 @@ namespace espena::broadcast_clock {
 
     void on_enter_config_mode();
     void on_save_config( std::string post_data );
+    void on_cancel_config( std::string post_data );
     void on_leave_config_mode();
 
   public:

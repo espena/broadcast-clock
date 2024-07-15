@@ -1,4 +1,5 @@
 #include "dial.hpp"
+#include "configuration.hpp"
 #include "../utils/micro_delay.hpp"
 #include "../gpio_mapping.hpp"
 #include <memory.h>
@@ -16,7 +17,8 @@ using namespace espena;
 const char *broadcast_clock::dial::m_component_name = "dial";
 
 broadcast_clock::dial::
-dial() : m_refresh_timer( nullptr ),
+dial() : m_config( nullptr ),
+         m_refresh_timer( nullptr ),
          m_current_seconds( 0 ),
          m_brightness_bit( 0 ) {
 
@@ -39,6 +41,7 @@ broadcast_clock::dial::
 
 void broadcast_clock::dial::
 init() {
+  m_config = configuration::get_instance();
   dial_task_queue_item item = { dial_task_message::init, nullptr };
   xQueueSend( m_task_queue, &item, 10 );
 }
@@ -129,6 +132,8 @@ refresh() {
 void broadcast_clock::dial::
 update() {
 
+  const char style = m_config->get_str( "dial_style" )[ 0 ];
+
   gpio_set_level( DIAL_XLAT, 0 );
   gpio_set_level( DIAL_SCLK, 0 );
   gpio_set_level( DIAL_VPRG, 0 );
@@ -138,7 +143,15 @@ update() {
     for( int j = 0; j < 16; j++ ) {
       const int led_id = 60 - ( ( ( i * 16 ) + j ) - 20 );
       for( int k = 0; k < 12; k++ ) {
-        if( k == m_brightness_bit && ( led_id <= m_current_seconds || led_id >= 60 ) ) {
+        if( style == 'u' && // count up
+            k == m_brightness_bit &&
+            ( led_id <= m_current_seconds || led_id >= 60 ) ) {
+          gpio_set_level( DIAL_SOUT, 1 );
+        }
+        else if( style == 'd' && // count down
+                 ( k == m_brightness_bit ) &&
+                 ( led_id >= m_current_seconds ) &&
+                 !( led_id < 60 && m_current_seconds == 0 ) ) {
           gpio_set_level( DIAL_SOUT, 1 );
         }
         else {

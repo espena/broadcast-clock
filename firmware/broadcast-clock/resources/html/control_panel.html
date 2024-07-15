@@ -134,12 +134,10 @@
         min-width: 5em;
         text-align: right;
       }
+      select,
       input[type="text"],
       input[type="password"] {
         display: block;
-      }
-      input[type="text"],
-      input[type="password"] {
         padding: 5px;
       }
       input[type="submit"] {
@@ -150,6 +148,15 @@
         cursor: pointer;
         border-radius: 5px;
         border: solid 1px #ccc; 
+      }
+      .pwshow {
+        display: inline-block;
+        padding: 5px 0 0 3px;
+      }
+      .pwshow>span {
+        font-size: 12px;
+        position: relative;
+        top: 3px;
       }
       .actions {
         text-align: right;
@@ -164,80 +171,80 @@
       </header>
       <div class="form">
         <form method="post" action="control_panel.html">
-          <fieldset class="time active">
+          <fieldset class="tab time active">
             <legend>Time</legend>
             <div>
               <label for="time_zone">Time zone</label>
-              <input type="text" list="tz_list" name="time_zone" id="time_zone" />
-              <datalist id="tz_list">
-                <option value="CET-1CEST,M3.5.0,M10.5.0/3">
-                <option value="EST5EDT,M3.2.0,M11.1.0">
-                <option value="PST8PDT,M3.2.0,M11.1.0">
-                <option value="GMT0BST,M3.5.0/1,M10.5.0">
-                <option value="EET-2EEST,M3.5.0/3,M10.5.0/4">
-                <option value="MSK-3">
-                <option value="JST-9">
-                <option value="AEST-10AEDT,M10.1.0,M4.1.0/3">
-                <option value="NZST-12NZDT,M9.5.0,M4.1.0/3">
-                <option value="IST-5:30">
-                <option value="CST6CDT,M3.2.0,M11.1.0">
-                <option value="MST7MDT,M3.2.0,M11.1.0">
-                <option value="HST10HDT,M3.2.0,M11.1.0">
-                <option value="AKST9AKDT,M3.2.0,M11.1.0">
-                <option value="WET0WEST,M3.5.0/1,M10.5.0">
-                <option value="ART-3">
-                <option value="BRT-3">
-                <option value="CLT-4">
-                <option value="COT-5">
-                <option value="WAT-1">
-                <option value="CAT-2">
-                <option value="EAT-3">
-                <option value="SAST-2">
-                <option value="KST-9">
-                <option value="HKT-8">
-                <option value="SGT-8">
-                <option value="AWST-8">
-                <option value="ACST-9:30ACDT,M10.1.0,M4.1.0/3">
-              </datalist>
+              <select name="time_zone" id="time_zone">
+                <option |time_zone:AKST9AKDT,M3.2.0,M11.1.0| value="AKST9AKDT,M3.2.0,M11.1.0">Alaska Standard Time (AKST)</option>
+                <option |time_zone:ART-3| value="ART-3">Argentina Time (ART)</option>
+                <option |time_zone:ACST-9:30ACDT,M10.1.0,M4.1.0/3| value="ACST-9:30ACDT,M10.1.0,M4.1.0/3">Australian Central Standard Time (ACST)</option>
+                <option |time_zone:AEST-10AEDT,M10.1.0,M4.1.0/3| value="AEST-10AEDT,M10.1.0,M4.1.0/3">Australian Eastern Standard Time (AEST)</option>
+                <option |time_zone:AWST-8| value="AWST-8">Australian Western Standard Time (AWST)</option>
+                <option |time_zone:BRT-3| value="BRT-3">Brasília Time (BRT)</option>
+                <option |time_zone:CAT-2| value="CAT-2">Central Africa Time (CAT)</option>
+                <option |time_zone:CET-1CEST,M3.5.0,M10.5.0/3| value="CET-1CEST,M3.5.0,M10.5.0/3">Central European Time (CET)</option>
+                <option |time_zone:CST6CDT,M3.2.0,M11.1.0| value="CST6CDT,M3.2.0,M11.1.0">Central Standard Time (CST)</option>
+                <option |time_zone:CLT-4| value="CLT-4">Chile Standard Time (CLT)</option>
+                <option |time_zone:COT-5| value="COT-5">Colombia Time (COT)</option>
+                <option |time_zone:EAT-3| value="EAT-3">East Africa Time (EAT)</option>
+                <option |time_zone:EET-2EEST,M3.5.0/3,M10.5.0/4| value="EET-2EEST,M3.5.0/3,M10.5.0/4">Eastern European Time (EET)</option>
+                <option |time_zone:EST5EDT,M3.2.0,M11.1.0| value="EST5EDT,M3.2.0,M11.1.0">Eastern Standard Time (EST)</option>
+                <option |time_zone:GMT0BST,M3.5.0/1,M10.5.0| value="GMT0BST,M3.5.0/1,M10.5.0">Greenwich Mean Time (GMT)</option>
+                <option |time_zone:HKT-8| value="HKT-8">Hong Kong Time (HKT)</option>
+                <option |time_zone:HST10HDT,M3.2.0,M11.1.0| value="HST10HDT,M3.2.0,M11.1.0">Hawaii Standard Time (HST)</option>
+                <option |time_zone:IST-5:30| value="IST-5:30">Indian Standard Time (IST)</option>
+                <option |time_zone:JST-9| value="JST-9">Japan Standard Time (JST)</option>
+                <option |time_zone:KST-9| value="KST-9">Korea Standard Time (KST)</option>
+                <option |time_zone:MSK-3| value="MSK-3">Moscow Standard Time (MSK)</option>
+                <option |time_zone:MST7MDT,M3.2.0,M11.1.0| value="MST7MDT,M3.2.0,M11.1.0">Mountain Standard Time (MST)</option>
+                <option |time_zone:NZST-12NZDT,M9.5.0,M4.1.0/3| value="NZST-12NZDT,M9.5.0,M4.1.0/3">New Zealand Standard Time (NZST)</option>
+                <option |time_zone:PST8PDT,M3.2.0,M11.1.0| value="PST8PDT,M3.2.0,M11.1.0">Pacific Standard Time (PST)</option>
+                <option |time_zone:SAST-2| value="SAST-2">South Africa Standard Time (SAST)</option>
+                <option |time_zone:SGT-8| value="SGT-8">Singapore Time (SGT)</option>
+                <option |time_zone:WAT-1| value="WAT-1">West Africa Time (WAT)</option>
+                <option |time_zone:WET0WEST,M3.5.0/1,M10.5.0| value="WET0WEST,M3.5.0/1,M10.5.0">Western European Time (WET)</option>              
+              </select>
             </div>
             </fieldset>
-          <fieldset class="display">
+          <fieldset class="tab display">
             <legend>Clock</legend>
             <div>
               <label>Dial style</label>
               <div>
-                <label for="countup">Count up</label><input type="radio" value="u" name="dial_style" id="countup" />
-                <label for="countdown">Count down</label><input type="radio" value="d" name="dial_style" id="countdown" />
+                <label for="countup">Count up</label><input |dial_style:u| type="radio" value="u" name="dial_style" id="countup" />
+                <label for="countdown">Count down</label><input |dial_style:d| type="radio" value="d" name="dial_style" id="countdown" />
               </div>
             </div>
             <div>
               <label>Time format</label>
               <div>
-                <label for="12h">12 hour</label><input type="radio" value="12h" name="time_format" id="12h" />
-                <label for="24h">24 hour</label><input type="radio" value="24h" name="time_format" id="24h" />
+                <label for="12h">12 hour</label><input |time_format:12h| type="radio" value="12h" name="time_format" id="12h" />
+                <label for="24h">24 hour</label><input |time_format:24h| type="radio" value="24h" name="time_format" id="24h" />
               </div>
             </div>
           </fieldset>
-          <fieldset class="wifi">
+          <fieldset class="tab wifi">
             <legend>Wifi</legend>
             <div>
               <label for="ssid">Network</label>
-              <input type="text" name="ssid" list="ssid_list" id="ssid">
+              <input type="text" name="ssid" list="ssid_list" id="ssid" value="|ssid|">
               <datalist id="ssid_list">
-                <option __ssid_selected__ value="MyNetwork">
-                <option __ssid_selected__ value="AnotherNetwork">
+                <option value="MyNetwork">
+                <option value="AnotherNetwork">
               </datalist>
             </div>
             <div>
               <label for="password">Password</label>
-              <input type="password" name="password" id="password">
+              <input type="password" name="password" id="password" value="|password|">
+              <span class="pwshow"><input type="checkbox" onclick="pwshow()"><span>Show Password</span></span>
             </div>
           </fieldset>
-          <fieldset class="ntp">
+          <fieldset class="tab ntp">
             <legend>NTP</legend>
             <div>
               <label for="ntp">NTP pool</label>
-              <input type="text" name="ntp" list="ntp_list" id="ntp">
+              <input type="text" name="ntp" list="ntp_list" id="ntp" value="|ntp|">
               <datalist id="ntp_list">
                 <option value="pool.ntp.org">
                 <option value="time.google.com">
@@ -256,22 +263,22 @@
             <div>
               <label>Update interval</label>
               <div>
-                <span><label for="5min">5 minutes</label><input type="radio" value="5min" name="time_format" id="5min" /></span>
-                <span><label for="15min">15 minutes</label><input type="radio" value="15min" name="time_format" id="15min" /></span>
-                <span><label for="30min">30 minutes</label><input type="radio" value="30min" name="time_format" id="30min" /></span>
-                <span><label for="60min">60 minutes</label><input type="radio" value="60min" name="time_format" id="60min" /></span>
+                <span><label for="5min">5 minutes</label><input |update_interval:300000| type="radio" value="300000" name="update_interval" id="5min" /></span>
+                <span><label for="15min">15 minutes</label><input |update_interval:900000| type="radio" value="900000" name="update_interval" id="15min" /></span>
+                <span><label for="30min">30 minutes</label><input |update_interval:1800000| type="radio" value="1800000" name="update_interval" id="30min" /></span>
+                <span><label for="60min">60 minutes</label><input |update_interval:3600000| type="radio" value="3600000" name="update_interval" id="60min" /></span>
               </div>
             </div>
           </fieldset>
           <fieldset class="actions">
-            <input type="submit" value="Save">
-            <input type="submit" value="Cancel">
+            <input type="submit" name="action" value="Save">
+            <input type="submit" name="action" value="Cancel">
           </fieldset>
         </form>
       </div>
     </div>
     <script>
-      var tabs = document.querySelectorAll( 'form fieldset' );
+      var tabs = document.querySelectorAll( 'form fieldset.tab' );
       tabs.forEach( ( tab ) => {
         tab.addEventListener( 'click', ( event ) => {
           tabs.forEach( ( tab ) => {
@@ -280,6 +287,11 @@
           tab.classList.add( 'active' );
         } )
       } );
+      function pwshow() {
+        var pw = document.getElementById('password');
+        if (pw.type === 'password') { pw.type = 'text'; }
+        else { pw.type = 'password'; }
+      }
     </script>
   </body>
 </html>

@@ -7,8 +7,12 @@
 
 using namespace espena;
 
+const char *broadcast_clock::configuration::m_nvs_namespace = "default";
+broadcast_clock::configuration *broadcast_clock::configuration::m_instance = nullptr;
+
 broadcast_clock::configuration::
 configuration() {
+  m_instance = this;
   read_from_nvs();
 }
 
@@ -20,15 +24,17 @@ broadcast_clock::configuration::
 void broadcast_clock::configuration::
 read_from_nvs() {
   nvs_handle_t nvs;
-  nvs_open( "broadcast_clock", NVS_READONLY, &nvs );
+  nvs_open( m_nvs_namespace, NVS_READONLY, &nvs );
   if( nvs ) {
     size_t required_size = 0;
     nvs_get_str( nvs, "config", NULL, &required_size );
-    if( required_size ) {
+    if( required_size > 0 ) {
+      ESP_LOGE( "configuration", "Configuration found" );
       m_data.resize( required_size );
       ESP_ERROR_CHECK( nvs_get_str( nvs, "config", &m_data[ 0 ], &required_size ) );
     }
     else {
+      ESP_LOGE( "configuration", "No configuration found, using default" );
       m_data = DEFAULT_CONFIG;
     }
     nvs_close( nvs );
@@ -39,8 +45,9 @@ read_from_nvs() {
 void broadcast_clock::configuration::
 save_to_nvs() {
   nvs_handle_t nvs;
-  nvs_open( "broadcast_clock", NVS_READWRITE, &nvs );
+  nvs_open( m_nvs_namespace, NVS_READWRITE, &nvs );
   if( nvs ) {
+    ESP_LOGE( "configuration", "Saving config: %s", m_data.c_str() );
     ESP_ERROR_CHECK( nvs_set_str( nvs, "config", m_data.c_str() ) );
     ESP_ERROR_CHECK( nvs_commit( nvs ) );
     nvs_close( nvs );
