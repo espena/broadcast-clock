@@ -1,6 +1,7 @@
 #ifndef __DOTMATRIX_HPP__
 #define __DOTMATRIX_HPP__
 
+#include "configuration.hpp"
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <driver/spi_master.h>
@@ -21,6 +22,8 @@ namespace espena::broadcast_clock {
 
         static const char *m_component_name;
         static const size_t m_component_stack_size = 4096;
+
+        configuration *m_config;
 
         bool m_test_mode;
         bool m_message_mode;

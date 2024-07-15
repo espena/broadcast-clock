@@ -15,7 +15,8 @@ using namespace espena;
 const char *broadcast_clock::dotmatrix::m_component_name = "dotmatrix";
 
 broadcast_clock::dotmatrix::
-dotmatrix() : m_message_mode( false ),
+dotmatrix() : m_config( nullptr ),
+              m_message_mode( false ),
               m_brightness( 0x00 ),
               m_current_hour( 0 ),
               m_current_minute( 0 ),
@@ -148,11 +149,13 @@ transmit( uint8_t u1_command,
 
 void broadcast_clock::dotmatrix::
 update() {
+  bool f12h = ( m_config && m_config->get_str( "time_format" ) == "12h" ? true : false );
+  const int8_t h = f12h ? m_current_hour % 12 : m_current_hour;
   if( !m_message_mode && !m_init_mode ) {
-    transmit( 0x60u, 0x30u | ( ( m_current_hour / 10 ) & 0x0f ), 0x60u, 0x30u | ( ( m_current_second / 10 ) & 0x0f ) );
-    transmit( 0x61u, 0x30u | ( ( m_current_hour % 10 ) & 0x0f ), 0x61u, 0x30u | ( ( m_current_second % 10 ) & 0x0f ) );
-    transmit( 0x62u, 0x30u | ( ( m_current_minute / 10 ) & 0x0f ), 0x62u, ' ' );
-    transmit( 0x63u, 0x30u | ( ( m_current_minute % 10 ) & 0x0f ), 0x63u, ' ' );
+    transmit( 0x60u, 0x30u | ( ( h / 10 ) & 0x0f ), 0x60u, 0x30u | ( ( m_current_second / 10 ) & 0x0f ) );
+    transmit( 0x61u, 0x30u | ( ( h % 10 ) & 0x0f ), 0x61u, 0x30u | ( ( m_current_second % 10 ) & 0x0f ) );
+    transmit( 0x62u, 0x30u | ( ( m_current_minute / 10 ) & 0x0f ), 0x62u, f12h && m_current_hour >= 12 ? 'P' : ' ' );
+    transmit( 0x63u, 0x30u | ( ( m_current_minute % 10 ) & 0x0f ), 0x63u, f12h && m_current_hour >= 12 ? 'M' : ' ' );
   }
   transmit( 0x01u, m_brightness, 0x01u, m_brightness );
   transmit( 0x02u, m_brightness, 0x02u, m_brightness );
@@ -161,6 +164,7 @@ update() {
 void broadcast_clock::dotmatrix::
 on_init() {
   ESP_LOGI( m_component_name, "Initializing" );
+  m_config = broadcast_clock::configuration::get_instance();
   init_spi();
   init_display();
   m_init_mode = true;
@@ -213,7 +217,7 @@ set_text( display_message *msg ) {
     transmit( 0x60u, msg->middle[ 0 ], 0x60u, msg->top[ 0 ] );
     transmit( 0x61u, msg->middle[ 1 ], 0x61u, msg->top[ 1 ] );
     transmit( 0x62u, msg->middle[ 2 ], 0x62u, msg->bottom[ 0 ] );
-    transmit( 0x63u, msg->middle[ 3 ], 0x62u, msg->bottom[ 1 ] );
+    transmit( 0x63u, msg->middle[ 3 ], 0x63u, msg->bottom[ 1 ] );
   }
 }
 
