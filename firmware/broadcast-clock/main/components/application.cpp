@@ -123,7 +123,10 @@ init_ap_duration_timeout() {
 void application::
 switch_to_station_mode() {
   m_captive_portal_dns.stop();
-  m_captive_portal_http.stop();
+  std::string conf = m_configuration->get_str( "configurator" );
+  if( conf != "on" ) {
+    m_captive_portal_http.stop();
+  }
   m_wifi.init( wifi::mode::station );
 }
 
@@ -157,7 +160,11 @@ on_cancel_config( std::string post_data ) {
 
 void application::
 on_leave_config_mode() {
-  switch_to_station_mode();
+  wifi_mode_t mode;
+  esp_wifi_get_mode( &mode );
+  if( mode != WIFI_MODE_STA ) {
+    switch_to_station_mode();
+  }
 }
 
 void application::

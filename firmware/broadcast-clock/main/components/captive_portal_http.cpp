@@ -7,6 +7,7 @@
 #include <freertos/queue.h>
 
 #include "esp_log.h"
+#include "esp_wifi.h"
 #include "esp_http_server.h"
 
 #include "captive_portal_http.hpp"
@@ -77,6 +78,7 @@ on_request( httpd_req_t *req ) {
   httpd_resp_set_type( req, "text/html; charset=is08859-1;" );
 
   if( uri == "/control_panel.html" && req->content_len > 0 && m_event_loop_handle ) {
+
     static std::string post_data;
     post_data.resize( req->content_len + 1 );
     httpd_req_recv( req, &post_data[ 0 ], req->content_len );
@@ -89,7 +91,17 @@ on_request( httpd_req_t *req ) {
 
     const char *buf_ex = ( char * ) broadcast_clock::resources::html::exit_page_html_start;
     const size_t buf_ex_len = broadcast_clock::resources::html::exit_page_html_end - broadcast_clock::resources::html::exit_page_html_start;
-    httpd_resp_send( req, buf_ex, buf_ex_len );
+
+    wifi_mode_t mode;
+    esp_wifi_get_mode( &mode );
+
+    if( mode == WIFI_MODE_STA ) { // Station mode, stay on configuration
+      std::string html = create_html_response();
+      httpd_resp_send( req, html.c_str(), html.length() );
+    }
+    else { // AP mode, exit from configuration
+      httpd_resp_send( req, buf_ex, buf_ex_len );
+    }
   }
   else {
     std::string html = create_html_response();

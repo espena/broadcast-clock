@@ -74,6 +74,7 @@
       form .display legend { left: 70px; }
       form .wifi legend { left: 140px; }
       form .ntp legend { left: 210px; }
+      form .opts legend { left: 280px; }
       fieldset {
         display: block;
         position: absolute;
@@ -139,6 +140,9 @@
       input[type="password"] {
         display: block;
         padding: 5px;
+      }
+      .opts.tab label {
+        padding-left: 5px;
       }
       input[type="submit"] {
         display: block;
@@ -284,6 +288,13 @@
                 <span><label for="30min">30 minutes</label><input |update_interval:1800000| type="radio" value="1800000" name="update_interval" id="30min" /></span>
                 <span><label for="60min">60 minutes</label><input |update_interval:3600000| type="radio" value="3600000" name="update_interval" id="60min" /></span>
               </div>
+            </div>
+          </fieldset>
+          <fieldset class="tab opts">
+            <legend>Options</legend>
+            <div>
+              <label>General options</label>
+              <div><input |configurator:on| type="checkbox" name="configurator" id="configurator"><label for="configurator">Enable web configurator after boot</label></div>
             </div>
           </fieldset>
           <fieldset class="actions">

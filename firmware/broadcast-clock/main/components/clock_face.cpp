@@ -118,6 +118,7 @@ wifi_event_handler( void *handler_arg,
         break;
       case broadcast_clock::wifi::LEAVE_CONFIG_MODE:
         instance->on_leave_config_mode();
+        instance->m_dotmatrix.display( nullptr );
         break;
     }
   }
@@ -135,6 +136,7 @@ wifi_event_handler( void *handler_arg,
         instance->m_dotmatrix.display( &exit_msg );
         break;
     }
+    instance->m_dotmatrix.display( nullptr );
   }
 }
 
