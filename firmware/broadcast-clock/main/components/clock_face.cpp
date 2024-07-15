@@ -1,4 +1,5 @@
 #include "clock_face.hpp"
+#include "configuration.hpp"
 #include "wifi.hpp"
 #include "captive_portal_http.hpp"
 #include <string>
@@ -187,27 +188,30 @@ init_ambient_sensor_interval_timer() {
 void broadcast_clock::clock_face::
 lux2threshold( uint16_t lux ) {
   static float hysteresis = 1.0;
-  int threshold = 1;
-  if( lux > ( 60000 * hysteresis ) ) {
-    threshold = 4;
-  }
-  else if( lux > ( 20000 * hysteresis) ) {
-    threshold = 3;
-  }
-  else if( lux > ( 1000 * hysteresis ) ) {
-    threshold = 2;
-  }
-  else if ( lux > ( 100 * hysteresis ) ) {
-    threshold = 1;
-  }
-  else {
-    threshold = 0;
-  }
-  if( m_threshold == threshold  ) {
-    hysteresis = 1.0;
-  }
-  else {
-    hysteresis = m_threshold < threshold ? 0.9 : 1.1;
+  broadcast_clock::configuration *c = broadcast_clock::configuration::get_instance();
+  int threshold = c->get_int( "brightness" );
+  if( threshold == 0 ) { // auto
+    if( lux > ( 60000 * hysteresis ) ) {
+      threshold = 4;
+    }
+    else if( lux > ( 20000 * hysteresis) ) {
+      threshold = 3;
+    }
+    else if( lux > ( 1000 * hysteresis ) ) {
+      threshold = 2;
+    }
+    else if ( lux > ( 100 * hysteresis ) ) {
+      threshold = 1;
+    }
+    else {
+      threshold = 0;
+    }
+    if( m_threshold == threshold  ) {
+      hysteresis = 1.0;
+    }
+    else {
+      hysteresis = m_threshold < threshold ? 0.9 : 1.1;
+    }
   }
   m_threshold = threshold;
 }

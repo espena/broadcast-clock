@@ -193,7 +193,7 @@ on_ambient_light_level( int threshold ) {
       brightness = 0x55u;
       break;
     case 4:
-      brightness = 0x77u;
+      brightness = 0x88u;
       break;
   }
   m_brightness = brightness;
