@@ -12,6 +12,8 @@ namespace espena::broadcast_clock {
   namespace resources::html {
     extern const uint8_t control_panel_html_start[ ] asm( "_binary_control_panel_html_start" );
     extern const uint8_t control_panel_html_end[ ] asm( "_binary_control_panel_html_end" );
+    extern const uint8_t exit_page_html_start[ ] asm( "_binary_exit_page_html_start" );
+    extern const uint8_t exit_page_html_end[ ] asm( "_binary_exit_page_html_end" );
   }
 
   class captive_portal_http {

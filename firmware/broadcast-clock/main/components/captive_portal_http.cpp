@@ -73,6 +73,8 @@ on_request( httpd_req_t *req ) {
   ESP_LOGI( m_component_name, "Request for %s", req->uri );
 
   std::string uri( req->uri );
+  httpd_resp_set_status( req, "302 Found" ); 
+  httpd_resp_set_type( req, "text/html; charset=is08859-1;" );
 
   if( uri == "/control_panel.html" && req->content_len > 0 && m_event_loop_handle ) {
     static std::string post_data;
@@ -84,11 +86,15 @@ on_request( httpd_req_t *req ) {
                         post_data.c_str(),
                         post_data.length(),
                         portMAX_DELAY );
+
+    const char *buf_ex = ( char * ) broadcast_clock::resources::html::exit_page_html_start;
+    const size_t buf_ex_len = broadcast_clock::resources::html::exit_page_html_end - broadcast_clock::resources::html::exit_page_html_start;
+    httpd_resp_send( req, buf_ex, buf_ex_len );
   }
-  httpd_resp_set_status( req, "302 Found" ); 
-  httpd_resp_set_type( req, "text/html; charset=is08859-1;" );
-  std::string html = create_html_response();
-  httpd_resp_send( req, html.c_str(), html.length() );
+  else {
+    std::string html = create_html_response();
+    httpd_resp_send( req, html.c_str(), html.length() );
+  }
   return ESP_OK;
 }
 
@@ -145,8 +151,8 @@ void broadcast_clock::captive_portal_http::start_sync() {
 
 std::string broadcast_clock::captive_portal_http::create_html_response() {
 
-  const char *buf = ( char * ) broadcast_clock::resources::html::control_panel_html_start;
-  const size_t buf_len = broadcast_clock::resources::html::control_panel_html_end - broadcast_clock::resources::html::control_panel_html_start;
+  const char *buf_cp = ( char * ) broadcast_clock::resources::html::control_panel_html_start;
+  const size_t buf_cp_len = broadcast_clock::resources::html::control_panel_html_end - broadcast_clock::resources::html::control_panel_html_start;
 
   broadcast_clock::configuration *cnf = broadcast_clock::configuration::get_instance();
 
@@ -159,8 +165,8 @@ std::string broadcast_clock::captive_portal_http::create_html_response() {
   std::string sel;
   std::string htm;
 
-  for( size_t i = 0; i < buf_len; i++ ) {
-    const unsigned char c = buf[ i ];
+  for( size_t i = 0; i < buf_cp_len; i++ ) {
+    const unsigned char c = buf_cp[ i ];
     if( c == '<' ) {
       is_ele = true;
       ele.clear();

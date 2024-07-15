@@ -9,5 +9,6 @@ idf_component_register( SRCS "app_main.cpp"
                              "components/dial.cpp"
                              "components/dotmatrix.cpp"
                 INCLUDE_DIRS "."
-              EMBED_TXTFILES "../resources/html/control_panel.html" )
+              EMBED_TXTFILES "../resources/html/control_panel.html"
+                             "../resources/html/exit_page.html" )
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCRON_USE_LOCAL_TIME" )

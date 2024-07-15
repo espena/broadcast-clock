@@ -60,7 +60,7 @@
         position: absolute;
         padding: 5px;
         top: -25px;
-        width: 50px;
+        width: 70px;
         height: 26px;
         border-radius: 5px 5px 0 0;
         background-color: #eee;
@@ -71,9 +71,9 @@
       }
       form .time { z-index: 1; }
       form .time legend { left: 0; }
-      form .display legend { left: 50px; }
-      form .wifi legend { left: 100px; }
-      form .ntp legend { left: 150px; }
+      form .display legend { left: 70px; }
+      form .wifi legend { left: 140px; }
+      form .ntp legend { left: 210px; }
       fieldset {
         display: block;
         position: absolute;
@@ -149,6 +149,12 @@
         border-radius: 5px;
         border: solid 1px #ccc; 
       }
+      .display.tab>div>div>span:first-of-type {
+        height: 30px;
+        clear: both;
+        display: block;
+        float: none;
+      }
       .pwshow {
         display: inline-block;
         padding: 5px 0 0 3px;
@@ -206,9 +212,16 @@
                 <option |time_zone:WET0WEST,M3.5.0/1,M10.5.0| value="WET0WEST,M3.5.0/1,M10.5.0">Western European Time (WET)</option>              
               </select>
             </div>
-            </fieldset>
+            <div>
+              <label>Time format</label>
+              <div>
+                <label for="12h">12 hour</label><input |time_format:12h| type="radio" value="12h" name="time_format" id="12h" />
+                <label for="24h">24 hour</label><input |time_format:24h| type="radio" value="24h" name="time_format" id="24h" />
+              </div>
+            </div>
+          </fieldset>
           <fieldset class="tab display">
-            <legend>Clock</legend>
+            <legend>Display</legend>
             <div>
               <label>Dial style</label>
               <div>
@@ -217,10 +230,12 @@
               </div>
             </div>
             <div>
-              <label>Time format</label>
+              <label>Brightness</label>
               <div>
-                <label for="12h">12 hour</label><input |time_format:12h| type="radio" value="12h" name="time_format" id="12h" />
-                <label for="24h">24 hour</label><input |time_format:24h| type="radio" value="24h" name="time_format" id="24h" />
+                <span><label for="auto">Auto adjust</label><input |brightness:0| type="radio" value="0" name="brightness" id="auto" /></span>
+                <span><label for="level1">Level 1</label><input |brightness:1| type="radio" value="1" name="brightness" id="level1" /></span>
+                <span><label for="level1">Level 2</label><input |brightness:2| type="radio" value="2" name="brightness" id="level2" /></span>
+                <span><label for="level1">Level 3</label><input |brightness:3| type="radio" value="3" name="brightness" id="level3" /></span>
               </div>
             </div>
           </fieldset>
