@@ -320,7 +320,7 @@
         if (pw.type === 'password') { pw.type = 'text'; }
         else { pw.type = 'password'; }
       }
-      var active_tab = window.localStorage.getItem( 'active_tab' ) || 'time';
+      var active_tab = window.localStorage.getItem( 'active_tab' ) ?? 'time';
       document.querySelector( 'form fieldset.tab.' + active_tab ).classList.add( 'active' );
     </script>
   </body>
