@@ -129,14 +129,11 @@ wifi_event_handler( void *handler_arg,
     switch( event_id ) {
       case broadcast_clock::captive_portal_http::EVENT_SAVE:
         instance->on_leave_config_mode();
-        instance->m_dotmatrix.display( &save_msg );
         break;
       case broadcast_clock::captive_portal_http::EVENT_CANCEL:
         instance->on_leave_config_mode();
-        instance->m_dotmatrix.display( &exit_msg );
         break;
     }
-    instance->m_dotmatrix.display( nullptr );
   }
 }
 
