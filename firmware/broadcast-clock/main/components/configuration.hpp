@@ -10,6 +10,8 @@ namespace espena::broadcast_clock {
 
   class configuration {
 
+    static const char *m_component_name;
+
     ::std::string m_data;
     ::std::map<std::string, std::string> m_values;
 
@@ -29,6 +31,7 @@ namespace espena::broadcast_clock {
 
     ::std::string get_str( ::std::string key );
     int get_int( ::std::string key );
+    bool get_bool( ::std::string key );
 
     void update( ::std::string data );
     void parse();

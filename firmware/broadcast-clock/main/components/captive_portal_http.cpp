@@ -96,6 +96,7 @@ on_request( httpd_req_t *req ) {
     esp_wifi_get_mode( &mode );
 
     if( mode == WIFI_MODE_STA ) { // Station mode, stay on configuration
+      vTaskDelay( 100 / portTICK_PERIOD_MS ); // Wait for save completed
       std::string html = create_html_response();
       httpd_resp_send( req, html.c_str(), html.length() );
     }

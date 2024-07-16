@@ -1,11 +1,15 @@
 #include "configuration.hpp"
 #include "../utils/from_hex.hpp"
+#include <algorithm>
+#include <cctype>
 #include <string>
 #include <map>
 #include <nvs_flash.h>
 #include <esp_log.h>
 
 using namespace espena;
+
+const char *broadcast_clock::configuration::m_component_name = "configuration";
 
 const char *broadcast_clock::configuration::m_nvs_namespace = "default";
 broadcast_clock::configuration *broadcast_clock::configuration::m_instance = nullptr;
@@ -29,16 +33,17 @@ read_from_nvs() {
     size_t required_size = 0;
     nvs_get_str( nvs, "config", NULL, &required_size );
     if( required_size > 0 ) {
-      ESP_LOGE( "configuration", "Configuration found" );
+      ESP_LOGI( m_component_name, "Configuration found" );
       m_data.resize( required_size );
       ESP_ERROR_CHECK( nvs_get_str( nvs, "config", &m_data[ 0 ], &required_size ) );
     }
     else {
-      ESP_LOGE( "configuration", "No configuration found, using default" );
+      ESP_LOGI( m_component_name, "No configuration found, using default" );
       m_data = DEFAULT_CONFIG;
     }
     nvs_close( nvs );
   }
+  ESP_LOGE( m_component_name, "Current configuration: %s", m_data.c_str() );
   parse();
 }
 
@@ -114,4 +119,23 @@ get_str( std::string key ) {
 int broadcast_clock::configuration::
 get_int( std::string key ) {
   return atoi( get_str( key ).c_str() );
+}
+
+bool broadcast_clock::configuration::
+get_bool( std::string key ) {
+  std::string s = get_str( key );
+  
+  std::transform( s.begin(), s.end(), s.begin(),
+    [ ]( unsigned char c ) {
+      return std::tolower( c );
+    } );
+  
+  return  ( ( s.empty() || 
+              s == "0" ||
+              s == "false" ||
+              s == "off" ||
+              s == "no" ||
+              s == " " )
+            ? false
+            : true);
 }

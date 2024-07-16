@@ -181,7 +181,7 @@
       </header>
       <div class="form">
         <form method="post" action="control_panel.html">
-          <fieldset class="tab time active">
+          <fieldset class="tab time">
             <legend>Time</legend>
             <div>
               <label for="time_zone">Time zone</label>
@@ -311,6 +311,7 @@
           tabs.forEach( ( tab ) => {
             tab.classList.remove( 'active' );
           } );
+          window.localStorage.setItem( 'active_tab', tab.classList[ 1 ] );
           tab.classList.add( 'active' );
         } )
       } );
@@ -319,6 +320,8 @@
         if (pw.type === 'password') { pw.type = 'text'; }
         else { pw.type = 'password'; }
       }
+      var active_tab = window.localStorage.getItem( 'active_tab' ) || 'time';
+      document.querySelector( 'form fieldset.tab.' + active_tab ).classList.add( 'active' );
     </script>
   </body>
 </html>
