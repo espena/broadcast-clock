@@ -149,13 +149,14 @@ transmit( uint8_t u1_command,
 
 void broadcast_clock::dotmatrix::
 update() {
-  bool f12h = ( m_config && m_config->get_str( "time_format" ) == "12h" ? true : false );
+  std::string t = m_config ? m_config->get_str( "time_format" ) : "24h";
+  bool f12h = ( t == "12h" );
   const int8_t h = f12h ? m_current_hour % 12 : m_current_hour;
   if( !m_message_mode && !m_init_mode ) {
     transmit( 0x60u, 0x30u | ( ( h / 10 ) & 0x0f ), 0x60u, 0x30u | ( ( m_current_second / 10 ) & 0x0f ) );
     transmit( 0x61u, 0x30u | ( ( h % 10 ) & 0x0f ), 0x61u, 0x30u | ( ( m_current_second % 10 ) & 0x0f ) );
-    transmit( 0x62u, 0x30u | ( ( m_current_minute / 10 ) & 0x0f ), 0x62u, f12h && m_current_hour >= 12 ? 'P' : ' ' );
-    transmit( 0x63u, 0x30u | ( ( m_current_minute % 10 ) & 0x0f ), 0x63u, f12h && m_current_hour >= 12 ? 'M' : ' ' );
+    transmit( 0x62u, 0x30u | ( ( m_current_minute / 10 ) & 0x0f ), 0x62u, f12h && m_current_hour >= 12 ? 'P' : 'A' );
+    transmit( 0x63u, 0x30u | ( ( m_current_minute % 10 ) & 0x0f ), 0x63u, f12h && m_current_hour >= 12 ? 'M' : 'M' );
   }
   transmit( 0x01u, m_brightness, 0x01u, m_brightness );
   transmit( 0x02u, m_brightness, 0x02u, m_brightness );
