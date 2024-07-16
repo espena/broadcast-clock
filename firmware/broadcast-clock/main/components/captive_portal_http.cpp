@@ -77,7 +77,7 @@ on_request( httpd_req_t *req ) {
   httpd_resp_set_status( req, "302 Found" ); 
   httpd_resp_set_type( req, "text/html; charset=is08859-1;" );
 
-  if( uri == "/control_panel.html" && req->content_len > 0 && m_event_loop_handle ) {
+  if( uri == "/save" && req->content_len > 0 && m_event_loop_handle ) {
 
     static std::string post_data;
     post_data.resize( req->content_len + 1 );
@@ -144,7 +144,7 @@ void broadcast_clock::captive_portal_http::start_sync() {
 
   httpd_uri_t location;
 
-  location.uri = "/control_panel.html",
+  location.uri = "/save",
   location.handler = request_handler,
   location.user_ctx = this;
   location.method = HTTP_POST,

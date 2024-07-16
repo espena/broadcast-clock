@@ -174,13 +174,19 @@
     </style>
   </head>
   <body>
+    <script>
+      var p = window.location.pathname.split( '/' );
+      if( p.pop() == 'save' ) {
+        window.location.href = '/';
+      }
+    </script>
     <div>
       <header>
         <h1>Broadcast clock</h1>
         <h2>Configuration and settings</h2>
       </header>
       <div class="form">
-        <form method="post" action="control_panel.html">
+        <form method="post" action="/save">
           <fieldset class="tab time">
             <legend>Time</legend>
             <div>
