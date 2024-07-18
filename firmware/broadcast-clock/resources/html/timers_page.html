@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Broadcast Clock - Timers</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+  </head>
+  <body>
+    <script>
+      var p = window.location.pathname.split( '/' );
+      if( p.pop() == 'stopwatch' ) {
+        window.location.href = '/';
+      }
+    </script>
+    <div>
+      <header>
+        <h1>Broadcast clock</h1>
+        <h2>Timers and stopwatch</h2>
+      </header>
+      <div class="form">
+        <form method="post" action="stopwatch">
+          <fieldset class="tab stopwatch">
+            <legend>Stopwatch</legend>
+            <div class="stopwatch buttons">
+              <button class="start">Start</button>
+              <button class="stop">Stop</button>
+            </div>
+            <div class="stopwatch buttons">
+              <button class="reset">Reset</button>
+            </div>
+          </fieldset>
+        </form>
+        <p class="links"><a class="back" href="/">Back to control panel</a></p>
+      </div>
+    </div>
+    <script>
+      var buttons = document.querySelectorAll( 'form fieldset.tab button' );
+      buttons.forEach( ( button ) => {
+        button.addEventListener( 'click', ( e ) => {
+          var action = button.classList[ 0 ];
+          var ts = ( new Date() ).getTime();
+          fetch( `/stopwatch/${action}?ts=${ts}`, { cache: 'no-store' } )
+            .then( response => response.text() )
+            .then( data => console.log( data ) );
+          e.preventDefault();
+        } );
+      } );
+      var tabs = document.querySelectorAll( 'form fieldset.tab' );
+      tabs.forEach( ( tab ) => {
+        tab.addEventListener( 'click', ( event ) => {
+          tabs.forEach( ( tab ) => {
+            tab.classList.remove( 'active' );
+          } );
+          window.localStorage.setItem( 'active_timer_tab', tab.classList[ 1 ] );
+          tab.classList.add( 'active' );
+        } )
+      } );
+      var active_timer_tab = window.localStorage.getItem( 'active_timer_tab' ) ?? 'stopwatch';
+      document.querySelector( 'form fieldset.tab.' + active_timer_tab ).classList.add( 'active' );
+      window.addEventListener( 'beforeunload', ( e ) => {
+        fetch( '/stopwatch/reset', { cache: 'no-store' } );
+      } );
+    </script>
+  </body>
+</html>

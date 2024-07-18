@@ -1,0 +1,201 @@
+* {
+  box-sizing: border-box;
+}
+html, body {
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  padding: 0;
+  margin: 0;
+  color: #000;
+  background-color: #fff;
+  position: relative;
+}
+body>div {
+  height: 30em;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: auto;
+  left: 0;
+  padding: 0 10px;
+  margin: 0 !important;
+  background-color: #fff;
+}
+header {
+  display: block;
+  padding: 10px 0;
+}
+h1, h2 {
+  margin: 0;
+}
+h1 {
+  font-size: 1.65em;
+}
+h2 {
+  font-size: 1em;
+  padding-bottom: 5px;
+}
+.form {
+  margin: 40px 0 0 0;
+  padding: 0;
+  position: relative;
+  height: 330px;
+
+}
+form legend {
+  box-sizing: border-box;
+  display: block;
+  font-size: 13px;
+  font-weight: normal;
+  display: block;
+  text-align: center;
+  position: absolute;
+  padding: 5px;
+  top: -25px;
+  width: 75px;
+  height: 26px;
+  border-radius: 5px 5px 0 0;
+  background-color: #eee;
+  cursor: pointer;
+  border-style: solid solid none solid;
+  border-width: 1px;
+  border-color: #aaa;
+}
+form .time { z-index: 1; }
+
+form .stopwatch legend { left: 0; }
+
+form .time legend { left: 0; }
+form .display legend { left: 75px; }
+form .wifi legend { left: 150px; }
+form .ntp legend { left: 225px; }
+form .opts legend { left: 300px; }
+fieldset {
+  display: block;
+  position: absolute;
+  height: 270px;
+  top: 0;
+  right: 0;
+  bottom: auto;
+  left: 0;
+  border-radius: 3px;
+  padding: 1em 1em 0.75em 1em;
+  background-color: #fff;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #aaa;
+  z-index: 0;
+}
+fieldset.actions {
+  padding: 0 5px;
+  border: none;
+}
+fieldset.active {
+  z-index: 1;
+}
+fieldset.active legend {
+  background-color: #fff;
+  height: 26px;
+}
+fieldset label {
+  font-size: 13px;
+  position: relative;
+  top: -2px;
+}
+fieldset span>label {
+  display: inline-block;
+  min-width: 6.5em;
+  margin-bottom: 0.5em;
+  text-align: right;
+}
+fieldset>div>label {
+  display: inline-block;
+  min-width: 6.5em;
+  margin-bottom: 0.5em;
+  font-weight: bold;
+}
+fieldset span {
+  display: block;
+  float: left;
+}
+fieldset>div {
+  margin-bottom: 1em;
+}
+fieldset>div>div {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+}
+fieldset>div>div>label {
+  display: inline-block;
+  min-width: 5em;
+  text-align: right;
+}
+select,
+input[type="text"],
+input[type="password"] {
+  display: block;
+  padding: 5px;
+}
+.opts.tab label {
+  padding-left: 5px;
+}
+input[type="submit"] {
+  display: block;
+  margin: 280px 0 0 10px;
+  float: right;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  border: solid 1px #ccc; 
+}
+.display.tab>div>div>span:first-of-type {
+  height: 30px;
+  clear: both;
+  display: block;
+  float: none;
+}
+.pwshow {
+  display: inline-block;
+  padding: 5px 0 0 3px;
+}
+.pwshow>span {
+  font-size: 12px;
+  position: relative;
+  top: 3px;
+}
+.actions {
+  text-align: right;
+}
+ul li,
+.pwshow>span {
+  font-size: 12px;
+}
+.stopwatch.buttons {
+  text-align: center;
+}
+.stopwatch.buttons button {
+  display: inline-block;
+  width: 100px;
+  padding: 2em 1em;
+  margin-top: 2em;
+  font-weight: bold;
+  text-transform: uppercase;
+  border-radius: 5px;
+}
+.stopwatch.buttons button.start {
+  margin-right: 2em;
+}
+.stopwatch.buttons .start {
+  background-color: #8b8;
+}
+.stopwatch.buttons .stop {
+  background-color: #b88;
+}
+p.links {
+  text-align: center;
+  padding-top: 290px;
+}
+a.back {
+  display: inline-block;
+  z-index: 10;
+}

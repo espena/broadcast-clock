@@ -3,6 +3,7 @@
 #include <memory.h>
 #include <string.h>
 #include <time.h>
+#include <sys/time.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <freertos/queue.h>
@@ -21,10 +22,17 @@ dotmatrix() : m_config( nullptr ),
               m_current_hour( 0 ),
               m_current_minute( 0 ),
               m_current_second( 0 ),
+              m_stopwatch_hour( 0 ),
+              m_stopwatch_minute( 0 ),
+              m_stopwatch_second( 0 ),
+              m_stopwatch_fraction( 0 ),
               m_task_queue( nullptr ),
               m_spi( nullptr ) {
     
   m_task_queue = xQueueCreate( 1, sizeof( dotmatrix_task_queue_item ) );
+
+  memset( &m_stopwatch_begin, 0x00, sizeof( timespec ) );
+  memset( &m_stopwatch_end, 0x00, sizeof( timespec ) );
 
   m_task_params.instance = this;
   m_task_params.stack_buffer = ( StackType_t * ) heap_caps_malloc( m_component_stack_size,
@@ -78,6 +86,24 @@ display( const display_message *msg ) {
 }
 
 void broadcast_clock::dotmatrix::
+stopwatch_start() {
+  dotmatrix_task_queue_item item = { dotmatrix_task_message::stopwatch_start, nullptr };
+  xQueueSend( m_task_queue, &item, 10 );
+}
+
+void broadcast_clock::dotmatrix::
+stopwatch_stop() {
+  dotmatrix_task_queue_item item = { dotmatrix_task_message::stopwatch_stop, nullptr };
+  xQueueSend( m_task_queue, &item, 10 );
+}
+
+void broadcast_clock::dotmatrix::
+stopwatch_reset() {
+  dotmatrix_task_queue_item item = { dotmatrix_task_message::stopwatch_reset, nullptr };
+  xQueueSend( m_task_queue, &item, 10 );
+}
+
+void broadcast_clock::dotmatrix::
 test() {
   dotmatrix_task_queue_item item = { dotmatrix_task_message::test, nullptr };
   xQueueSend( m_task_queue, &item, 10 );
@@ -90,14 +116,28 @@ task_loop( void *arg ) {
   dotmatrix_task_queue_item item;
   memset( &item, 0x00, sizeof( dotmatrix_task_queue_item ) );
   while( 1 ) {
-    if( xQueueReceive( inst->m_task_queue, &item, 10 ) ) {
+    if( xQueueReceive( inst->m_task_queue, &item, 1 ) ) {
       inst->on_message( item.message, item.arg );
     }
     time_t now = time( NULL );
     struct tm timeinfo;
     localtime_r( &now, &timeinfo );
     
-    if( inst->m_current_hour != timeinfo.tm_hour || 
+    if( inst->m_stopwatch_begin.tv_nsec != 0 || inst->m_stopwatch_end.tv_nsec != 0 ) {
+      if( inst->m_stopwatch_begin.tv_nsec != 0 ) {
+
+        clock_gettime( CLOCK_MONOTONIC, &inst->m_stopwatch_end );
+        const uint32_t mstart = inst->m_stopwatch_begin.tv_sec * 1000 + inst->m_stopwatch_begin.tv_nsec / 1000000;
+        const uint32_t mend = inst->m_stopwatch_end.tv_sec * 1000 + inst->m_stopwatch_end.tv_nsec / 1000000;
+        const uint32_t mdiff = mend - mstart;
+        inst->m_stopwatch_hour =     ( mdiff / 3600000 ) % 60;
+        inst->m_stopwatch_minute =   ( mdiff /   60000 ) % 60;
+        inst->m_stopwatch_second =   ( mdiff /    1000 ) % 60;
+        inst->m_stopwatch_fraction = ( mdiff /      10 ) % 100;
+        inst->update();
+      }
+    }
+    else if( inst->m_current_hour != timeinfo.tm_hour || 
         inst->m_current_minute != timeinfo.tm_min ||
         inst->m_current_second != timeinfo.tm_sec ) {
 
@@ -120,6 +160,15 @@ on_message( dotmatrix_task_message msg, void *arg ) {
       break;
     case dotmatrix_task_message::display:
       on_display( static_cast<display_message *>( arg ) );
+      break;
+    case dotmatrix_task_message::stopwatch_start:
+      on_stopwatch_start();
+      break;
+    case dotmatrix_task_message::stopwatch_stop:
+      on_stopwatch_stop();
+      break;
+    case dotmatrix_task_message::stopwatch_reset:
+      on_stopwatch_reset();
       break;
     case dotmatrix_task_message::ambient_light_level:
       on_ambient_light_level( *static_cast<uint16_t *>( arg ) );
@@ -149,15 +198,23 @@ transmit( uint8_t u1_command,
 
 void broadcast_clock::dotmatrix::
 update() {
-  std::string t = m_config ? m_config->get_str( "time_format" ) : "24h";
-  bool f12h = ( t == "12h" ) ? true : false;
-  const int8_t h = ( f12h ? m_current_hour % 12 : m_current_hour );
-  const char *meridiem = f12h ? ( m_current_hour >= 12 ? "PM" : "AM" ) : "  ";
   if( !m_message_mode && !m_init_mode ) {
-    transmit( 0x60u, 0x30u | ( ( h / 10 ) & 0x0f ), 0x60u, 0x30u | ( ( m_current_second / 10 ) & 0x0f ) );
-    transmit( 0x61u, 0x30u | ( ( h % 10 ) & 0x0f ), 0x61u, 0x30u | ( ( m_current_second % 10 ) & 0x0f ) );
-    transmit( 0x62u, 0x30u | ( ( m_current_minute / 10 ) & 0x0f ), 0x62u, meridiem[ 0 ] );
-    transmit( 0x63u, 0x30u | ( ( m_current_minute % 10 ) & 0x0f ), 0x63u, meridiem[ 1 ] );
+    if( m_stopwatch_begin.tv_nsec != 0 || m_stopwatch_end.tv_nsec != 0 ) {
+      transmit( 0x60u, 0x30u | ( ( m_stopwatch_minute / 10 ) & 0x0f ), 0x60u, 0x30u | ( ( m_stopwatch_fraction / 10 ) & 0x0f ) );
+      transmit( 0x61u, 0x30u | ( ( m_stopwatch_minute % 10 ) & 0x0f ), 0x61u, 0x30u | ( ( m_stopwatch_fraction % 10 ) & 0x0f ) );
+      transmit( 0x62u, 0x30u | ( ( m_stopwatch_second / 10 ) & 0x0f ), 0x62u, 0x30u | ( ( m_stopwatch_hour / 10 ) & 0x0f ) );
+      transmit( 0x63u, 0x30u | ( ( m_stopwatch_second % 10 ) & 0x0f ), 0x63u, 0x30u | ( ( m_stopwatch_hour % 10 ) & 0x0f ) );
+    }
+    else {
+      std::string t = m_config ? m_config->get_str( "time_format" ) : "24h";
+      bool f12h = ( t == "12h" ) ? true : false;
+      const int8_t h = ( f12h ? m_current_hour % 12 : m_current_hour );
+      const char *meridiem = f12h ? ( m_current_hour >= 12 ? "PM" : "AM" ) : "  ";
+      transmit( 0x60u, 0x30u | ( ( h / 10 ) & 0x0f ), 0x60u, 0x30u | ( ( m_current_second / 10 ) & 0x0f ) );
+      transmit( 0x61u, 0x30u | ( ( h % 10 ) & 0x0f ), 0x61u, 0x30u | ( ( m_current_second % 10 ) & 0x0f ) );
+      transmit( 0x62u, 0x30u | ( ( m_current_minute / 10 ) & 0x0f ), 0x62u, meridiem[ 0 ] );
+      transmit( 0x63u, 0x30u | ( ( m_current_minute % 10 ) & 0x0f ), 0x63u, meridiem[ 1 ] );
+    }
   }
   transmit( 0x01u, m_brightness, 0x01u, m_brightness );
   transmit( 0x02u, m_brightness, 0x02u, m_brightness );
@@ -207,6 +264,22 @@ on_display( display_message *msg ) {
   if( m_message_mode ) {
     set_text( msg );
   }
+}
+
+void broadcast_clock::dotmatrix::
+on_stopwatch_start() {
+  clock_gettime( CLOCK_MONOTONIC, &m_stopwatch_begin );
+}
+
+void broadcast_clock::dotmatrix::
+on_stopwatch_stop() {
+  memset( &m_stopwatch_begin, 0x00, sizeof( timespec ) );
+}
+
+void broadcast_clock::dotmatrix::
+on_stopwatch_reset() {
+  memset( &m_stopwatch_begin, 0x00, sizeof( timespec ) );
+  memset( &m_stopwatch_end, 0x00, sizeof( timespec ) );
 }
 
 void broadcast_clock::dotmatrix::

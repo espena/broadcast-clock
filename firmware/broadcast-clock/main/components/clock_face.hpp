@@ -50,6 +50,10 @@ namespace espena::broadcast_clock {
     void on_enter_config_mode();
     void on_leave_config_mode();
 
+    void on_stopwatch_start();
+    void on_stopwatch_stop();
+    void on_stopwatch_reset();
+
     static void on_ambient_sensor_interval( void* arg );
     void check_ambient_light();
 

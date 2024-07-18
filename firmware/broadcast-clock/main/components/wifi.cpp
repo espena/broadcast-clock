@@ -248,6 +248,7 @@ init_wifi() {
     esp_wifi_set_mode( WIFI_MODE_STA );
     esp_wifi_set_config( WIFI_IF_STA, &wifi_config );
     esp_wifi_start();
+    esp_wifi_set_ps( WIFI_PS_NONE );
 
   }
   else if( m_current_mode == mode::access_point ) {
@@ -272,7 +273,7 @@ init_wifi() {
     wifi_config.ap.ssid_len = sizeof( ssid );
     wifi_config.ap.channel = 7;
     wifi_config.ap.password[ 0 ] = '\0';
-    wifi_config.ap.max_connection = 10;
+    wifi_config.ap.max_connection = 100;
     wifi_config.ap.authmode = WIFI_AUTH_OPEN;
 
     ESP_LOGI( m_component_name, "Setting WiFi mode to AP" );

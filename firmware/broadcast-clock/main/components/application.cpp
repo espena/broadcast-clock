@@ -19,9 +19,9 @@ application() : m_configuration( nullptr ),
                 m_i2c_bus( nullptr ),
                 m_event_loop_handle( nullptr ) {
   esp_event_loop_args_t loop_args = {
-    .queue_size = 1000,
+    .queue_size = 100,
     .task_name = "event_loop",
-    .task_priority = uxTaskPriorityGet( NULL ),
+    .task_priority = 15,
     .task_stack_size = 4096,
     .task_core_id = tskNO_AFFINITY
   };
@@ -30,7 +30,6 @@ application() : m_configuration( nullptr ),
 
 application::
 ~application() {
-
 }
 
 void application::

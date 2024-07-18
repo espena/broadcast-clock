@@ -92,6 +92,24 @@ on_init( i2c_master_bus_handle_t i2c_bus ) {
                                      broadcast_clock::captive_portal_http::EVENT_CANCEL,
                                      wifi_event_handler,
                                      this );
+
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::captive_portal_http::m_event_base,
+                                     broadcast_clock::captive_portal_http::EVENT_STOPWATCH_START,
+                                     wifi_event_handler,
+                                     this );
+
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::captive_portal_http::m_event_base,
+                                     broadcast_clock::captive_portal_http::EVENT_STOPWATCH_STOP,
+                                     wifi_event_handler,
+                                     this );
+
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::captive_portal_http::m_event_base,
+                                     broadcast_clock::captive_portal_http::EVENT_STOPWATCH_RESET,
+                                     wifi_event_handler,
+                                     this );
   }
 
   m_dotmatrix.init();
@@ -124,14 +142,21 @@ wifi_event_handler( void *handler_arg,
   }
   else if( source == broadcast_clock::captive_portal_http::m_event_base ) {
     broadcast_clock::clock_face *instance = static_cast<broadcast_clock::clock_face *>( handler_arg );
-    const static dotmatrix::display_message save_msg = { "  ", "Save", "  " };
-    const static dotmatrix::display_message exit_msg = { "  ", "Exit", "  " };
     switch( event_id ) {
       case broadcast_clock::captive_portal_http::EVENT_SAVE:
         instance->on_leave_config_mode();
         break;
       case broadcast_clock::captive_portal_http::EVENT_CANCEL:
         instance->on_leave_config_mode();
+        break;
+      case broadcast_clock::captive_portal_http::EVENT_STOPWATCH_START:
+        instance->on_stopwatch_start();
+        break;
+      case broadcast_clock::captive_portal_http::EVENT_STOPWATCH_STOP:
+        instance->on_stopwatch_stop();
+        break;
+      case broadcast_clock::captive_portal_http::EVENT_STOPWATCH_RESET:
+        instance->on_stopwatch_reset();
         break;
     }
   }
@@ -158,6 +183,27 @@ void broadcast_clock::clock_face::
 on_enter_config_mode() {
   broadcast_clock::dotmatrix::display_message msg = { "  ", "Conf", "  " };
   m_dotmatrix.display( &msg );
+}
+
+void broadcast_clock::clock_face::
+on_stopwatch_start() {
+  ESP_LOGI( m_component_name, "Stopwatch started" );
+  m_dotmatrix.stopwatch_start();
+  m_dial.stopwatch_start();
+}
+
+void broadcast_clock::clock_face::
+on_stopwatch_stop() {
+  ESP_LOGI( m_component_name, "Stopwatch stopped" );
+  m_dotmatrix.stopwatch_stop();
+  m_dial.stopwatch_stop();
+}
+
+void broadcast_clock::clock_face::
+on_stopwatch_reset() {
+  ESP_LOGI( m_component_name, "Stopwatch reset" );
+  m_dotmatrix.stopwatch_reset();
+  m_dial.stopwatch_reset();
 }
 
 void broadcast_clock::clock_face::

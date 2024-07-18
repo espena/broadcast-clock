@@ -2,6 +2,7 @@
 #define __DIAL_HPP__
 
 #include "configuration.hpp"
+#include <sys/time.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <vector>
@@ -14,6 +15,9 @@ namespace espena::broadcast_clock {
         static const char *m_component_name;
         static const size_t m_component_stack_size = 8192;
         
+        struct timespec m_stopwatch_begin;
+        struct timespec m_stopwatch_end;
+
         configuration *m_config;
         
         esp_timer_handle_t m_refresh_timer;
@@ -60,6 +64,11 @@ namespace espena::broadcast_clock {
         ~dial();
         void init();
         void set_ambient_light_level( uint16_t lux );
+
+        void stopwatch_start();
+        void stopwatch_stop();
+        void stopwatch_reset();
+
     };
 
 }

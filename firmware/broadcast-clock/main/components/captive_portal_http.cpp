@@ -20,7 +20,7 @@ const esp_event_base_t broadcast_clock::captive_portal_http::m_event_base = "CAP
 
 broadcast_clock::captive_portal_http::captive_portal_http() : m_message_queue( nullptr ),
                                                               m_server( nullptr )
-{
+{    
   m_cfg.uri_match_fn = httpd_uri_match_wildcard;
   m_cfg.lru_purge_enable = true;
   m_message_queue = xQueueCreate( 50, sizeof( captive_portal_http_task_queue_item ) );
@@ -33,7 +33,7 @@ broadcast_clock::captive_portal_http::captive_portal_http() : m_message_queue( n
                      m_component_name,
                      m_component_stack_size,
                      &m_task_params,
-                     4 | portPRIVILEGE_BIT,
+                     22,
                      m_task_params.stack_buffer,
                      &m_task_params.task_buffer ); 
 
@@ -62,22 +62,8 @@ request_handler( httpd_req_t *req ) {
   return inst->on_request( req );
 }
 
-esp_err_t broadcast_clock::captive_portal_http::
-on_request( httpd_req_t *req ) {
-
-  const size_t req_hdr_host_len = httpd_req_get_hdr_value_len( req, "Host" );
-  std::string hostname;
-  hostname.resize( req_hdr_host_len + 1 );
-
-  httpd_req_get_hdr_value_str( req, "Host", &hostname[ 0 ], req_hdr_host_len + 1 );
-
-  ESP_LOGI( m_component_name, "Request for %s", req->uri );
-
-  std::string uri( req->uri );
-  httpd_resp_set_status( req, "302 Found" ); 
-  httpd_resp_set_type( req, "text/html; charset=is08859-1;" );
-
-  if( uri == "/save" && req->content_len > 0 && m_event_loop_handle ) {
+void broadcast_clock::captive_portal_http::
+save_handler( httpd_req_t *req ) {
 
     static std::string post_data;
     post_data.resize( req->content_len + 1 );
@@ -98,11 +84,83 @@ on_request( httpd_req_t *req ) {
     if( mode == WIFI_MODE_STA ) { // Station mode, stay on configuration
       vTaskDelay( 100 / portTICK_PERIOD_MS ); // Wait for save completed
       std::string html = create_html_response();
+      httpd_resp_set_hdr( req, "Connection", "Close"  );
       httpd_resp_send( req, html.c_str(), html.length() );
     }
     else { // AP mode, exit from configuration
       httpd_resp_send( req, buf_ex, buf_ex_len );
     }
+}
+
+void broadcast_clock::captive_portal_http::
+timers_handler( httpd_req_t *req ) {
+
+  esp_event_post_to( m_event_loop_handle,
+                      m_event_base,
+                      EVENT_ENTER_TIMERS,
+                      "",
+                      0,
+                      portMAX_DELAY );
+
+  const char *buf_sw = ( char * ) broadcast_clock::resources::html::timers_page_html_start;
+  const size_t buf_sw_len = broadcast_clock::resources::html::timers_page_html_end - broadcast_clock::resources::html::timers_page_html_start;
+  httpd_resp_send( req, buf_sw, buf_sw_len );
+}
+
+void broadcast_clock::captive_portal_http::
+stopwatch_handler( httpd_req_t *req ) {
+
+  httpd_resp_send( req, "OK", 3 );
+  std::string uri( req->uri );
+  uint32_t e = 0;
+  if( uri.starts_with( "/stopwatch/start" ) ) e = EVENT_STOPWATCH_START;
+  else if( uri.starts_with( "/stopwatch/stop" ) ) e = EVENT_STOPWATCH_STOP;
+  else e = EVENT_STOPWATCH_RESET;
+
+  esp_event_post_to( m_event_loop_handle,
+                     m_event_base,
+                     e,
+                     "",
+                     0,
+                     portMAX_DELAY );
+}
+
+esp_err_t broadcast_clock::captive_portal_http::
+on_request( httpd_req_t *req ) {
+
+  const size_t req_hdr_host_len = httpd_req_get_hdr_value_len( req, "Host" );
+  std::string hostname;
+  hostname.resize( req_hdr_host_len + 1 );
+
+  httpd_req_get_hdr_value_str( req, "Host", &hostname[ 0 ], req_hdr_host_len + 1 );
+
+  ESP_LOGI( m_component_name, "Request for %s", req->uri );
+
+  std::string uri( req->uri );
+
+  if( uri == "/save" && req->content_len > 0 && m_event_loop_handle ) {
+    httpd_resp_set_status( req, "302 Found" ); 
+    httpd_resp_set_type( req, "text/html; charset=is08859-1;" );
+    save_handler( req );
+  }
+  else if( uri == "/timers" && m_event_loop_handle ) {
+    httpd_resp_set_status( req, "302 Found" ); 
+    httpd_resp_set_type( req, "text/html; charset=is08859-1;" );
+    timers_handler( req );
+  }
+  else if( uri.starts_with( "/stopwatch/start" ) ||
+           uri.starts_with( "/stopwatch/stop" ) ||
+           uri.starts_with( "/stopwatch/reset" ) ) {
+    httpd_resp_set_status( req, "302 Found" ); 
+    httpd_resp_set_type( req, "text/html; charset=is08859-1;" );
+    stopwatch_handler( req );
+  }
+  else if( uri == "/styles.css" ) {
+    httpd_resp_set_status( req, "302 Found" ); 
+    httpd_resp_set_type( req, "text/css; charset=is08859-1;" );
+    const char *buf_st = ( char * ) broadcast_clock::resources::html::styles_css_start;
+    const size_t buf_st_len = broadcast_clock::resources::html::styles_css_end - broadcast_clock::resources::html::styles_css_start;
+    httpd_resp_send( req, buf_st, buf_st_len );
   }
   else {
     std::string html = create_html_response();
@@ -143,6 +201,11 @@ void broadcast_clock::captive_portal_http::start_sync() {
   }
 
   httpd_uri_t location;
+
+  location.uri = "/timers",
+  location.handler = request_handler,
+  location.user_ctx = this;
+  location.method = HTTP_POST,
 
   location.uri = "/save",
   location.handler = request_handler,

@@ -2,6 +2,7 @@
 #define __DOTMATRIX_HPP__
 
 #include "configuration.hpp"
+#include <sys/time.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <driver/spi_master.h>
@@ -35,6 +36,14 @@ namespace espena::broadcast_clock {
         uint8_t m_current_minute;
         uint8_t m_current_second;
 
+        uint32_t m_stopwatch_hour;
+        uint32_t m_stopwatch_minute;
+        uint32_t m_stopwatch_second;
+        uint32_t m_stopwatch_fraction;
+
+        struct timespec m_stopwatch_begin;
+        struct timespec m_stopwatch_end;
+
         QueueHandle_t m_task_queue;
 
         spi_device_handle_t m_spi;
@@ -52,6 +61,9 @@ namespace espena::broadcast_clock {
             start,
             ambient_light_level,
             display,
+            stopwatch_start,
+            stopwatch_stop,
+            stopwatch_reset,
             test
         };
 
@@ -68,6 +80,11 @@ namespace espena::broadcast_clock {
         void on_start();
         void on_ambient_light_level( int threshold );
         void on_display( display_message *msg );
+
+        void on_stopwatch_start();
+        void on_stopwatch_stop();
+        void on_stopwatch_reset();
+
         void on_test();
 
 
@@ -94,6 +111,10 @@ namespace espena::broadcast_clock {
         void set_ambient_light_level( uint16_t lux );
 
         void display( const display_message *msg );
+
+        void stopwatch_start();
+        void stopwatch_stop();
+        void stopwatch_reset();
 
     };
 

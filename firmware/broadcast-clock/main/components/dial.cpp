@@ -5,6 +5,7 @@
 #include <memory.h>
 #include <vector>
 #include <time.h>
+#include <sys/time.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <freertos/queue.h>
@@ -21,6 +22,9 @@ dial() : m_config( nullptr ),
          m_refresh_timer( nullptr ),
          m_current_seconds( 0 ),
          m_brightness_bit( 0 ) {
+
+    memset( &m_stopwatch_begin, 0x00, sizeof( timespec ) );
+    memset( &m_stopwatch_end, 0x00, sizeof( timespec ) );
 
     m_task_queue = xQueueCreate( 100, sizeof( dial_task_queue_item ) );
 
@@ -118,7 +122,11 @@ refresh() {
   utils::micro_delay();
   gpio_set_level( DIAL_BLANK, 1 );
   utils::micro_delay();
-  if( m_current_seconds != timeinfo.tm_sec ) {
+  if( m_stopwatch_begin.tv_nsec > 0 ||
+      m_stopwatch_begin.tv_sec > 0 ) {
+      update();
+  }
+  else if( m_current_seconds != timeinfo.tm_sec ) {
       m_current_seconds = timeinfo.tm_sec;
       update();
   }
@@ -138,14 +146,34 @@ update() {
   gpio_set_level( DIAL_SCLK, 0 );
   gpio_set_level( DIAL_VPRG, 0 );
 
+  bool stopwatch_running = m_stopwatch_begin.tv_nsec > 0 || m_stopwatch_begin.tv_sec > 0;
+  bool stopwatch_stopped = !stopwatch_running && ( m_stopwatch_end.tv_nsec > 0 || m_stopwatch_end.tv_sec > 0 );
+  static int16_t stopwatch_led_runner = 0;
+  if( stopwatch_running ) {
+      clock_gettime( CLOCK_MONOTONIC, &m_stopwatch_end );
+      uint32_t stopwatch_begin_ms = ( m_stopwatch_begin.tv_sec * 1000 ) + ( m_stopwatch_begin.tv_nsec / 1000000 );
+      uint32_t stopwatch_end_ms = ( m_stopwatch_end.tv_sec * 1000 ) + ( m_stopwatch_end.tv_nsec / 1000000 );
+      uint32_t ms_delta = ( stopwatch_end_ms - stopwatch_begin_ms ) % 1000;
+      stopwatch_led_runner = static_cast<int16_t>( static_cast<float>( 0.06 * ms_delta ) ) + 1;
+  }
+
   gpio_set_level( DIAL_SOUT, 0 );
   for( int i = 0; i < 5; i++ ) {
     for( int j = 0; j < 16; j++ ) {
       const int led_id = 60 - ( ( ( i * 16 ) + j ) - 20 );
       for( int k = 0; k < 12; k++ ) {
-        if( style == 'u' && // count up
-            k == m_brightness_bit &&
-            ( led_id <= m_current_seconds || led_id >= 60 ) ) {
+        if( stopwatch_running || stopwatch_stopped ) {
+          if( k == m_brightness_bit &&
+            ( led_id == stopwatch_led_runner || led_id >= 77 ) ) {
+            gpio_set_level( DIAL_SOUT, 1 );
+          }
+          else {
+            gpio_set_level( DIAL_SOUT, 0 );
+          }
+        }
+        else if( style == 'u' && // count up
+                 k == m_brightness_bit &&
+                 ( led_id <= m_current_seconds || led_id >= 60 ) ) {
           gpio_set_level( DIAL_SOUT, 1 );
         }
         else if( style == 'd' && // count down
@@ -220,4 +248,20 @@ init_refresh_timer() {
   timer_args.name = m_component_name;
   ESP_ERROR_CHECK( esp_timer_create( &timer_args, &m_refresh_timer ) );
   ESP_ERROR_CHECK( esp_timer_start_periodic( m_refresh_timer, 5000 ) );
+}
+
+void broadcast_clock::dial::
+stopwatch_start() {
+  clock_gettime( CLOCK_MONOTONIC, &m_stopwatch_begin );
+}
+
+void broadcast_clock::dial::
+stopwatch_stop() {
+  memset( &m_stopwatch_begin, 0x00, sizeof( timespec ) );
+}
+
+void broadcast_clock::dial::
+stopwatch_reset() {
+  memset( &m_stopwatch_begin, 0x00, sizeof( timespec ) );
+  memset( &m_stopwatch_end, 0x00, sizeof( timespec ) );
 }

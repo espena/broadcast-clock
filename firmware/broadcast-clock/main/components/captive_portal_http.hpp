@@ -14,6 +14,10 @@ namespace espena::broadcast_clock {
     extern const uint8_t control_panel_html_end[ ] asm( "_binary_control_panel_html_end" );
     extern const uint8_t exit_page_html_start[ ] asm( "_binary_exit_page_html_start" );
     extern const uint8_t exit_page_html_end[ ] asm( "_binary_exit_page_html_end" );
+    extern const uint8_t timers_page_html_start[ ] asm( "_binary_timers_page_html_start" );
+    extern const uint8_t timers_page_html_end[ ] asm( "_binary_timers_page_html_end" );
+    extern const uint8_t styles_css_start[ ] asm( "_binary_styles_css_start" );
+    extern const uint8_t styles_css_end[ ] asm( "_binary_styles_css_end" );
   }
 
   class captive_portal_http {
@@ -21,8 +25,14 @@ namespace espena::broadcast_clock {
   public:
 
     static const esp_event_base_t m_event_base;
-    static const uint32_t EVENT_SAVE = 0x01u;
-    static const uint32_t EVENT_CANCEL = 0x02u;
+
+    static const uint32_t EVENT_SAVE            = 0x01u;
+    static const uint32_t EVENT_CANCEL          = 0x02u;
+    static const uint32_t EVENT_ENTER_TIMERS    = 0x03u;
+    static const uint32_t EVENT_LEAVE_TIMERS    = 0x04u;
+    static const uint32_t EVENT_STOPWATCH_START = 0x05u;
+    static const uint32_t EVENT_STOPWATCH_STOP  = 0x06u;
+    static const uint32_t EVENT_STOPWATCH_RESET = 0x07u;
 
   private:
 
@@ -41,7 +51,11 @@ namespace espena::broadcast_clock {
     static void task_loop( void *arg );
 
     static esp_err_t request_handler( httpd_req_t *req );
+
     esp_err_t on_request( httpd_req_t *req );
+    void save_handler( httpd_req_t *req );
+    void timers_handler( httpd_req_t *req );
+    void stopwatch_handler( httpd_req_t *req );
 
     typedef struct captive_portal_http_task_params_struct {
         captive_portal_http *instance;
