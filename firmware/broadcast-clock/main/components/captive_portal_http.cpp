@@ -125,6 +125,23 @@ stopwatch_handler( httpd_req_t *req ) {
                      portMAX_DELAY );
 }
 
+void broadcast_clock::captive_portal_http::
+countdown_handler( httpd_req_t *req ) {
+
+  httpd_resp_send( req, "OK", 3 );
+  std::string uri( req->uri );
+  uint32_t e = 0;
+  if( uri.starts_with( "/countdown/start" ) ) e = EVENT_COUNTDOWN_START;
+  else e = EVENT_COUNTDOWN_RESET;
+
+  esp_event_post_to( m_event_loop_handle,
+                     m_event_base,
+                     e,
+                     "",
+                     0,
+                     portMAX_DELAY );
+}
+
 esp_err_t broadcast_clock::captive_portal_http::
 on_request( httpd_req_t *req ) {
 
@@ -154,6 +171,12 @@ on_request( httpd_req_t *req ) {
     httpd_resp_set_status( req, "302 Found" ); 
     httpd_resp_set_type( req, "text/html; charset=is08859-1;" );
     stopwatch_handler( req );
+  }
+  else if( uri.starts_with( "/countdown/start" ) ||
+           uri.starts_with( "/countdown/reset" ) ) {
+    httpd_resp_set_status( req, "302 Found" ); 
+    httpd_resp_set_type( req, "text/html; charset=is08859-1;" );
+    countdown_handler( req );
   }
   else if( uri == "/styles.css" ) {
     httpd_resp_set_status( req, "302 Found" ); 

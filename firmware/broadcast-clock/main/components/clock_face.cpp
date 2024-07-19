@@ -110,6 +110,18 @@ on_init( i2c_master_bus_handle_t i2c_bus ) {
                                      broadcast_clock::captive_portal_http::EVENT_STOPWATCH_RESET,
                                      wifi_event_handler,
                                      this );
+
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::captive_portal_http::m_event_base,
+                                     broadcast_clock::captive_portal_http::EVENT_COUNTDOWN_START,
+                                     wifi_event_handler,
+                                     this );
+
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::captive_portal_http::m_event_base,
+                                     broadcast_clock::captive_portal_http::EVENT_COUNTDOWN_RESET,
+                                     wifi_event_handler,
+                                     this );
   }
 
   m_dotmatrix.init();
@@ -158,6 +170,12 @@ wifi_event_handler( void *handler_arg,
       case broadcast_clock::captive_portal_http::EVENT_STOPWATCH_RESET:
         instance->on_stopwatch_reset();
         break;
+      case broadcast_clock::captive_portal_http::EVENT_COUNTDOWN_START:
+        instance->on_countdown_start();
+        break;
+      case broadcast_clock::captive_portal_http::EVENT_COUNTDOWN_RESET:
+        instance->on_countdown_reset();
+        break;
     }
   }
 }
@@ -204,6 +222,16 @@ on_stopwatch_reset() {
   ESP_LOGI( m_component_name, "Stopwatch reset" );
   m_dotmatrix.stopwatch_reset();
   m_dial.stopwatch_reset();
+}
+
+void broadcast_clock::clock_face::
+on_countdown_start() {
+  ESP_LOGI( m_component_name, "Countdown start" );
+}
+
+void broadcast_clock::clock_face::
+on_countdown_reset() {
+  ESP_LOGI( m_component_name, "Countdown reset" );
 }
 
 void broadcast_clock::clock_face::
