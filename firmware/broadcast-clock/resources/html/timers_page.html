@@ -20,7 +20,7 @@
         <h2>Timers and stopwatch</h2>
       </header>
       <div class="form">
-        <form method="post" action="stopwatch">
+        <form method="post" action="timers">
           <fieldset class="tab stopwatch">
             <legend>Stopwatch</legend>
             <div class="stopwatch buttons">
@@ -31,13 +31,24 @@
               <button class="reset">Reset</button>
             </div>
           </fieldset>
+          <fieldset class="tab countdown">
+            <legend>Countdown</legend>
+            <div class="countdown buttons">
+              <button class="start">Start</button>
+              <button class="reset">Reset</button>
+            </div>
+            <div class="countdown period">
+              <label for="period">Period (hh:mm:ss)</label> <input type="time" id="period" name="period" value="00:05:00" step="1">
+            </div>
+          </fieldset>
         </form>
         <p class="links"><a class="back" href="/">Back to control panel</a></p>
       </div>
     </div>
     <script>
-      var buttons = document.querySelectorAll( 'form fieldset.tab button' );
-      buttons.forEach( ( button ) => {
+
+      var buttons_sw = document.querySelectorAll( 'form fieldset.tab.stopwatch button' );
+      buttons_sw.forEach( ( button ) => {
         button.addEventListener( 'click', ( e ) => {
           var action = button.classList[ 0 ];
           var ts = ( new Date() ).getTime();
@@ -47,6 +58,20 @@
           e.preventDefault();
         } );
       } );
+
+      var buttons_cd = document.querySelectorAll( 'form fieldset.tab.countdown button' );
+      buttons_cd.forEach( ( button ) => {
+        button.addEventListener( 'click', ( e ) => {
+          var action = button.classList[ 0 ];
+          var ts = ( new Date() ).getTime();
+          var period = document.querySelector( 'form fieldset.tab.countdown input#period' ).value;
+          fetch( `/countdown/${action}?ts=${ts}&period=${period}`, { cache: 'no-store' } )
+            .then( response => response.text() )
+            .then( data => console.log( data ) );
+          e.preventDefault();
+        } );
+      } );
+
       var tabs = document.querySelectorAll( 'form fieldset.tab' );
       tabs.forEach( ( tab ) => {
         tab.addEventListener( 'click', ( event ) => {
@@ -57,11 +82,13 @@
           tab.classList.add( 'active' );
         } )
       } );
+
       var active_timer_tab = window.localStorage.getItem( 'active_timer_tab' ) ?? 'stopwatch';
       document.querySelector( 'form fieldset.tab.' + active_timer_tab ).classList.add( 'active' );
       window.addEventListener( 'beforeunload', ( e ) => {
         fetch( '/stopwatch/reset', { cache: 'no-store' } );
       } );
+
     </script>
   </body>
 </html>

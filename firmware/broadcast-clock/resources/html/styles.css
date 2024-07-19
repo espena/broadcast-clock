@@ -64,6 +64,7 @@ form legend {
 form .time { z-index: 1; }
 
 form .stopwatch legend { left: 0; }
+form .countdown legend { left: 75px; }
 
 form .time legend { left: 0; }
 form .display legend { left: 75px; }
@@ -170,9 +171,26 @@ ul li,
 .pwshow>span {
   font-size: 12px;
 }
+.countdown.period {
+  padding-top: 1em;
+}
+.countdown.period label {
+  position: relative;
+  top: -1px;
+}
+.countdown.period input {
+  padding-left: 5px;
+  padding-right: 5px;
+  border-style: none none solid none;
+  border-width: 1px;
+  border-color: #000;
+}
+.countdown.period,
+.countdown.buttons,
 .stopwatch.buttons {
   text-align: center;
 }
+.countdown.buttons button,
 .stopwatch.buttons button {
   display: inline-block;
   width: 100px;
@@ -182,13 +200,16 @@ ul li,
   text-transform: uppercase;
   border-radius: 5px;
 }
-.stopwatch.buttons button.start {
+.stopwatch.buttons button.start,
+.countdown.buttons button.start {
   margin-right: 2em;
 }
-.stopwatch.buttons .start {
+.stopwatch.buttons .start,
+.countdown.buttons .start {
   background-color: #8b8;
 }
-.stopwatch.buttons .stop {
+.stopwatch.buttons .stop,
+.countdown.buttons .stop {
   background-color: #b88;
 }
 p.links {
