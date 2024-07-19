@@ -25,6 +25,7 @@ dial() : m_config( nullptr ),
 
     memset( &m_stopwatch_begin, 0x00, sizeof( timespec ) );
     memset( &m_stopwatch_end, 0x00, sizeof( timespec ) );
+    memset( &m_countdown_period, 0x00, sizeof( timespec ) );
 
     m_task_queue = xQueueCreate( 100, sizeof( dial_task_queue_item ) );
 
@@ -248,6 +249,12 @@ init_refresh_timer() {
   timer_args.name = m_component_name;
   ESP_ERROR_CHECK( esp_timer_create( &timer_args, &m_refresh_timer ) );
   ESP_ERROR_CHECK( esp_timer_start_periodic( m_refresh_timer, 8000 ) );
+}
+
+void broadcast_clock::dial::
+countdown_start( struct timespec *period ) {
+  memcpy( &m_countdown_period, period, 0x00, sizeof( timespec ) );
+  clock_gettime( CLOCK_MONOTONIC, &m_stopwatch_begin );
 }
 
 void broadcast_clock::dial::

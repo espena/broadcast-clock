@@ -13,6 +13,9 @@
 #include "captive_portal_http.hpp"
 #include "configuration.hpp"
 
+#include "../utils/get_query_field.hpp"
+#include "../utils/span_to_timespec.hpp"
+
 using namespace espena;
 
 const char *broadcast_clock::captive_portal_http::m_component_name = "captive_portal_http";
@@ -127,18 +130,26 @@ stopwatch_handler( httpd_req_t *req ) {
 
 void broadcast_clock::captive_portal_http::
 countdown_handler( httpd_req_t *req ) {
-
   httpd_resp_send( req, "OK", 3 );
   std::string uri( req->uri );
+
+  static struct timespec countdown_period;
+  static std::string period;
+
+  period = utils::get_query_field( uri, "period" );
+  memset( &countdown_period, 0x00, sizeof( struct timespec ) );
+
+  utils::span_to_timespec( period, &countdown_period );  
   uint32_t e = 0;
+
   if( uri.starts_with( "/countdown/start" ) ) e = EVENT_COUNTDOWN_START;
   else e = EVENT_COUNTDOWN_RESET;
 
   esp_event_post_to( m_event_loop_handle,
                      m_event_base,
                      e,
-                     "",
-                     0,
+                     &countdown_period,
+                     sizeof( struct timespec ),
                      portMAX_DELAY );
 }
 

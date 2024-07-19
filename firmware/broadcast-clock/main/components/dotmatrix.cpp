@@ -34,6 +34,8 @@ dotmatrix() : m_config( nullptr ),
   memset( &m_stopwatch_begin, 0x00, sizeof( timespec ) );
   memset( &m_stopwatch_end, 0x00, sizeof( timespec ) );
 
+  memset( &m_countdown_period, 0x00, sizeof( timespec ) );
+
   m_task_params.instance = this;
   m_task_params.stack_buffer = ( StackType_t * ) heap_caps_malloc( m_component_stack_size,
                                                                     MALLOC_CAP_SPIRAM );
@@ -104,6 +106,23 @@ stopwatch_reset() {
 }
 
 void broadcast_clock::dotmatrix::
+countdown_start( struct timespec *period ) {
+  static struct timespec current_period;
+  memcpy( &current_period, period, sizeof( struct timespec ) );
+
+  ESP_LOGI( m_component_name, "Countdown start: %llu", current_period.tv_sec );
+
+  dotmatrix_task_queue_item item = { dotmatrix_task_message::countdown_start, &current_period };
+  xQueueSend( m_task_queue, &item, 10 );
+}
+
+void broadcast_clock::dotmatrix::
+countdown_reset() {
+  dotmatrix_task_queue_item item = { dotmatrix_task_message::countdown_reset, nullptr };
+  xQueueSend( m_task_queue, &item, 10 );
+}
+
+void broadcast_clock::dotmatrix::
 test() {
   dotmatrix_task_queue_item item = { dotmatrix_task_message::test, nullptr };
   xQueueSend( m_task_queue, &item, 10 );
@@ -125,15 +144,30 @@ task_loop( void *arg ) {
     
     if( inst->m_stopwatch_begin.tv_nsec != 0 || inst->m_stopwatch_end.tv_nsec != 0 ) {
       if( inst->m_stopwatch_begin.tv_nsec != 0 ) {
-
         clock_gettime( CLOCK_MONOTONIC, &inst->m_stopwatch_end );
         const uint32_t mstart = inst->m_stopwatch_begin.tv_sec * 1000 + inst->m_stopwatch_begin.tv_nsec / 1000000;
         const uint32_t mend = inst->m_stopwatch_end.tv_sec * 1000 + inst->m_stopwatch_end.tv_nsec / 1000000;
         const uint32_t mdiff = mend - mstart;
-        inst->m_stopwatch_hour =     ( mdiff / 3600000 ) % 60;
-        inst->m_stopwatch_minute =   ( mdiff /   60000 ) % 60;
-        inst->m_stopwatch_second =   ( mdiff /    1000 ) % 60;
-        inst->m_stopwatch_fraction = ( mdiff /      10 ) % 100;
+        if( inst->m_countdown_period.tv_sec != 0 ) {
+          
+          int32_t mremain = ( inst->m_countdown_period.tv_sec * 1000 ) - mdiff;
+
+          if( mremain <= 0 ) {
+            inst->countdown_reset();
+            mremain = 0;
+          }
+
+          inst->m_stopwatch_hour =     ( mremain / 3600000 ) % 60;
+          inst->m_stopwatch_minute =   ( mremain /   60000 ) % 60;
+          inst->m_stopwatch_second =   ( mremain /    1000 ) % 60;
+          inst->m_stopwatch_fraction = ( mremain /      10 ) % 100;
+        }
+        else {
+          inst->m_stopwatch_hour =     ( mdiff / 3600000 ) % 60;
+          inst->m_stopwatch_minute =   ( mdiff /   6000 ) % 60;
+          inst->m_stopwatch_second =   ( mdiff /    1000 ) % 60;
+          inst->m_stopwatch_fraction = ( mdiff /      10 ) % 100;
+        }
         inst->update();
       }
     }
@@ -169,6 +203,12 @@ on_message( dotmatrix_task_message msg, void *arg ) {
       break;
     case dotmatrix_task_message::stopwatch_reset:
       on_stopwatch_reset();
+      break;
+    case dotmatrix_task_message::countdown_start:
+      on_countdown_start( static_cast<struct timespec *>( arg ) );
+      break;
+    case dotmatrix_task_message::countdown_reset:
+      on_countdown_reset();
       break;
     case dotmatrix_task_message::ambient_light_level:
       on_ambient_light_level( *static_cast<uint16_t *>( arg ) );
@@ -278,6 +318,19 @@ on_stopwatch_stop() {
 
 void broadcast_clock::dotmatrix::
 on_stopwatch_reset() {
+  memset( &m_stopwatch_begin, 0x00, sizeof( timespec ) );
+  memset( &m_stopwatch_end, 0x00, sizeof( timespec ) );
+}
+
+void broadcast_clock::dotmatrix::
+on_countdown_start( struct timespec *period ) {
+  memcpy( &m_countdown_period, period, sizeof( struct timespec ) );
+  clock_gettime( CLOCK_MONOTONIC, &m_stopwatch_begin );
+}
+
+void broadcast_clock::dotmatrix::
+on_countdown_reset() {
+  memset( &m_countdown_period, 0x00, sizeof( timespec ) );
   memset( &m_stopwatch_begin, 0x00, sizeof( timespec ) );
   memset( &m_stopwatch_end, 0x00, sizeof( timespec ) );
 }

@@ -44,6 +44,8 @@ namespace espena::broadcast_clock {
         struct timespec m_stopwatch_begin;
         struct timespec m_stopwatch_end;
 
+        struct timespec m_countdown_period;
+
         QueueHandle_t m_task_queue;
 
         spi_device_handle_t m_spi;
@@ -64,6 +66,8 @@ namespace espena::broadcast_clock {
             stopwatch_start,
             stopwatch_stop,
             stopwatch_reset,
+            countdown_start,
+            countdown_reset,
             test
         };
 
@@ -85,8 +89,10 @@ namespace espena::broadcast_clock {
         void on_stopwatch_stop();
         void on_stopwatch_reset();
 
-        void on_test();
+        void on_countdown_start( struct timespec *period );
+        void on_countdown_reset();
 
+        void on_test();
 
         void init_spi();
         void init_display();
@@ -115,6 +121,9 @@ namespace espena::broadcast_clock {
         void stopwatch_start();
         void stopwatch_stop();
         void stopwatch_reset();
+
+        void countdown_start( struct timespec *period );
+        void countdown_reset();
 
     };
 

@@ -171,7 +171,7 @@ wifi_event_handler( void *handler_arg,
         instance->on_stopwatch_reset();
         break;
       case broadcast_clock::captive_portal_http::EVENT_COUNTDOWN_START:
-        instance->on_countdown_start();
+        instance->on_countdown_start( static_cast<struct timespec *>( event_params ) );
         break;
       case broadcast_clock::captive_portal_http::EVENT_COUNTDOWN_RESET:
         instance->on_countdown_reset();
@@ -225,13 +225,17 @@ on_stopwatch_reset() {
 }
 
 void broadcast_clock::clock_face::
-on_countdown_start() {
-  ESP_LOGI( m_component_name, "Countdown start" );
+on_countdown_start( struct timespec *period ) {
+  ESP_LOGI( m_component_name, "Countdown start: %llu", period->tv_sec );
+  m_dotmatrix.countdown_start( period );
+  m_dial.stopwatch_start();
 }
 
 void broadcast_clock::clock_face::
 on_countdown_reset() {
   ESP_LOGI( m_component_name, "Countdown reset" );
+  m_dotmatrix.countdown_reset();
+  m_dial.stopwatch_reset();
 }
 
 void broadcast_clock::clock_face::

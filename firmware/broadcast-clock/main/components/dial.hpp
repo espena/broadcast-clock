@@ -18,6 +18,8 @@ namespace espena::broadcast_clock {
         struct timespec m_stopwatch_begin;
         struct timespec m_stopwatch_end;
 
+        struct timespec m_countdown_period;
+
         configuration *m_config;
         
         esp_timer_handle_t m_refresh_timer;
@@ -62,12 +64,15 @@ namespace espena::broadcast_clock {
 
         dial();
         ~dial();
+
         void init();
         void set_ambient_light_level( uint16_t lux );
 
         void stopwatch_start();
         void stopwatch_stop();
         void stopwatch_reset();
+
+        void countdown_start( struct timespec *period );
 
     };
 
