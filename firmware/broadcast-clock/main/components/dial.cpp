@@ -247,7 +247,7 @@ init_refresh_timer() {
   timer_args.arg = this;
   timer_args.name = m_component_name;
   ESP_ERROR_CHECK( esp_timer_create( &timer_args, &m_refresh_timer ) );
-  ESP_ERROR_CHECK( esp_timer_start_periodic( m_refresh_timer, 5000 ) );
+  ESP_ERROR_CHECK( esp_timer_start_periodic( m_refresh_timer, 8000 ) );
 }
 
 void broadcast_clock::dial::
