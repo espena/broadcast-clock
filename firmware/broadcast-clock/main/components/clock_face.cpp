@@ -236,10 +236,10 @@ lux2threshold( uint16_t lux ) {
   broadcast_clock::configuration *c = broadcast_clock::configuration::get_instance();
   int threshold = c->get_int( "brightness" );
   if( threshold == 0 ) { // auto
-    if( lux > ( 60000 * hysteresis ) ) {
+    if( lux > ( 15000 * hysteresis ) ) {
       threshold = 4;
     }
-    else if( lux > ( 20000 * hysteresis) ) {
+    else if( lux > ( 8000 * hysteresis) ) {
       threshold = 3;
     }
     else if( lux > ( 1000 * hysteresis ) ) {
