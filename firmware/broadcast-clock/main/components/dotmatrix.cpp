@@ -207,8 +207,8 @@ update() {
     }
     else {
       std::string t = m_config ? m_config->get_str( "time_format" ) : "24h";
-      bool f12h = ( t == "12h" ) ? true : false;
-      const int8_t h = ( f12h ? m_current_hour % 12 : m_current_hour );
+      bool f12h = ( t == "12h" );
+      const int8_t h = ( f12h ? ( m_current_hour % 12 ? m_current_hour % 12 : 12 ) : m_current_hour );
       const char *meridiem = f12h ? ( m_current_hour >= 12 ? "PM" : "AM" ) : "  ";
       transmit( 0x60u, 0x30u | ( ( h / 10 ) & 0x0f ), 0x60u, 0x30u | ( ( m_current_second / 10 ) & 0x0f ) );
       transmit( 0x61u, 0x30u | ( ( h % 10 ) & 0x0f ), 0x61u, 0x30u | ( ( m_current_second % 10 ) & 0x0f ) );
