@@ -21,7 +21,11 @@ broadcast_clock::dial::
 dial() : m_config( nullptr ),
          m_refresh_timer( nullptr ),
          m_current_seconds( 0 ),
-         m_brightness_bit( 0 ) {
+         m_brightness_bit( 0 ),
+         m_blue_indicator( false ),
+         m_green_indicator( false ),
+         m_yellow_indicator( false ),
+         m_red_indicator( false ) {
 
     memset( &m_stopwatch_begin, 0x00, sizeof( timespec ) );
     memset( &m_stopwatch_end, 0x00, sizeof( timespec ) );
@@ -79,6 +83,9 @@ on_message( dial_task_message msg, void *arg ) {
     case dial_task_message::init:
       on_init();
       break;
+    case dial_task_message::update:
+      update();
+      break;
     case dial_task_message::ambient_light_level:
       on_ambient_light_level( *static_cast<uint16_t *>( arg ) );
       break;
@@ -96,16 +103,16 @@ void broadcast_clock::dial::
 on_ambient_light_level( int threshold ) {
   switch( threshold ) {
     case 0:
-      m_brightness_bit = 7;
+      m_brightness_bit = 6;
       break;
     case 1:
-      m_brightness_bit = 5;
+      m_brightness_bit = 4;
       break;
     case 2:
-      m_brightness_bit = 3;
+      m_brightness_bit = 2;
       break;
     case 3:
-      m_brightness_bit = 2;
+      m_brightness_bit = 1;
       break;
     case 4:
       m_brightness_bit = 1;
@@ -120,9 +127,6 @@ refresh() {
   localtime_r( &now, &timeinfo );
   ESP_ERROR_CHECK( ledc_set_duty( LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 1 ) );
   ESP_ERROR_CHECK( ledc_update_duty( LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0 ) );
-  utils::micro_delay();
-  gpio_set_level( DIAL_BLANK, 1 );
-  utils::micro_delay();
   if( m_stopwatch_begin.tv_nsec > 0 ||
       m_stopwatch_begin.tv_sec > 0 ) {
       update();
@@ -131,9 +135,8 @@ refresh() {
       m_current_seconds = timeinfo.tm_sec;
       update();
   }
-  utils::micro_delay();
+  gpio_set_level( DIAL_BLANK, 1 );
   gpio_set_level( DIAL_BLANK, 0 );
-  utils::micro_delay();
   ESP_ERROR_CHECK( ledc_set_duty( LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 1 ) );
   ESP_ERROR_CHECK( ledc_update_duty( LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0 ) );
 }
@@ -157,7 +160,6 @@ update() {
       uint32_t ms_delta = ( stopwatch_end_ms - stopwatch_begin_ms ) % 1000;
       stopwatch_led_runner = static_cast<int16_t>( static_cast<float>( 0.06 * ms_delta ) ) + 1;
   }
-
   gpio_set_level( DIAL_SOUT, 0 );
   for( int i = 0; i < 5; i++ ) {
     for( int j = 0; j < 16; j++ ) {
@@ -174,30 +176,50 @@ update() {
         }
         else if( style == 'u' && // count up
                  k == m_brightness_bit &&
-                 ( led_id <= m_current_seconds || led_id >= 60 ) ) {
+                 ( led_id <= m_current_seconds || led_id == 60 || led_id > 64 ) ) {
           gpio_set_level( DIAL_SOUT, 1 );
         }
         else if( style == 'd' && // count down
                  ( k == m_brightness_bit ) &&
-                 ( led_id >= m_current_seconds ) &&
+                 ( led_id >= m_current_seconds && ( led_id < 61 || led_id > 64 ) ) &&
                  !( led_id < 60 && m_current_seconds == 0 ) ) {
           gpio_set_level( DIAL_SOUT, 1 );
+        }
+        else if( led_id >= 61 && led_id <= 64 ) { // Indicators
+          gpio_set_level( DIAL_SOUT, 0 );
+          switch( led_id ) {
+            case 61:
+              if( k == 4 ) {
+                gpio_set_level( DIAL_SOUT, m_blue_indicator ? 1 : 0 );
+              }
+              break;
+            case 62:
+              if( k == 2 ) {
+                gpio_set_level( DIAL_SOUT, m_green_indicator ? 1 : 0 );
+              }
+              break;
+            case 63:
+              if( k == 2 ) {
+                gpio_set_level( DIAL_SOUT, m_yellow_indicator ? 1 : 0 );
+              }
+              break;
+            case 64:
+              if( k == 2 ) {
+                gpio_set_level( DIAL_SOUT, m_red_indicator ? 1 : 0 );
+              }
+              break;
+          }
         }
         else {
           gpio_set_level( DIAL_SOUT, 0 );
         }
-        utils::micro_delay();
         gpio_set_level( DIAL_SCLK, 1 );
-        utils::micro_delay();
         gpio_set_level( DIAL_SCLK, 0 );
-        utils::micro_delay();
       }
     }
   }
   gpio_set_level( DIAL_XLAT, 1 );
-  utils::micro_delay();
   gpio_set_level( DIAL_XLAT, 0 );
-  utils::micro_delay();
 }
 
 void broadcast_clock::dial::
@@ -218,7 +240,7 @@ init_gpio() {
   timer_conf.speed_mode = LEDC_LOW_SPEED_MODE;
   timer_conf.duty_resolution = LEDC_TIMER_2_BIT;
   timer_conf.timer_num = LEDC_TIMER_0;
-  timer_conf.freq_hz = 2000000;
+  timer_conf.freq_hz = m_pwm_frequency_hz;
   timer_conf.clk_cfg = LEDC_AUTO_CLK;
   ESP_ERROR_CHECK( ledc_timer_config( &timer_conf ) );
   ledc_channel_config_t ledc_conf;
@@ -248,13 +270,20 @@ init_refresh_timer() {
   timer_args.arg = this;
   timer_args.name = m_component_name;
   ESP_ERROR_CHECK( esp_timer_create( &timer_args, &m_refresh_timer ) );
-  ESP_ERROR_CHECK( esp_timer_start_periodic( m_refresh_timer, 8000 ) );
+  ESP_ERROR_CHECK( esp_timer_start_periodic( m_refresh_timer, m_refresh_interval ) );
 }
 
 void broadcast_clock::dial::
 countdown_start( struct timespec *period ) {
-  memcpy( &m_countdown_period, period, 0x00, sizeof( timespec ) );
+  memcpy( &m_countdown_period, period, sizeof( timespec ) );
   clock_gettime( CLOCK_MONOTONIC, &m_stopwatch_begin );
+}
+
+void broadcast_clock::dial::
+countdown_reset() {
+  memset( &m_countdown_period, 0x00, sizeof( timespec ) );
+  memset( &m_stopwatch_begin, 0x00, sizeof( timespec ) );
+  memset( &m_stopwatch_end, 0x00, sizeof( timespec ) );
 }
 
 void broadcast_clock::dial::
@@ -271,4 +300,24 @@ void broadcast_clock::dial::
 stopwatch_reset() {
   memset( &m_stopwatch_begin, 0x00, sizeof( timespec ) );
   memset( &m_stopwatch_end, 0x00, sizeof( timespec ) );
+}
+
+void broadcast_clock::dial::
+blink_green_indicator() {
+  m_green_indicator = !m_green_indicator;
+  dial_task_queue_item item = { dial_task_message::update, nullptr };
+  xQueueSend( m_task_queue, &item, 10 );
+  vTaskDelay( 500 / portTICK_PERIOD_MS );
+  m_green_indicator = !m_green_indicator;
+  xQueueSend( m_task_queue, &item, 10 );
+}
+
+void broadcast_clock::dial::
+set_indicators( bool blue, bool green, bool yellow, bool red ) {
+  m_blue_indicator = blue;
+  m_green_indicator = green;
+  m_yellow_indicator = yellow;
+  m_red_indicator = red;
+  dial_task_queue_item item = { dial_task_message::update, nullptr };
+  xQueueSend( m_task_queue, &item, 10 );
 }

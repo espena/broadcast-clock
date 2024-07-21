@@ -9,11 +9,13 @@
 #include <freertos/queue.h>
 #include <driver/spi_master.h>
 #include <driver/gpio.h>
+#include <esp_event.h>
 #include <esp_log.h>
 
 using namespace espena;
 
 const char *broadcast_clock::dotmatrix::m_component_name = "dotmatrix";
+const esp_event_base_t broadcast_clock::dotmatrix::m_event_base = "broadcast_clock_dotmatrix_event";
 
 broadcast_clock::dotmatrix::
 dotmatrix() : m_config( nullptr ),
@@ -27,6 +29,7 @@ dotmatrix() : m_config( nullptr ),
               m_stopwatch_second( 0 ),
               m_stopwatch_fraction( 0 ),
               m_task_queue( nullptr ),
+              m_event_loop_handle( nullptr ),
               m_spi( nullptr ) {
     
   m_task_queue = xQueueCreate( 1, sizeof( dotmatrix_task_queue_item ) );
@@ -152,20 +155,20 @@ task_loop( void *arg ) {
           
           int32_t mremain = ( inst->m_countdown_period.tv_sec * 1000 ) - mdiff;
 
-          if( mremain <= 0 ) {
-            inst->countdown_reset();
+          if( mremain < 0 ) {
+            inst->on_countdown_finish();
             mremain = 0;
           }
 
-          inst->m_stopwatch_hour =     ( mremain / 3600000 ) % 60;
-          inst->m_stopwatch_minute =   ( mremain /   60000 ) % 60;
-          inst->m_stopwatch_second =   ( mremain /    1000 ) % 60;
-          inst->m_stopwatch_fraction = ( mremain /      10 ) % 100;
+          inst->m_stopwatch_fraction = ( ( mremain /      10 ) % 100 );
+          inst->m_stopwatch_second =   ( ( mremain /    1000 ) %  60 );
+          inst->m_stopwatch_minute =   ( ( mremain /   60000 ) %  60 );
+          inst->m_stopwatch_hour =     ( ( mremain / 3600000 ) %  60 );
         }
         else {
-          inst->m_stopwatch_hour =     ( mdiff / 3600000 ) % 60;
-          inst->m_stopwatch_minute =   ( mdiff /   6000 ) % 60;
-          inst->m_stopwatch_second =   ( mdiff /    1000 ) % 60;
+          inst->m_stopwatch_hour =     ( mdiff / 3600000 ) %  60;
+          inst->m_stopwatch_minute =   ( mdiff /   60000 ) %  60;
+          inst->m_stopwatch_second =   ( mdiff /    1000 ) %  60;
           inst->m_stopwatch_fraction = ( mdiff /      10 ) % 100;
         }
         inst->update();
@@ -326,6 +329,19 @@ void broadcast_clock::dotmatrix::
 on_countdown_start( struct timespec *period ) {
   memcpy( &m_countdown_period, period, sizeof( struct timespec ) );
   clock_gettime( CLOCK_MONOTONIC, &m_stopwatch_begin );
+}
+
+void broadcast_clock::dotmatrix::
+on_countdown_finish() {
+  ESP_LOGI( m_component_name, "Countdown finish" );
+  if( m_event_loop_handle ) {
+    esp_event_post_to( m_event_loop_handle,
+                      m_event_base,
+                      EVENT_COUNTDOWN_FINISH,
+                      "",
+                      0,
+                      portMAX_DELAY );
+  }
 }
 
 void broadcast_clock::dotmatrix::

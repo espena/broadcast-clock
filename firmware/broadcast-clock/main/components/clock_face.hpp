@@ -5,6 +5,7 @@
 #include "dotmatrix.hpp"
 #include "ambient_sensor.hpp"
 #include <driver/i2c_master.h>
+#include <esp_wifi.h>
 #include <esp_event.h>
 #include <esp_timer.h>
 
@@ -12,8 +13,21 @@ namespace espena::broadcast_clock {
 
   class clock_face {
 
+  public:
+
+    static const esp_event_base_t m_event_base;
+    static const uint32_t EVENT_COUNTDOWN_FINISH = 0x01u;
+
+  private:
+
     static const char *m_component_name;
-    static const int m_component_stack_size = 2048;
+    static const int m_component_stack_size = 4096;
+
+    bool m_is_initialized;
+    struct timespec m_last_ntp_sync_time;
+
+    uint8_t m_error_flags;
+    static const uint8_t ERROR_FLAG_NTP_SYNC_FAILED = 0x01u;
 
     QueueHandle_t m_task_queue;
 
@@ -38,13 +52,14 @@ namespace espena::broadcast_clock {
 
     static void task_loop( void *arg );
 
-    static void wifi_event_handler( void *handler_arg,
-                                    esp_event_base_t event_base,
-                                    int32_t event_id,
-                                    void *event_params );
+    static void event_handler( void *handler_arg,
+                               esp_event_base_t event_base,
+                               int32_t event_id,
+                               void *event_params );
 
     void on_message( clock_face_task_message msg, void *arg );
     void on_ntp_sync();
+    void on_ntp_failed();
     void on_init( i2c_master_bus_handle_t i2c_bus );
 
     void on_enter_config_mode();
@@ -55,10 +70,13 @@ namespace espena::broadcast_clock {
     void on_stopwatch_reset();
 
     void on_countdown_start( struct timespec *period );
+    void on_countdown_finish();
     void on_countdown_reset();
 
     static void on_ambient_sensor_interval( void* arg );
+
     void check_ambient_light();
+    void update_indicators();
 
     i2c_master_bus_handle_t m_i2c_bus;
     esp_timer_handle_t m_ambient_sensor_interval_timer;
@@ -77,6 +95,7 @@ namespace espena::broadcast_clock {
     void init( i2c_master_bus_handle_t i2c_bus );
     void init_ambient_sensor_interval_timer();
     void set_event_loop_handle( esp_event_loop_handle_t h ) { m_event_loop_handle = h; };
+    void display_ip( esp_netif_ip_info_t *ip_info );
 
   };
 

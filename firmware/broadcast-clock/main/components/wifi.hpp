@@ -6,6 +6,7 @@
 #include <freertos/task.h>
 #include <freertos/queue.h>
 #include <esp_wifi.h>
+#include <esp_sntp.h>
 #include <esp_log.h>
 #include <esp_event.h>
 
@@ -17,8 +18,10 @@ namespace espena::broadcast_clock {
 
     static const esp_event_base_t m_event_base;
     static const uint32_t WIFI_EVENT_NTP_SYNC = 0x01u;
-    static const uint32_t ENTER_CONFIG_MODE = 0x02u;
-    static const uint32_t LEAVE_CONFIG_MODE = 0x04u;
+    static const uint32_t WIFI_EVENT_NTP_SYNC_FAILED = 0x02u;
+    static const uint32_t WIFI_EVENT_GOT_IP = 0x03u;
+    static const uint32_t ENTER_CONFIG_MODE = 0x04u;
+    static const uint32_t LEAVE_CONFIG_MODE = 0x05u;
 
     enum class mode {
       none,
@@ -82,7 +85,9 @@ namespace espena::broadcast_clock {
     void init_wifi();
     void init_ntp();
 
-    void on_client_connected();
+    void got_ip( esp_netif_ip_info_t *ip_info );
+
+    //void on_client_connected();
     
   public:
 

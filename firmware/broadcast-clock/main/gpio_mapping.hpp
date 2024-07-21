@@ -1,6 +1,11 @@
 #ifndef GPIO_MAPPING_HPP
 #define GPIO_MAPPING_HPP
 
+#include <driver/gpio.h>
+
+// Piezo transducer GPIO
+#define PIEZO_TRANSDUCER GPIO_NUM_5
+
 // Dial GPIO mapping
 #define DIAL_SIN    GPIO_NUM_33
 #define DIAL_SOUT   GPIO_NUM_32

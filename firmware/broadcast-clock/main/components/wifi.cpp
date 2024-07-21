@@ -99,9 +99,24 @@ on_event( void *arg,
       case IP_EVENT_STA_GOT_IP:
         ip_event_got_ip_t *e = static_cast<ip_event_got_ip_t *>( event_data );
         ESP_LOGI( m_component_name, "Got ip:" IPSTR, IP2STR( &( e->ip_info.ip ) ) );
+        instance->got_ip( &( e->ip_info ) );
         instance->init_ntp();
         break;
     }
+  }
+}
+
+void broadcast_clock::wifi::
+got_ip( esp_netif_ip_info_t *_ip_info ) {
+  static esp_netif_ip_info_t ip_info;
+  memcpy( &ip_info, _ip_info, sizeof( esp_netif_ip_info_t ) );
+  if( m_event_loop_handle ) {
+    esp_event_post_to( m_event_loop_handle,
+                       broadcast_clock::wifi::m_event_base,
+                       broadcast_clock::wifi::WIFI_EVENT_GOT_IP,
+                       &ip_info,
+                       sizeof( ip_info ),
+                       10 );
   }
 }
 
@@ -292,14 +307,26 @@ init_wifi() {
 void broadcast_clock::wifi::
 on_ntp_sync( struct timeval *now ) {
   ESP_LOGI( m_component_name, "Time synchronized" );
+
   if( m_app_instance && m_app_instance->m_event_loop_handle ) {
     struct tm timeinfo;
     memset( &timeinfo, 0x00, sizeof( struct tm ) );
     time_t epoch = static_cast<time_t>( now->tv_sec );
     localtime_r( &epoch, &timeinfo );
+
+    uint32_t e = 0;
+    if( sntp_get_sync_status() == SNTP_SYNC_STATUS_COMPLETED ) {
+      ESP_LOGI( "DEBUG", "NTP sync OK" );
+      e = broadcast_clock::wifi::WIFI_EVENT_NTP_SYNC;
+    }
+    else {
+      ESP_LOGE( "DEBUG", "NTP sync ERROR" );
+      e = wifi::WIFI_EVENT_NTP_SYNC_FAILED;
+    }
+
     esp_event_post_to( m_app_instance->m_event_loop_handle,
                        broadcast_clock::wifi::m_event_base,
-                       broadcast_clock::wifi::WIFI_EVENT_NTP_SYNC,
+                       e,
                        &timeinfo,
                        sizeof( timeinfo ),
                        10 );

@@ -20,22 +20,22 @@
         <h2>Timers and stopwatch</h2>
       </header>
       <div class="form">
-        <form method="post" action="timers">
+        <form id="timers">
           <fieldset class="tab stopwatch">
             <legend>Stopwatch</legend>
             <div class="stopwatch buttons">
-              <button class="start">Start</button>
-              <button class="stop">Stop</button>
+              <button type="button" class="start">Start</button>
+              <button type="button" class="stop">Stop</button>
             </div>
             <div class="stopwatch buttons">
-              <button class="reset">Reset</button>
+              <button type="button" class="reset">Reset</button>
             </div>
           </fieldset>
           <fieldset class="tab countdown">
             <legend>Countdown</legend>
             <div class="countdown buttons">
-              <button class="start">Start</button>
-              <button class="reset">Reset</button>
+              <button type="button" class="start">Start</button>
+              <button type="button" class="reset">Reset</button>
             </div>
             <div class="countdown period">
               <label for="period">Period (hh:mm:ss)</label> <input type="time" id="period" name="period" value="00:05:00" step="1">
@@ -46,6 +46,15 @@
       </div>
     </div>
     <script>
+
+      var coundown_input = document.getElementById( 'period' );
+      coundown_input.addEventListener( 'keydown', ( e ) => {
+        if( e.key == 'Enter' ) {
+          e.preventDefault();
+          var start_button = document.querySelector( '.countdown.buttons .start' );
+          start_button.focus();
+        }
+      } );
 
       var buttons_sw = document.querySelectorAll( 'form fieldset.tab.stopwatch button' );
       buttons_sw.forEach( ( button ) => {
@@ -82,12 +91,14 @@
           tab.classList.add( 'active' );
         } )
       } );
-
       var active_timer_tab = window.localStorage.getItem( 'active_timer_tab' ) ?? 'stopwatch';
       document.querySelector( 'form fieldset.tab.' + active_timer_tab ).classList.add( 'active' );
+      
+      /*
       window.addEventListener( 'beforeunload', ( e ) => {
         fetch( '/stopwatch/reset', { cache: 'no-store' } );
       } );
+      */
 
     </script>
   </body>

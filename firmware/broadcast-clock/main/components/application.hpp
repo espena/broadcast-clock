@@ -4,6 +4,7 @@
 #include "wifi.hpp"
 #include "configuration.hpp"
 #include "clock_face.hpp"
+#include "beeper.hpp"
 #include "captive_portal_dns.hpp"
 #include "captive_portal_http.hpp"
 #include <string>
@@ -24,6 +25,8 @@ namespace espena::broadcast_clock {
     captive_portal_dns m_captive_portal_dns;
     captive_portal_http m_captive_portal_http;
     clock_face m_clock_face;
+    beeper m_beeper;
+
     i2c_master_bus_handle_t m_i2c_bus;
 
     esp_event_loop_handle_t m_event_loop_handle;
@@ -37,10 +40,12 @@ namespace espena::broadcast_clock {
 
     void switch_to_station_mode();
 
+    void on_got_ip( esp_netif_ip_info_t *ip_info );
     void on_enter_config_mode();
     void on_save_config( std::string post_data );
     void on_cancel_config( std::string post_data );
     void on_leave_config_mode();
+    void on_countdown_finish();
 
   public:
 

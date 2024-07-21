@@ -4,7 +4,10 @@
 #include <string>
 
 namespace espena::utils {
-  std::string get_query_field( const std::string query, const std::string field ) {
+
+  std::string
+  get_query_field( const std::string query, const std::string field ) {
+
     std::string key;
     std::string value;
     bool is_key = true;
@@ -36,8 +39,10 @@ namespace espena::utils {
       }
     }
     return field == key ? value : "";
-  }
-}
+  
+  } // get_query_field
+
+} // namespace espena::utils
 
 #endif // __GET_QUERY_FIELD__
 

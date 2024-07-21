@@ -62,6 +62,12 @@ init() {
 
     esp_event_handler_register_with( m_event_loop_handle,
                                      broadcast_clock::wifi::m_event_base,
+                                     broadcast_clock::wifi::WIFI_EVENT_GOT_IP,
+                                     wifi_event_handler,
+                                     this );
+
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::wifi::m_event_base,
                                      broadcast_clock::wifi::ENTER_CONFIG_MODE,
                                      wifi_event_handler,
                                      this );
@@ -73,8 +79,16 @@ init() {
                                      this );
     init_ap_duration_timeout();
 
+    m_beeper.init();
+    m_beeper.set_event_loop_handle( m_event_loop_handle );
+    
     m_clock_face.set_event_loop_handle( m_event_loop_handle );
     m_clock_face.init( m_i2c_bus );
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::clock_face::m_event_base,
+                                     broadcast_clock::clock_face::EVENT_COUNTDOWN_FINISH,
+                                     wifi_event_handler,
+                                     this );
 
     if( m_configuration->get_bool( "configurator" ) ) {
       m_captive_portal_http.init();
@@ -92,6 +106,9 @@ wifi_event_handler( void *handler_arg,
   if( source == broadcast_clock::wifi::m_event_base ) {
     broadcast_clock::application *instance = static_cast<broadcast_clock::application *>( handler_arg );
     switch( event_id ) {
+      case broadcast_clock::wifi::WIFI_EVENT_GOT_IP:
+        instance->on_got_ip( static_cast<esp_netif_ip_info_t *>( event_params ) );
+        break;
       case broadcast_clock::wifi::ENTER_CONFIG_MODE:
         instance->on_enter_config_mode();
         break;
@@ -108,6 +125,14 @@ wifi_event_handler( void *handler_arg,
         break;
       case broadcast_clock::captive_portal_http::EVENT_CANCEL:
         instance->on_cancel_config( std::string( ( char * ) event_params ) );
+        break;
+    }
+  }
+  else if( source == broadcast_clock::clock_face::m_event_base ) {
+    broadcast_clock::application *instance = static_cast<broadcast_clock::application *>( handler_arg );
+    switch( event_id ) {
+      case broadcast_clock::clock_face::EVENT_COUNTDOWN_FINISH:
+        instance->on_countdown_finish();
         break;
     }
   }
@@ -136,6 +161,11 @@ switch_to_station_mode() {
     m_captive_portal_http.stop();
   }
   m_wifi.init( wifi::mode::station );
+}
+
+void application::
+on_got_ip( esp_netif_ip_info_t *ip_info ) {
+  m_clock_face.display_ip( ip_info );
 }
 
 void application::
@@ -174,6 +204,11 @@ on_leave_config_mode() {
 }
 
 void application::
+on_countdown_finish() {
+  m_beeper.alarm();
+}
+
+void application::
 on_ap_duration_timeout( void *arg ) {
   ESP_LOGI( "application", "Terminate access mode, start station mode" );
   application *app = static_cast<application *>( arg );
@@ -194,7 +229,6 @@ init_nvs() {
 
 void application::
 init_timezone() {
-  //setenv( "TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 1 );
   std::string timezone = m_configuration->get_str( "time_zone" );
   ESP_LOGI( "application", "Setting timezone to %s", timezone.c_str() );
   setenv( "TZ", timezone.c_str(), 1 );
