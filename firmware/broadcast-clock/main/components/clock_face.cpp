@@ -223,8 +223,6 @@ on_ntp_sync() {
   m_error_flags &= ~ERROR_FLAG_NTP_SYNC_FAILED;
   m_dial.set_red_indicator( m_error_flags != 0 );
   m_dial.set_green_indicator( m_error_flags == 0 );
-  vTaskDelay( 1000 / portTICK_PERIOD_MS );
-  m_dial.set_green_indicator( false );
 }
 
 void broadcast_clock::clock_face::
@@ -311,10 +309,9 @@ update_indicators() {
         int ntp_interval_ms = c->get_int( "update_interval" );
         sntp_sync_status_t ntp_status = sntp_get_sync_status();
         if( ntp_status == SNTP_SYNC_STATUS_COMPLETED ) {
-          ESP_LOGI( m_component_name, "NTP sync OK" );
-          m_dial.blink_green_indicator();
-          clock_gettime( CLOCK_MONOTONIC, &m_last_ntp_sync_time );
           m_error_flags &= ~ERROR_FLAG_NTP_SYNC_FAILED;
+          ESP_LOGI( m_component_name, "NTP sync OK" );
+          clock_gettime( CLOCK_MONOTONIC, &m_last_ntp_sync_time );
         }
         else {
           struct timespec now;
@@ -327,6 +324,7 @@ update_indicators() {
       }
     }
     m_dial.set_red_indicator( m_error_flags > 0 );
+    m_dial.set_green_indicator( m_error_flags == 0 );
   }
 }
 

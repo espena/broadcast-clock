@@ -189,22 +189,22 @@ update() {
           gpio_set_level( DIAL_SOUT, 0 );
           switch( led_id ) {
             case 61:
-              if( k == 4 ) {
+              if( k == 4 && m_current_seconds % 2 == 0 ) {
                 gpio_set_level( DIAL_SOUT, m_blue_indicator ? 1 : 0 );
               }
               break;
             case 62:
-              if( k == 2 ) {
+              if( k == 2 && m_current_seconds % 2 == 0 ) {
                 gpio_set_level( DIAL_SOUT, m_green_indicator ? 1 : 0 );
               }
               break;
             case 63:
-              if( k == 2 ) {
+              if( k == 2 && m_current_seconds % 2 == 0 ) {
                 gpio_set_level( DIAL_SOUT, m_yellow_indicator ? 1 : 0 );
               }
               break;
             case 64:
-              if( k == 2 ) {
+              if( k == 2 && m_current_seconds % 2 == 0 ) {
                 gpio_set_level( DIAL_SOUT, m_red_indicator ? 1 : 0 );
               }
               break;

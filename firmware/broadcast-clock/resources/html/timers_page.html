@@ -74,6 +74,7 @@
           var action = button.classList[ 0 ];
           var ts = ( new Date() ).getTime();
           var period = document.querySelector( 'form fieldset.tab.countdown input#period' ).value;
+          window.localStorage.setItem( 'most_recent_period', period );
           fetch( `/countdown/${action}?ts=${ts}&period=${period}`, { cache: 'no-store' } )
             .then( response => response.text() )
             .then( data => console.log( data ) );
@@ -94,11 +95,8 @@
       var active_timer_tab = window.localStorage.getItem( 'active_timer_tab' ) ?? 'stopwatch';
       document.querySelector( 'form fieldset.tab.' + active_timer_tab ).classList.add( 'active' );
       
-      /*
-      window.addEventListener( 'beforeunload', ( e ) => {
-        fetch( '/stopwatch/reset', { cache: 'no-store' } );
-      } );
-      */
+      var most_recent_period = window.localStorage.getItem( 'most_recent_period' ) ?? '00:05:00';
+      document.querySelector( 'form fieldset.tab.countdown input#period' ).value = most_recent_period;
 
     </script>
   </body>
