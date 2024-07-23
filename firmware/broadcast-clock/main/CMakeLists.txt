@@ -13,5 +13,6 @@ idf_component_register( SRCS "app_main.cpp"
               EMBED_TXTFILES "../resources/html/control_panel.html"
                              "../resources/html/timers_page.html"
                              "../resources/html/exit_page.html"
-                             "../resources/html/styles.css" )
+                             "../resources/html/styles.css"
+                             "../resources/gfx/favicon.ico" )
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCRON_USE_LOCAL_TIME" )

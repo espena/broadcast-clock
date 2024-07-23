@@ -196,6 +196,13 @@ on_request( httpd_req_t *req ) {
     const size_t buf_st_len = broadcast_clock::resources::html::styles_css_end - broadcast_clock::resources::html::styles_css_start;
     httpd_resp_send( req, buf_st, buf_st_len );
   }
+  else if( uri == "/favicon.ico" ) {
+    httpd_resp_set_status( req, "302 Found" ); 
+    httpd_resp_set_type( req, "image/x-icon;" );
+    const char *buf_ico = ( char * ) broadcast_clock::resources::gfx::favicon_ico_start;
+    const size_t buf_ico_len = broadcast_clock::resources::gfx::favicon_ico_end - broadcast_clock::resources::gfx::favicon_ico_start;
+    httpd_resp_send( req, buf_ico, buf_ico_len );
+  }
   else {
     std::string html = create_html_response();
     httpd_resp_send( req, html.c_str(), html.length() );
