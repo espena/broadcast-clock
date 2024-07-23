@@ -37,6 +37,7 @@ init() {
 
     init_nvs();
     m_configuration = broadcast_clock::configuration::get_instance();
+    m_configuration->set_event_loop_handle( m_event_loop_handle );
 
     init_timezone();
     init_i2c();
