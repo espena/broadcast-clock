@@ -19,7 +19,7 @@ clock_face() : m_is_initialized( false ),
                m_task_queue( nullptr ),
                m_event_loop_handle( nullptr ),
                m_i2c_bus( nullptr ),
-               m_ambient_sensor_interval_timer( nullptr ),
+               m_interval_timer( nullptr ),
                m_threshold( 0 ) {
 
   memset( &m_last_ntp_sync_time, 0x00, sizeof( struct timespec ) );
@@ -61,6 +61,9 @@ on_message( clock_face_task_message msg, void *arg ) {
   switch( msg ) {
     case clock_face_task_message::init:
       on_init( *static_cast<i2c_master_bus_handle_t *>( arg ) );
+      break;
+    case clock_face_task_message::update_indicators:
+      on_update_indicators();
       break;
   }
 }
@@ -150,7 +153,7 @@ on_init( i2c_master_bus_handle_t i2c_bus ) {
 
   m_ambient_sensor.init( m_i2c_bus );
 
-  init_ambient_sensor_interval_timer();
+  init_interval_timer();
 }
 
 void broadcast_clock::clock_face::
@@ -165,9 +168,6 @@ event_handler( void *handler_arg,
     switch( event_id ) {
       case broadcast_clock::wifi::WIFI_EVENT_NTP_SYNC:
         instance->on_ntp_sync();
-        break;
-      case broadcast_clock::wifi::WIFI_EVENT_NTP_SYNC_FAILED:
-        instance->on_ntp_failed();
         break;
       case broadcast_clock::wifi::ENTER_CONFIG_MODE:
         instance->on_enter_config_mode();
@@ -220,16 +220,7 @@ on_ntp_sync() {
     m_dotmatrix.start();
     m_is_initialized = true;
   }
-  m_error_flags &= ~ERROR_FLAG_NTP_SYNC_FAILED;
-  m_dial.set_red_indicator( m_error_flags != 0 );
-  m_dial.set_green_indicator( m_error_flags == 0 );
-}
-
-void broadcast_clock::clock_face::
-on_ntp_failed() {
-  ESP_LOGE( m_component_name, "NTP sync failed" );
-  m_error_flags |= ERROR_FLAG_NTP_SYNC_FAILED;
-  m_dial.set_red_indicator( m_error_flags != 0 );
+  clock_gettime( CLOCK_MONOTONIC, &m_last_ntp_sync_time );
 }
 
 void broadcast_clock::clock_face::
@@ -294,7 +285,26 @@ on_countdown_finish() {
 }
 
 void broadcast_clock::clock_face::
-on_ambient_sensor_interval( void* arg ) {
+on_update_indicators() {
+  if( m_is_initialized ) {
+    broadcast_clock::configuration *c = broadcast_clock::configuration::get_instance();
+    if( c ) {
+      int ntp_interval_ms = c->get_int( "update_interval" );
+      struct timespec now;
+      clock_gettime( CLOCK_MONOTONIC, &now );
+      if( ( now.tv_sec - m_last_ntp_sync_time.tv_sec ) > ( ( ntp_interval_ms / 1000 ) + 60 ) ) {
+        m_error_flags |= ERROR_FLAG_NTP_SYNC_FAILED;
+      }
+      else {
+        m_error_flags &= ~ERROR_FLAG_NTP_SYNC_FAILED;
+      }
+    }
+    m_dial.set_red_indicator( m_error_flags > 0 );
+  }
+}
+
+void broadcast_clock::clock_face::
+on_interval_timer( void* arg ) {
   clock_face *instance = static_cast<clock_face *>( arg );
   instance->check_ambient_light();
   instance->update_indicators();
@@ -302,30 +312,8 @@ on_ambient_sensor_interval( void* arg ) {
 
 void broadcast_clock::clock_face::
 update_indicators() {
-  if( m_is_initialized ) {
-    if( esp_sntp_enabled() ) {
-      broadcast_clock::configuration *c = broadcast_clock::configuration::get_instance();
-      if( c ) {
-        int ntp_interval_ms = c->get_int( "update_interval" );
-        sntp_sync_status_t ntp_status = sntp_get_sync_status();
-        if( ntp_status == SNTP_SYNC_STATUS_COMPLETED ) {
-          m_error_flags &= ~ERROR_FLAG_NTP_SYNC_FAILED;
-          ESP_LOGI( m_component_name, "NTP sync OK" );
-          clock_gettime( CLOCK_MONOTONIC, &m_last_ntp_sync_time );
-        }
-        else {
-          struct timespec now;
-          clock_gettime( CLOCK_MONOTONIC, &now );
-          if( ( now.tv_sec - m_last_ntp_sync_time.tv_sec ) > ( ( ntp_interval_ms / 1000 ) + 60 ) ) {
-            clock_gettime( CLOCK_MONOTONIC, &m_last_ntp_sync_time );
-            m_error_flags |= ERROR_FLAG_NTP_SYNC_FAILED;
-          }
-        }
-      }
-    }
-    m_dial.set_red_indicator( m_error_flags > 0 );
-    m_dial.set_green_indicator( m_error_flags == 0 );
-  }
+  clock_face_task_queue_item item = { clock_face_task_message::update_indicators, nullptr };
+  xQueueSend( m_task_queue, &item, 10 );
 }
 
 void broadcast_clock::clock_face::
@@ -336,14 +324,14 @@ init( i2c_master_bus_handle_t i2c_bus ) {
 }
 
 void broadcast_clock::clock_face::
-init_ambient_sensor_interval_timer() {
+init_interval_timer() {
   esp_timer_create_args_t timer_args;
   memset( &timer_args, 0x00, sizeof( esp_timer_create_args_t ) );
-  timer_args.callback = &clock_face::on_ambient_sensor_interval;
+  timer_args.callback = &clock_face::on_interval_timer;
   timer_args.arg = this;
   timer_args.name = m_component_name;
-  ESP_ERROR_CHECK( esp_timer_create( &timer_args, &m_ambient_sensor_interval_timer ) );
-  ESP_ERROR_CHECK( esp_timer_start_periodic( m_ambient_sensor_interval_timer, 1000000 ) );
+  ESP_ERROR_CHECK( esp_timer_create( &timer_args, &m_interval_timer ) );
+  ESP_ERROR_CHECK( esp_timer_start_periodic( m_interval_timer, 1000000 ) );
 }
 
 void broadcast_clock::clock_face::
@@ -395,7 +383,7 @@ display_ip( esp_netif_ip_info_t *ip_info ) {
   for( int i = 0; i < 4; i++ ) {
     broadcast_clock::dotmatrix::display_message msg = { "  ", octet[ i ], "IP" };
     m_dotmatrix.display( &msg );
-    vTaskDelay( 3000 / portTICK_PERIOD_MS );
+    vTaskDelay( 2000 / portTICK_PERIOD_MS );
   }
   m_dotmatrix.display( nullptr );
 } 
