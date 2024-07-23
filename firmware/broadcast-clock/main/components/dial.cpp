@@ -19,7 +19,8 @@ using namespace espena;
 const char *broadcast_clock::dial::m_component_name = "dial";
 
 broadcast_clock::dial::
-dial() : m_config( nullptr ),
+dial() : m_initialized( false ),
+         m_config( nullptr ),
          m_refresh_timer( nullptr ),
          m_current_seconds( 0 ),
          m_brightness_bit( 0 ),
@@ -40,7 +41,7 @@ dial() : m_config( nullptr ),
                  m_component_name,
                  m_component_stack_size,
                  &m_task_params,
-                 1,
+                 23,
                  &m_task_params.task_handle );
 }
 
@@ -72,9 +73,13 @@ task_loop( void *arg ) {
   dial_task_queue_item item;
   memset( &item, 0x00, sizeof( dial_task_queue_item ) );
   while( 1 ) {
-    if( xQueueReceive( inst->m_task_queue, &item, 1 ) ) {
+    if( xQueueReceive( inst->m_task_queue, &item, 0 ) ) {
       inst->on_message( item.message, item.arg );
     }
+    if( inst->m_initialized ) {
+      inst->refresh();
+    }
+    vTaskDelay( 1 );
   }
 }
 
@@ -97,7 +102,7 @@ void broadcast_clock::dial::
 on_init() {
   ESP_LOGI( m_component_name, "Initializing" );
   init_gpio();
-  refresh_loop();
+  m_initialized = true;
 }
 
 void broadcast_clock::dial::
@@ -107,13 +112,13 @@ on_ambient_light_level( int threshold ) {
       m_brightness_bit = 6;
       break;
     case 1:
-      m_brightness_bit = 4;
+      m_brightness_bit = 5;
       break;
     case 2:
-      m_brightness_bit = 2;
+      m_brightness_bit = 4;
       break;
     case 3:
-      m_brightness_bit = 1;
+      m_brightness_bit = 2;
       break;
     case 4:
       m_brightness_bit = 1;
@@ -129,7 +134,6 @@ refresh() {
   if( m_stopwatch_begin.tv_nsec > 0 ||
       m_stopwatch_begin.tv_sec > 0 ) {
       update();
-      vTaskDelay( 10 / portTICK_PERIOD_MS );
   }
   else if( m_current_seconds != timeinfo.tm_sec ) {
       m_current_seconds = timeinfo.tm_sec;
@@ -138,18 +142,19 @@ refresh() {
   gpio_set_level( DIAL_BLANK, 1 );
   gpio_set_level( DIAL_BLANK, 0 );
 
+  portDISABLE_INTERRUPTS();
   for( int i = 0; i < 4096; i++ ) {
     gpio_set_level( DIAL_GSCLK, 1 );
-    usleep( 1 );
+    utils::micro_delay();
     gpio_set_level( DIAL_GSCLK, 0 );
-    usleep( 1 );
+    utils::micro_delay();
   }
+  portENABLE_INTERRUPTS();
 }
 
 void broadcast_clock::dial::
 update() {
 
-  
   const char style = m_config->get_str( "dial_style" )[ 0 ];
 
   gpio_set_level( DIAL_XLAT, 0 );
@@ -169,7 +174,6 @@ update() {
   gpio_set_level( DIAL_SOUT, 0 );
   for( int i = 0; i < 5; i++ ) {
     for( int j = 0; j < 16; j++ ) {
-      esp_task_wdt_reset();
       const int led_id = 60 - ( ( ( i * 16 ) + j ) - 20 );
       for( int k = 0; k < 12; k++ ) {
         if( stopwatch_running || stopwatch_stopped ) {
@@ -224,7 +228,6 @@ update() {
         gpio_set_level( DIAL_SCLK, 0 );
       }
     }
-    esp_task_wdt_reset();
   }
   gpio_set_level( DIAL_XLAT, 1 );
   gpio_set_level( DIAL_XLAT, 0 );
@@ -241,21 +244,6 @@ init_gpio() {
   gpio_set_direction( DIAL_DCPRG, GPIO_MODE_OUTPUT );
   gpio_set_direction( DIAL_SCLK, GPIO_MODE_OUTPUT );
   gpio_set_direction( DIAL_BLANK, GPIO_MODE_OUTPUT );
-}
-
-void broadcast_clock::dial::
-on_refresh_timer( void* arg ) {
-  dial *instance = static_cast<dial *>( arg );
-  instance->refresh();
-}
-
-void broadcast_clock::dial::
-refresh_loop() {
-  ESP_ERROR_CHECK(esp_task_wdt_add(NULL));
-  while( 1 ) {
-    refresh();
-    vTaskDelay( 1 / portTICK_PERIOD_MS );
-  }  
 }
 
 void broadcast_clock::dial::

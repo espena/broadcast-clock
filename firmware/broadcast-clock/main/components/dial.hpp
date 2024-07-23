@@ -18,6 +18,8 @@ namespace espena::broadcast_clock {
     static const int m_refresh_interval = 20000;
     static const int m_pwm_frequency_hz = 2500000;
 
+    bool m_initialized;
+
     struct timespec m_stopwatch_begin;
     struct timespec m_stopwatch_end;
 
@@ -57,8 +59,6 @@ namespace espena::broadcast_clock {
 
     static void task_loop( void *arg );
 
-    static void on_refresh_timer( void *arg );
-
     void on_message( dial_task_message msg, void *arg );
     void on_init();
     void on_ambient_light_level( int threshold );
@@ -67,8 +67,6 @@ namespace espena::broadcast_clock {
     void update();
 
     void init_gpio();
-
-    void refresh_loop();
 
     void set_indicators( bool blue, bool green, bool yellow, bool red );
 
