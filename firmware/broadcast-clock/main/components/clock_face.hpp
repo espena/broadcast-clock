@@ -42,7 +42,8 @@ namespace espena::broadcast_clock {
     clock_face_task_params m_task_params;
 
     enum class clock_face_task_message {
-        init
+        init,
+        update_indicators
     };
 
     typedef struct clock_face_task_queue_item_struct {
@@ -59,7 +60,6 @@ namespace espena::broadcast_clock {
 
     void on_message( clock_face_task_message msg, void *arg );
     void on_ntp_sync();
-    void on_ntp_failed();
     void on_init( i2c_master_bus_handle_t i2c_bus );
 
     void on_enter_config_mode();
@@ -72,14 +72,16 @@ namespace espena::broadcast_clock {
     void on_countdown_start( struct timespec *period );
     void on_countdown_finish();
     void on_countdown_reset();
+    
+    void on_update_indicators();
 
-    static void on_ambient_sensor_interval( void* arg );
+    static void on_interval_timer( void* arg );
 
     void check_ambient_light();
     void update_indicators();
 
     i2c_master_bus_handle_t m_i2c_bus;
-    esp_timer_handle_t m_ambient_sensor_interval_timer;
+    esp_timer_handle_t m_interval_timer;
 
     dial m_dial;
     dotmatrix m_dotmatrix;
@@ -93,7 +95,7 @@ namespace espena::broadcast_clock {
     clock_face();
     ~clock_face();
     void init( i2c_master_bus_handle_t i2c_bus );
-    void init_ambient_sensor_interval_timer();
+    void init_interval_timer();
     void set_event_loop_handle( esp_event_loop_handle_t h ) { m_event_loop_handle = h; };
     void display_ip( esp_netif_ip_info_t *ip_info );
 
