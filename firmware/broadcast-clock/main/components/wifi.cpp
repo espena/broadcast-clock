@@ -43,6 +43,16 @@ broadcast_clock::wifi::
 }
 
 void broadcast_clock::wifi::
+set_event_loop_handle( esp_event_loop_handle_t h ) {
+  m_event_loop_handle = h;
+  esp_event_handler_register_with( m_event_loop_handle,
+                                   broadcast_clock::configuration::m_event_base,
+                                   broadcast_clock::configuration::CONFIGURATION_UPDATED,
+                                   on_event,
+                                   this );
+}
+
+void broadcast_clock::wifi::
 init( mode m ) {
   static mode current_mode;
   current_mode = m;
@@ -104,6 +114,13 @@ on_event( void *arg,
         break;
     }
   }
+  else if( event_base == broadcast_clock::configuration::m_event_base ) {
+    switch( event_id ) {
+      case broadcast_clock::configuration::CONFIGURATION_UPDATED:
+        instance->on_configuration_changed();
+        break;
+    }
+  }
 }
 
 void broadcast_clock::wifi::
@@ -149,6 +166,16 @@ on_message( wifi_task_message msg, void *arg ) {
     case wifi_task_message::leave_config_mode:
       on_leave_config_mode();
       break;
+  }
+}
+
+void broadcast_clock::wifi::
+on_configuration_changed() {
+  broadcast_clock::configuration *c = broadcast_clock::configuration::get_instance();
+  const int upint = c->get_int( "update_interval" );
+  if( sntp_get_sync_interval() != upint ) {
+    ESP_LOGI( m_component_name, "NTP interval changed to %d minutes, updating...", upint / 60000 );
+    sntp_set_sync_interval( upint );
   }
 }
 
@@ -243,7 +270,6 @@ init_wifi() {
                                          this,
                                          &instance_got_ip );
     
-    
     wifi_config_t wifi_config;
     memset( &wifi_config, 0x00, sizeof( wifi_config_t ) );
 
@@ -299,9 +325,7 @@ init_wifi() {
 
     esp_wifi_set_config( WIFI_IF_AP, &wifi_config );
     esp_wifi_start();
-
   }
-
 }
 
 void broadcast_clock::wifi::

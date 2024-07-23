@@ -5,12 +5,22 @@
 
 #include <string>
 #include <map>
+#include <esp_event.h>
 
 namespace espena::broadcast_clock {
 
   class configuration {
 
+  public:
+
+    static const esp_event_base_t m_event_base;
+    static const uint32_t CONFIGURATION_UPDATED = 0x01u;
+
+  private:
+
     static const char *m_component_name;
+
+    esp_event_loop_handle_t m_event_loop_handle;
 
     ::std::string m_data;
     ::std::map<std::string, std::string> m_values;
@@ -32,6 +42,8 @@ namespace espena::broadcast_clock {
     ::std::string get_str( ::std::string key );
     int get_int( ::std::string key );
     bool get_bool( ::std::string key );
+
+    void set_event_loop_handle( esp_event_loop_handle_t event_loop_handle ) { m_event_loop_handle = event_loop_handle; };
 
     void update( ::std::string data );
     void parse();

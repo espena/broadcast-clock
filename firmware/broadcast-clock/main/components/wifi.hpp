@@ -1,6 +1,8 @@
 #ifndef __WIFI_HPP__
 #define __WIFI_HPP__
 
+#include "configuration.hpp"
+
 #include <time.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -73,6 +75,7 @@ namespace espena::broadcast_clock {
 
     void enter_config_mode();
     void on_enter_config_mode();
+    void on_configuration_changed();
 
     void leave_config_mode();
     void on_leave_config_mode();
@@ -95,7 +98,7 @@ namespace espena::broadcast_clock {
     ~wifi();
 
     void init( mode m = mode::station );
-    void set_event_loop_handle( esp_event_loop_handle_t h ) { m_event_loop_handle = h; };
+    void set_event_loop_handle( esp_event_loop_handle_t h );
 
   };
 

@@ -5,17 +5,19 @@
 #include <string>
 #include <map>
 #include <nvs_flash.h>
+#include <esp_event.h>
 #include <esp_log.h>
 
 using namespace espena;
 
 const char *broadcast_clock::configuration::m_component_name = "configuration";
+const esp_event_base_t broadcast_clock::configuration::m_event_base = "broadcast_clock_configuration_event";
 
 const char *broadcast_clock::configuration::m_nvs_namespace = "default";
 broadcast_clock::configuration *broadcast_clock::configuration::m_instance = nullptr;
 
 broadcast_clock::configuration::
-configuration() {
+configuration() : m_event_loop_handle( nullptr ) {
   m_instance = this;
   read_from_nvs();
 }
@@ -64,6 +66,14 @@ update( std::string data ) {
   m_data = data;
   save_to_nvs();
   parse();
+  if( m_event_loop_handle ) {
+    esp_event_post_to( m_event_loop_handle,
+                       m_event_base,
+                       CONFIGURATION_UPDATED,
+                       nullptr,
+                       0,
+                       portMAX_DELAY );
+  }
 }
 
 void broadcast_clock::configuration::
