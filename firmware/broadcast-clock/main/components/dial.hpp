@@ -15,7 +15,7 @@ namespace espena::broadcast_clock {
     static const char *m_component_name;
     static const size_t m_component_stack_size = 8192;
     
-    static const int m_refresh_interval = 5000;
+    static const int m_refresh_interval = 20000;
     static const int m_pwm_frequency_hz = 2500000;
 
     struct timespec m_stopwatch_begin;
@@ -67,7 +67,8 @@ namespace espena::broadcast_clock {
     void update();
 
     void init_gpio();
-    void init_refresh_timer();
+
+    void refresh_loop();
 
     void set_indicators( bool blue, bool green, bool yellow, bool red );
 

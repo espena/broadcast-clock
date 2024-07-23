@@ -7,8 +7,7 @@ namespace espena::utils {
 
   inline static void
   micro_delay() {
-    __asm__ __volatile__ ( "nop" );
-    __asm__ __volatile__ ( "nop" );
+    usleep( 1 );
   } // micro_delay
 
 } // namespace espena::utils
