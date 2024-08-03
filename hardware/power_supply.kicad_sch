@@ -4290,75 +4290,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Polarized")
-		(at 176.53 132.08 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "0d80e619-e775-4bb0-a012-9544716bec6d")
-		(property "Reference" "C21"
-			(at 172.72 130.556 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Value" "10µF"
-			(at 172.72 133.096 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
-			(at 177.4952 135.89 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 176.53 132.08 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Polarized capacitor"
-			(at 176.53 132.08 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "4a3f4528-646f-4069-b960-0b92c2653f5a")
-		)
-		(pin "2"
-			(uuid "1ce5f6e8-b62c-428b-af14-fc9bde6ab185")
-		)
-		(instances
-			(project "broadcast_clock"
-				(path "/40ecfd14-7e3d-4342-87f4-c464dfcd4cdf/08d14882-9adb-43c1-98ed-4244eb646c28"
-					(reference "C21")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:L")
 		(at 118.11 127 90)
 		(unit 1)
@@ -4487,75 +4418,6 @@
 			(project "broadcast_clock"
 				(path "/40ecfd14-7e3d-4342-87f4-c464dfcd4cdf/08d14882-9adb-43c1-98ed-4244eb646c28"
 					(reference "#PWR047")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:C_Polarized")
-		(at 176.53 68.58 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "110b6ab1-2333-4ac1-a389-a9a6e9b4b6bd")
-		(property "Reference" "C27"
-			(at 172.72 67.056 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Value" "10µF"
-			(at 172.72 69.596 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
-			(at 177.4952 72.39 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 176.53 68.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Polarized capacitor"
-			(at 176.53 68.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "95bbeafd-3fe1-41bb-a5f7-e3eba800c986")
-		)
-		(pin "2"
-			(uuid "ddcf2ae5-62e4-45f8-8a24-f7f5d2ea2f92")
-		)
-		(instances
-			(project "broadcast_clock"
-				(path "/40ecfd14-7e3d-4342-87f4-c464dfcd4cdf/08d14882-9adb-43c1-98ed-4244eb646c28"
-					(reference "C27")
 					(unit 1)
 				)
 			)
@@ -5370,6 +5232,75 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:C")
+		(at 176.53 132.08 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "5487816d-74df-4efa-961b-3f1d810b413a")
+		(property "Reference" "C21"
+			(at 171.45 129.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "10µF"
+			(at 177.8 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+			(at 177.4952 135.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 176.53 132.08 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Unpolarized capacitor"
+			(at 176.53 132.08 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "34bc02e4-fe76-4b63-82dc-975b14907b0d")
+		)
+		(pin "2"
+			(uuid "0adc309d-1945-4c18-9de0-75cb7697aed4")
+		)
+		(instances
+			(project "broadcast_clock"
+				(path "/40ecfd14-7e3d-4342-87f4-c464dfcd4cdf/08d14882-9adb-43c1-98ed-4244eb646c28"
+					(reference "C21")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power_espena:+5V")
 		(at 209.55 124.46 0)
 		(unit 1)
@@ -5796,7 +5727,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "40nF"
+		(property "Value" "39nF"
 			(at 133.35 121.92 0)
 			(effects
 				(font
@@ -6197,8 +6128,8 @@
 				)
 			)
 		)
-		(property "Value" "2A"
-			(at 48.26 113.665 0)
+		(property "Value" "250mA"
+			(at 48.768 113.538 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7401,75 +7332,6 @@
 	)
 	(symbol
 		(lib_id "Device:C_Polarized")
-		(at 176.53 104.14 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "e142ad92-9ed4-4e65-9c5a-e5b36d0e129a")
-		(property "Reference" "C24"
-			(at 172.72 102.616 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Value" "10µF"
-			(at 172.72 105.156 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
-			(at 177.4952 107.95 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 176.53 104.14 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Polarized capacitor"
-			(at 176.53 104.14 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "1f5620a3-40ef-41d1-80e5-27507acb9588")
-		)
-		(pin "2"
-			(uuid "ecdf779b-fbc4-4867-bad8-ddeb4ebc8fc6")
-		)
-		(instances
-			(project "broadcast_clock"
-				(path "/40ecfd14-7e3d-4342-87f4-c464dfcd4cdf/08d14882-9adb-43c1-98ed-4244eb646c28"
-					(reference "C24")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:C_Polarized")
 		(at 220.98 132.08 0)
 		(mirror y)
 		(unit 1)
@@ -7871,6 +7733,144 @@
 			(project "broadcast_clock"
 				(path "/40ecfd14-7e3d-4342-87f4-c464dfcd4cdf/08d14882-9adb-43c1-98ed-4244eb646c28"
 					(reference "#PWR060")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 176.53 104.14 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "f5fbb583-130b-44f5-84f4-db4cea73bbce")
+		(property "Reference" "C24"
+			(at 171.45 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "10µF"
+			(at 177.8 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+			(at 177.4952 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 176.53 104.14 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Unpolarized capacitor"
+			(at 176.53 104.14 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "c70545c9-4d10-4f3f-8bba-2df85e81c9c8")
+		)
+		(pin "2"
+			(uuid "6d5f41e3-59d2-4413-b72b-1bfa8aa52c1f")
+		)
+		(instances
+			(project "broadcast_clock"
+				(path "/40ecfd14-7e3d-4342-87f4-c464dfcd4cdf/08d14882-9adb-43c1-98ed-4244eb646c28"
+					(reference "C24")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 176.53 68.58 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "fc5df770-cd14-461a-ba6e-433948f812e5")
+		(property "Reference" "C21"
+			(at 171.45 66.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "10µF"
+			(at 177.8 71.12 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+			(at 177.4952 72.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 176.53 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Unpolarized capacitor"
+			(at 176.53 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "f323e09c-f68f-40e5-b865-25ad266ae727")
+		)
+		(pin "2"
+			(uuid "6b509732-d566-436e-b21b-096514a3304f")
+		)
+		(instances
+			(project "broadcast_clock"
+				(path "/40ecfd14-7e3d-4342-87f4-c464dfcd4cdf/08d14882-9adb-43c1-98ed-4244eb646c28"
+					(reference "C21")
 					(unit 1)
 				)
 			)
