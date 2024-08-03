@@ -8027,7 +8027,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "26pF"
+		(property "Value" "27pF"
 			(at 218.44 146.685 0)
 			(effects
 				(font
@@ -8708,7 +8708,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "26pF"
+		(property "Value" "27pF"
 			(at 82.55 146.05 0)
 			(effects
 				(font
