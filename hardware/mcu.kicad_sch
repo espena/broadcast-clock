@@ -2610,6 +2610,12 @@
 		)
 	)
 	(junction
+		(at 95.25 41.91)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "0515f74e-641c-4781-a524-1e55c4aefbe0")
+	)
+	(junction
 		(at 132.08 106.68)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -2668,12 +2674,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "77cdce45-5b65-48cd-95e7-83822ebedb06")
-	)
-	(junction
-		(at 92.71 41.91)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "7db86d78-b968-433a-9c15-5168e61ec675")
 	)
 	(junction
 		(at 190.5 130.81)
@@ -2913,7 +2913,7 @@
 	)
 	(wire
 		(pts
-			(xy 77.47 41.91) (xy 92.71 41.91)
+			(xy 77.47 41.91) (xy 95.25 41.91)
 		)
 		(stroke
 			(width 0)
@@ -2923,7 +2923,7 @@
 	)
 	(wire
 		(pts
-			(xy 92.71 39.37) (xy 92.71 41.91)
+			(xy 95.25 39.37) (xy 95.25 41.91)
 		)
 		(stroke
 			(width 0)
@@ -3213,7 +3213,7 @@
 	)
 	(wire
 		(pts
-			(xy 92.71 29.21) (xy 92.71 31.75)
+			(xy 95.25 29.21) (xy 95.25 31.75)
 		)
 		(stroke
 			(width 0)
@@ -3320,16 +3320,6 @@
 			(type default)
 		)
 		(uuid "81e53772-32bf-4586-9129-2e1ac1d14706")
-	)
-	(wire
-		(pts
-			(xy 92.71 41.91) (xy 101.6 41.91)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "834f93cc-6086-4071-aa7a-587ec2c22b84")
 	)
 	(wire
 		(pts
@@ -3870,6 +3860,16 @@
 			(type default)
 		)
 		(uuid "d91f184e-09f3-4870-a3ee-2813efa6d13e")
+	)
+	(wire
+		(pts
+			(xy 95.25 41.91) (xy 101.6 41.91)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d9b502a4-98ac-4ffd-b6ce-cc8d9ba7472a")
 	)
 	(polyline
 		(pts
@@ -4577,7 +4577,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "4k7"
+		(property "Value" "4,7kΩ"
 			(at 81.28 37.465 0)
 			(effects
 				(font
@@ -4630,7 +4630,7 @@
 	)
 	(symbol
 		(lib_id "power_espena:+3.3V_MCU")
-		(at 92.71 29.21 0)
+		(at 95.25 29.21 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -4638,7 +4638,7 @@
 		(dnp no)
 		(uuid "152af909-b2da-44f5-b9d4-55ec11f85eae")
 		(property "Reference" "#PWR04"
-			(at 92.71 33.02 0)
+			(at 95.25 33.02 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4647,7 +4647,7 @@
 			)
 		)
 		(property "Value" "+3.3V_MCU"
-			(at 95.25 24.13 0)
+			(at 97.79 24.13 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4655,7 +4655,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 92.71 29.21 0)
+			(at 95.25 29.21 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4664,7 +4664,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 92.71 29.21 0)
+			(at 95.25 29.21 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4673,7 +4673,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"+3.3V_MCU\""
-			(at 92.71 29.21 0)
+			(at 95.25 29.21 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4842,7 +4842,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "10k"
+		(property "Value" "10kΩ"
 			(at 152.4 158.115 0)
 			(effects
 				(font
@@ -4911,7 +4911,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "10k"
+		(property "Value" "10kΩ"
 			(at 189.23 66.675 0)
 			(effects
 				(font
@@ -5629,7 +5629,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "10k"
+		(property "Value" "10kΩ"
 			(at 189.23 137.795 0)
 			(effects
 				(font
@@ -5830,7 +5830,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "10k"
+		(property "Value" "10kΩ"
 			(at 189.23 122.555 0)
 			(effects
 				(font
@@ -6152,7 +6152,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 92.71 35.56 0)
+		(at 95.25 35.56 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -6160,7 +6160,7 @@
 		(dnp yes)
 		(uuid "a3e75a5f-bdb4-4951-8c3c-7406d13d433f")
 		(property "Reference" "R17"
-			(at 90.17 34.925 0)
+			(at 92.71 34.925 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6168,8 +6168,8 @@
 				(justify right)
 			)
 		)
-		(property "Value" "4k7"
-			(at 90.17 37.465 0)
+		(property "Value" "4,7kΩ"
+			(at 92.71 37.465 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6178,7 +6178,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
-			(at 90.932 35.56 90)
+			(at 93.472 35.56 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6187,7 +6187,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 92.71 35.56 0)
+			(at 95.25 35.56 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6196,7 +6196,7 @@
 			)
 		)
 		(property "Description" "Resistor"
-			(at 92.71 35.56 0)
+			(at 95.25 35.56 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6238,7 +6238,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "47uF"
+		(property "Value" "47μF"
 			(at 161.29 33.02 0)
 			(effects
 				(font
@@ -6308,7 +6308,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "4.7k"
+		(property "Value" "4,7kΩ"
 			(at 191.77 39.3699 0)
 			(effects
 				(font
@@ -6575,7 +6575,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "4.7k"
+		(property "Value" "4,7kΩ"
 			(at 130.81 40.005 0)
 			(effects
 				(font
@@ -6710,7 +6710,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "1uF"
+		(property "Value" "1μF"
 			(at 128.27 150.495 0)
 			(effects
 				(font
@@ -6914,7 +6914,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "4,7k"
+		(property "Value" "4,7kΩ"
 			(at 132.08 134.6199 0)
 			(effects
 				(font
@@ -6984,7 +6984,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "4k7"
+		(property "Value" "4,7k"
 			(at 134.62 113.665 0)
 			(effects
 				(font

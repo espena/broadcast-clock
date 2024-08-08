@@ -7517,7 +7517,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "53.6k"
+		(property "Value" "53,6kΩ"
 			(at 77.47 127.635 0)
 			(effects
 				(font
@@ -7760,7 +7760,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "53.6k"
+		(property "Value" "53,6kΩ"
 			(at 224.79 127.635 0)
 			(effects
 				(font
@@ -8164,7 +8164,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "47uF"
+		(property "Value" "47µF"
 			(at 105.41 59.69 0)
 			(effects
 				(font
@@ -8503,7 +8503,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "47uF"
+		(property "Value" "47µF"
 			(at 214.63 59.69 0)
 			(effects
 				(font
@@ -8573,7 +8573,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "4.7k"
+		(property "Value" "4,7kΩ"
 			(at 226.06 111.125 0)
 			(effects
 				(font
@@ -9211,7 +9211,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "4.7k"
+		(property "Value" "4,7kΩ"
 			(at 78.74 107.9499 0)
 			(effects
 				(font

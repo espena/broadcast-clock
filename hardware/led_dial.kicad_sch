@@ -8481,7 +8481,7 @@
 		(fields_autoplaced yes)
 		(uuid "3aa1403a-efc1-4619-8b44-0fd83f464ef8")
 		(property "Reference" "R8"
-			(at 199.39 73.025 0)
+			(at 199.39 72.3899 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8489,8 +8489,8 @@
 				(justify right)
 			)
 		)
-		(property "Value" "2k"
-			(at 199.39 75.565 0)
+		(property "Value" "2kΩ"
+			(at 199.39 74.9299 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9724,7 +9724,7 @@
 		(fields_autoplaced yes)
 		(uuid "732a00f7-d5f5-4695-8f59-b39e9c4d9b45")
 		(property "Reference" "R6"
-			(at 77.47 73.025 0)
+			(at 77.47 72.3899 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9732,8 +9732,8 @@
 				(justify right)
 			)
 		)
-		(property "Value" "2k"
-			(at 77.47 75.565 0)
+		(property "Value" "2kΩ"
+			(at 77.47 74.9299 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9933,21 +9933,21 @@
 		(fields_autoplaced yes)
 		(uuid "78ae1bfe-acb1-4ee8-aaf0-e8c8951bb9fd")
 		(property "Reference" "R10"
-			(at 101.6 167.005 0)
+			(at 106.68 166.3699 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify right)
+				(justify left)
 			)
 		)
-		(property "Value" "2k"
-			(at 101.6 169.545 0)
+		(property "Value" "2kΩ"
+			(at 106.68 168.9099 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify right)
+				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
@@ -10901,7 +10901,7 @@
 		(fields_autoplaced yes)
 		(uuid "93cbadaa-cb03-4dc9-8e33-aac1ac9c52ce")
 		(property "Reference" "R213"
-			(at 49.53 118.745 0)
+			(at 49.53 118.1099 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10909,8 +10909,8 @@
 				(justify right)
 			)
 		)
-		(property "Value" "10k"
-			(at 49.53 121.285 0)
+		(property "Value" "10kΩ"
+			(at 49.53 120.6499 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11598,7 +11598,7 @@
 		(fields_autoplaced yes)
 		(uuid "9ffe4ed6-84fe-4315-b525-d592efed9bd3")
 		(property "Reference" "R7"
-			(at 138.43 73.025 0)
+			(at 138.43 72.3899 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11606,8 +11606,8 @@
 				(justify right)
 			)
 		)
-		(property "Value" "2k"
-			(at 138.43 75.565 0)
+		(property "Value" "2kΩ"
+			(at 138.43 74.9299 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12152,7 +12152,7 @@
 		(fields_autoplaced yes)
 		(uuid "adaa767d-9c37-42da-be3d-235fd53cd979")
 		(property "Reference" "R9"
-			(at 260.35 73.025 0)
+			(at 260.35 72.3899 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12160,8 +12160,8 @@
 				(justify right)
 			)
 		)
-		(property "Value" "2k"
-			(at 260.35 75.565 0)
+		(property "Value" "2kΩ"
+			(at 260.35 74.9299 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12578,7 +12578,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "10k"
+		(property "Value" "10kΩ"
 			(at 41.275 120.6499 0)
 			(effects
 				(font

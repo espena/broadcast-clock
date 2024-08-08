@@ -3853,7 +3853,7 @@
 		)
 		(uuid "1963767b-c07e-4c7f-becf-86fae158b08b")
 	)
-	(text "RF CAGE"
+	(text "VIA FENCE"
 		(exclude_from_sim no)
 		(at 76.2 95.25 0)
 		(effects
@@ -4770,7 +4770,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "100uF"
+		(property "Value" "100μF"
 			(at 142.24 137.16 0)
 			(effects
 				(font
@@ -4908,7 +4908,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "820uF"
+		(property "Value" "820μF"
 			(at 161.29 134.62 0)
 			(effects
 				(font
@@ -6060,7 +6060,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "820uF"
+		(property "Value" "820μF"
 			(at 249.555 133.096 0)
 			(effects
 				(font
@@ -6197,7 +6197,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "5.6kΩ"
+		(property "Value" "5,6kΩ"
 			(at 130.81 123.19 0)
 			(effects
 				(font
@@ -6338,7 +6338,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "100uF"
+		(property "Value" "100μF"
 			(at 60.96 135.636 0)
 			(effects
 				(font
@@ -7333,34 +7333,32 @@
 	(symbol
 		(lib_id "Device:C_Polarized")
 		(at 220.98 132.08 0)
-		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "e31be752-02b3-4237-a14b-1e1c7edf9c05")
 		(property "Reference" "C19"
-			(at 217.805 130.556 0)
+			(at 217.17 129.9209 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
+				(justify right)
 			)
 		)
-		(property "Value" "820uF"
-			(at 217.805 133.096 0)
+		(property "Value" "820μF"
+			(at 217.17 132.4609 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
+				(justify right)
 			)
 		)
 		(property "Footprint" "Capacitor_SMD_espena:CP_Elec_18x16.5"
-			(at 220.0148 135.89 0)
+			(at 221.9452 135.89 0)
 			(effects
 				(font
 					(size 1.27 1.27)
