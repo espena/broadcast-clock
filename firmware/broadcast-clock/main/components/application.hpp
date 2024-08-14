@@ -5,6 +5,7 @@
 #include "configuration.hpp"
 #include "clock_face.hpp"
 #include "beeper.hpp"
+#include "lea_m8t.hpp"
 #include "captive_portal_dns.hpp"
 #include "captive_portal_http.hpp"
 #include <string>
@@ -24,6 +25,7 @@ namespace espena::broadcast_clock {
     wifi m_wifi;
     captive_portal_dns m_captive_portal_dns;
     captive_portal_http m_captive_portal_http;
+    lea_m8t m_lea_m8t;
     clock_face m_clock_face;
     beeper m_beeper;
 
@@ -46,6 +48,8 @@ namespace espena::broadcast_clock {
     void on_cancel_config( std::string post_data );
     void on_leave_config_mode();
     void on_countdown_finish();
+
+    static void on_press_test( void *arg );
 
   public:
 

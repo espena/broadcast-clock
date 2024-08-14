@@ -80,6 +80,7 @@ init() {
                                      this );
     init_ap_duration_timeout();
 
+    m_lea_m8t.init();
     m_beeper.init();
     m_beeper.set_event_loop_handle( m_event_loop_handle );
     
@@ -91,10 +92,29 @@ init() {
                                      wifi_event_handler,
                                      this );
 
+    gpio_config_t io_conf;
+    memset( &io_conf, 0x00, sizeof( gpio_config_t ) );
+
+    io_conf.intr_type = GPIO_INTR_NEGEDGE;
+    io_conf.pin_bit_mask = 1ULL << GPIO_NUM_0;
+    io_conf.mode = GPIO_MODE_INPUT;
+    io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
+    io_conf.pull_up_en = GPIO_PULLUP_DISABLE;
+
+    gpio_config( &io_conf );
+    gpio_install_isr_service( ESP_INTR_FLAG_LEVEL3 );
+    gpio_isr_handler_add( GPIO_NUM_0, &on_press_test, this );
+     
     if( m_configuration->get_bool( "configurator" ) ) {
       m_captive_portal_http.init();
       m_captive_portal_http.start();
     }
+}
+
+void application::
+on_press_test( void *arg ) {
+  application *app = static_cast<application *>( arg );
+  app->m_clock_face.test();
 }
 
 void application::

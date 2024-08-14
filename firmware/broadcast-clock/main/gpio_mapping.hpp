@@ -27,4 +27,7 @@
 #define I2C_SCL GPIO_NUM_22
 #define I2C_SDA GPIO_NUM_21
 
+// LEA M8T GPIO mapping
+#define LEA_M8T_TIMEPULSE GPIO_NUM_34
+
 #endif // GPIO_MAPPING_HPP
