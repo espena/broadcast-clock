@@ -20,7 +20,8 @@ const esp_event_base_t broadcast_clock::dotmatrix::m_event_base = "broadcast_clo
 broadcast_clock::dotmatrix::
 dotmatrix() : m_config( nullptr ),
               m_message_mode( false ),
-              m_brightness( 0x00 ),
+              m_brightness_u1( 0x00 ),
+              m_brightness_u2( 0x00 ),
               m_current_hour( 0 ),
               m_current_minute( 0 ),
               m_current_second( 0 ),
@@ -259,8 +260,8 @@ update() {
       transmit( 0x63u, 0x30u | ( ( m_current_minute % 10 ) & 0x0f ), 0x63u, meridiem[ 1 ] );
     }
   }
-  transmit( 0x01u, m_brightness, 0x01u, m_brightness );
-  transmit( 0x02u, m_brightness, 0x02u, m_brightness );
+  transmit( 0x01u, m_brightness_u1, 0x01u, m_brightness_u2 );
+  transmit( 0x02u, m_brightness_u1, 0x02u, m_brightness_u2 );
 }
 
 void broadcast_clock::dotmatrix::
@@ -281,24 +282,30 @@ on_start() {
 
 void broadcast_clock::dotmatrix::
 on_ambient_light_level( int threshold ) {
-  uint8_t brightness = 0x00;
+  uint8_t brightness_u1 = 0x00;
+  uint8_t brightness_u2 = 0x00;
   switch( threshold ) {
     case 0:
       // fallthru
     case 1:
-      brightness = 0x00u;
+      brightness_u1 = 0x11u;
+      brightness_u2 = 0x00u;
       break;
     case 2:
-      brightness = 0x22u;
+      brightness_u1 = 0x33u;
+      brightness_u2 = 0x11u;
       break;
     case 3:
-      brightness = 0x55u;
+      brightness_u1 = 0x77u;
+      brightness_u2 = 0x33u;
       break;
     case 4:
-      brightness = 0x88u;
+      brightness_u1 = 0xffu;
+      brightness_u2 = 0x55u;
       break;
   }
-  m_brightness = brightness;
+  m_brightness_u1 = brightness_u1;
+  m_brightness_u2 = brightness_u2;
 }
 
 void broadcast_clock::dotmatrix::

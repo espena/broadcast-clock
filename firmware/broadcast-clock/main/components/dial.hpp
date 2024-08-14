@@ -19,6 +19,7 @@ namespace espena::broadcast_clock {
     static const int m_pwm_frequency_hz = 2500000;
 
     bool m_initialized;
+    bool m_test_mode;
 
     struct timespec m_stopwatch_begin;
     struct timespec m_stopwatch_end;
@@ -48,6 +49,7 @@ namespace espena::broadcast_clock {
 
     enum class dial_task_message {
       init,
+      test,
       update,
       ambient_light_level
     };
@@ -61,6 +63,7 @@ namespace espena::broadcast_clock {
 
     void on_message( dial_task_message msg, void *arg );
     void on_init();
+    void on_test();
     void on_ambient_light_level( int threshold );
 
     void refresh();
@@ -76,6 +79,7 @@ namespace espena::broadcast_clock {
     ~dial();
 
     void init();
+    void test();
     void set_ambient_light_level( uint16_t lux );
 
     void stopwatch_start();

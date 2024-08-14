@@ -24,6 +24,7 @@ namespace espena::broadcast_clock {
     static const int m_component_stack_size = 4096;
 
     bool m_is_initialized;
+    bool m_test_mode;
     struct timespec m_last_ntp_sync_time;
 
     uint8_t m_error_flags;
@@ -43,6 +44,7 @@ namespace espena::broadcast_clock {
 
     enum class clock_face_task_message {
         init,
+        test,
         update_indicators
     };
 
@@ -61,6 +63,7 @@ namespace espena::broadcast_clock {
     void on_message( clock_face_task_message msg, void *arg );
     void on_ntp_sync();
     void on_init( i2c_master_bus_handle_t i2c_bus );
+    void on_test();
 
     void on_enter_config_mode();
     void on_leave_config_mode();
@@ -95,6 +98,7 @@ namespace espena::broadcast_clock {
     clock_face();
     ~clock_face();
     void init( i2c_master_bus_handle_t i2c_bus );
+    void test();
     void init_interval_timer();
     void set_event_loop_handle( esp_event_loop_handle_t h ) { m_event_loop_handle = h; };
     void display_ip( esp_netif_ip_info_t *ip_info );

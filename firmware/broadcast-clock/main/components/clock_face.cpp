@@ -15,6 +15,7 @@ const esp_event_base_t broadcast_clock::clock_face::m_event_base = "broadcast_cl
 
 broadcast_clock::clock_face::
 clock_face() : m_is_initialized( false ),
+               m_test_mode( false ),
                m_error_flags( 0x00u ),
                m_task_queue( nullptr ),
                m_event_loop_handle( nullptr ),
@@ -62,10 +63,21 @@ on_message( clock_face_task_message msg, void *arg ) {
     case clock_face_task_message::init:
       on_init( *static_cast<i2c_master_bus_handle_t *>( arg ) );
       break;
+    case clock_face_task_message::test:
+      on_test();
+      break;
     case clock_face_task_message::update_indicators:
       on_update_indicators();
       break;
   }
+}
+
+void broadcast_clock::clock_face::
+on_test() {
+  m_test_mode = true;
+  m_threshold = 2;
+  m_dial.test();
+  m_dotmatrix.test();
 }
 
 void broadcast_clock::clock_face::
@@ -324,6 +336,12 @@ init( i2c_master_bus_handle_t i2c_bus ) {
 }
 
 void broadcast_clock::clock_face::
+test() {
+  clock_face_task_queue_item item = { clock_face_task_message::test, nullptr };
+  xQueueSend( m_task_queue, &item, 10 );
+}
+
+void broadcast_clock::clock_face::
 init_interval_timer() {
   esp_timer_create_args_t timer_args;
   memset( &timer_args, 0x00, sizeof( esp_timer_create_args_t ) );
@@ -339,7 +357,10 @@ lux2threshold( uint16_t lux ) {
   static float hysteresis = 1.0;
   broadcast_clock::configuration *c = broadcast_clock::configuration::get_instance();
   int threshold = c->get_int( "brightness" );
-  if( threshold == 0 ) { // auto
+  if( m_test_mode ) {
+    threshold = 2;
+  }
+  else if( threshold == 0 ) { // auto
     if( lux > ( 15000 * hysteresis ) ) {
       threshold = 4;
     }

@@ -20,6 +20,7 @@ const char *broadcast_clock::dial::m_component_name = "dial";
 
 broadcast_clock::dial::
 dial() : m_initialized( false ),
+         m_test_mode( false ),
          m_config( nullptr ),
          m_refresh_timer( nullptr ),
          m_current_seconds( 0 ),
@@ -48,6 +49,12 @@ dial() : m_initialized( false ),
 broadcast_clock::dial::
 ~dial() {
 
+}
+
+void broadcast_clock::dial::
+test() {
+  dial_task_queue_item item = { dial_task_message::test, nullptr };
+  xQueueSend( m_task_queue, &item, 10 );
 }
 
 void broadcast_clock::dial::
@@ -89,6 +96,9 @@ on_message( dial_task_message msg, void *arg ) {
     case dial_task_message::init:
       on_init();
       break;
+    case dial_task_message::test:
+      on_test();
+      break;
     case dial_task_message::update:
       update();
       break;
@@ -106,8 +116,15 @@ on_init() {
 }
 
 void broadcast_clock::dial::
+on_test() {
+  ESP_LOGI( m_component_name, "Test dial" );
+  m_test_mode = true;
+}
+
+void broadcast_clock::dial::
 on_ambient_light_level( int threshold ) {
   switch( threshold ) {
+    /*
     case 0:
       m_brightness_bit = 6;
       break;
@@ -122,6 +139,23 @@ on_ambient_light_level( int threshold ) {
       break;
     case 4:
       m_brightness_bit = 1;
+      break;
+    */
+
+    case 0:
+      m_brightness_bit = 5;
+      break;
+    case 1:
+      m_brightness_bit = 4;
+      break;
+    case 2:
+      m_brightness_bit = 3;
+      break;
+    case 3:
+      m_brightness_bit = 1;
+      break;
+    case 4:
+      m_brightness_bit = 0;
       break;
   }
 }
@@ -176,7 +210,15 @@ update() {
     for( int j = 0; j < 16; j++ ) {
       const int led_id = 60 - ( ( ( i * 16 ) + j ) - 20 );
       for( int k = 0; k < 12; k++ ) {
-        if( stopwatch_running || stopwatch_stopped ) {
+        if( m_test_mode ) {
+          if( k == m_brightness_bit ) {
+            gpio_set_level( DIAL_SOUT, 1 );
+          }
+          else {
+            gpio_set_level( DIAL_SOUT, 0 );
+          }
+        }
+        else if( stopwatch_running || stopwatch_stopped ) {
           if( k == m_brightness_bit &&
             ( led_id == stopwatch_led_runner || led_id >= 77 ) ) {
             gpio_set_level( DIAL_SOUT, 1 );

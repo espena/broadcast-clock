@@ -34,7 +34,8 @@ namespace espena::broadcast_clock {
     bool m_message_mode;
     bool m_init_mode;
 
-    uint8_t m_brightness;
+    uint8_t m_brightness_u1;
+    uint8_t m_brightness_u2;
 
     uint8_t m_current_hour;
     uint8_t m_current_minute;

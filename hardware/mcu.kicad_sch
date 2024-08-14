@@ -2664,6 +2664,12 @@
 		(uuid "525ef358-4962-453e-962e-f288c8581bea")
 	)
 	(junction
+		(at 191.77 44.45)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "59c7bfaf-c05d-444c-9224-54f97c24d4d3")
+	)
+	(junction
 		(at 153.67 33.02)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -2698,12 +2704,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "df9253c0-3243-4e89-bb6d-70355ad663eb")
-	)
-	(junction
-		(at 189.23 44.45)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "e1e9cefa-d593-42d4-96f9-4bbef5038ff5")
 	)
 	(junction
 		(at 162.56 153.67)
@@ -2793,7 +2793,7 @@
 	)
 	(wire
 		(pts
-			(xy 189.23 31.75) (xy 189.23 34.29)
+			(xy 191.77 31.75) (xy 191.77 34.29)
 		)
 		(stroke
 			(width 0)
@@ -2943,7 +2943,7 @@
 	)
 	(wire
 		(pts
-			(xy 189.23 41.91) (xy 189.23 44.45)
+			(xy 191.77 41.91) (xy 191.77 44.45)
 		)
 		(stroke
 			(width 0)
@@ -3343,7 +3343,7 @@
 	)
 	(wire
 		(pts
-			(xy 184.15 44.45) (xy 189.23 44.45)
+			(xy 184.15 44.45) (xy 191.77 44.45)
 		)
 		(stroke
 			(width 0)
@@ -3473,7 +3473,7 @@
 	)
 	(wire
 		(pts
-			(xy 157.48 31.75) (xy 189.23 31.75)
+			(xy 157.48 31.75) (xy 191.77 31.75)
 		)
 		(stroke
 			(width 0)
@@ -3763,6 +3763,16 @@
 	)
 	(wire
 		(pts
+			(xy 191.77 44.45) (xy 207.01 44.45)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c6cf97e9-c975-43ed-9b5b-78c2ef3d95ee")
+	)
+	(wire
+		(pts
 			(xy 137.16 58.42) (xy 134.62 58.42)
 		)
 		(stroke
@@ -3890,16 +3900,6 @@
 			(type default)
 		)
 		(uuid "df85a12b-1836-4052-8540-8f1bd8d46c5d")
-	)
-	(wire
-		(pts
-			(xy 189.23 44.45) (xy 207.01 44.45)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "e0dc9a04-5351-4792-8b2a-97e03dd1c8bb")
 	)
 	(wire
 		(pts
@@ -6291,7 +6291,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 189.23 38.1 0)
+		(at 191.77 38.1 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -6300,7 +6300,7 @@
 		(fields_autoplaced yes)
 		(uuid "b8a766a4-a6b8-4225-b172-2fadd10ae4a9")
 		(property "Reference" "R2"
-			(at 191.77 36.8299 0)
+			(at 194.31 36.8299 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6309,7 +6309,7 @@
 			)
 		)
 		(property "Value" "4,7kΩ"
-			(at 191.77 39.3699 0)
+			(at 194.31 39.3699 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6318,7 +6318,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
-			(at 187.452 38.1 90)
+			(at 189.992 38.1 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6327,7 +6327,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 189.23 38.1 0)
+			(at 191.77 38.1 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6336,7 +6336,7 @@
 			)
 		)
 		(property "Description" "Resistor"
-			(at 189.23 38.1 0)
+			(at 191.77 38.1 0)
 			(effects
 				(font
 					(size 1.27 1.27)
