@@ -3,7 +3,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <memory.h>
-#include <driver/i2c.h>
+//#include <driver/i2c.h>
 #include <driver/i2c_master.h>
 #include <esp_log.h>
 
@@ -34,7 +34,7 @@ init( i2c_master_bus_handle_t i2c_bus ) {
 
 void broadcast_clock::ambient_sensor::
 init_sensor() {
-  ESP_ERROR_CHECK( i2c_master_probe( m_i2c_bus, m_i2c_address, 1000 ) );
+  i2c_master_probe( m_i2c_bus, m_i2c_address, -1 );
   i2c_device_config_t dev_cfg;
   memset( &dev_cfg, 0x00, sizeof( i2c_device_config_t ) );
   dev_cfg.dev_addr_length = I2C_ADDR_BIT_LEN_7;

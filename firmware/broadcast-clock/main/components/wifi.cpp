@@ -340,11 +340,9 @@ on_ntp_sync( struct timeval *now ) {
 
     uint32_t e = 0;
     if( sntp_get_sync_status() == SNTP_SYNC_STATUS_COMPLETED ) {
-      ESP_LOGI( "DEBUG", "NTP sync OK" );
       e = broadcast_clock::wifi::WIFI_EVENT_NTP_SYNC;
     }
     else {
-      ESP_LOGE( "DEBUG", "NTP sync ERROR" );
       e = wifi::WIFI_EVENT_NTP_SYNC_FAILED;
     }
 

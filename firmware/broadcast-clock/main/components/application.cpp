@@ -3,6 +3,7 @@
 #include "captive_portal_dns.hpp"
 #include "captive_portal_http.hpp"
 #include "../gpio_mapping.hpp"
+#include <rtc_wdt.h>
 #include <string>
 #include <memory.h>
 #include <nvs_flash.h>
@@ -36,6 +37,7 @@ void application::
 init() {
 
     init_nvs();
+
     m_configuration = broadcast_clock::configuration::get_instance();
     m_configuration->set_event_loop_handle( m_event_loop_handle );
 
@@ -80,31 +82,21 @@ init() {
                                      this );
     init_ap_duration_timeout();
 
-    m_lea_m8t.init();
     m_beeper.init();
     m_beeper.set_event_loop_handle( m_event_loop_handle );
     
     m_clock_face.set_event_loop_handle( m_event_loop_handle );
+
     m_clock_face.init( m_i2c_bus );
+
     esp_event_handler_register_with( m_event_loop_handle,
                                      broadcast_clock::clock_face::m_event_base,
                                      broadcast_clock::clock_face::EVENT_COUNTDOWN_FINISH,
                                      wifi_event_handler,
                                      this );
 
-    gpio_config_t io_conf;
-    memset( &io_conf, 0x00, sizeof( gpio_config_t ) );
+    m_lea_m8t.init( m_i2c_bus );
 
-    io_conf.intr_type = GPIO_INTR_NEGEDGE;
-    io_conf.pin_bit_mask = 1ULL << GPIO_NUM_0;
-    io_conf.mode = GPIO_MODE_INPUT;
-    io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
-    io_conf.pull_up_en = GPIO_PULLUP_DISABLE;
-
-    gpio_config( &io_conf );
-    gpio_install_isr_service( ESP_INTR_FLAG_LEVEL3 );
-    gpio_isr_handler_add( GPIO_NUM_0, &on_press_test, this );
-     
     if( m_configuration->get_bool( "configurator" ) ) {
       m_captive_portal_http.init();
       m_captive_portal_http.start();
@@ -113,8 +105,15 @@ init() {
 
 void application::
 on_press_test( void *arg ) {
-  application *app = static_cast<application *>( arg );
-  app->m_clock_face.test();
+
+}
+
+void application::
+on_start_test( void *arg ) {
+  if( gpio_get_level( GPIO_NUM_0 ) == 0 ) {
+    application *app = static_cast<application *>( arg );
+    app->m_clock_face.test();
+  }
 }
 
 void application::
@@ -266,5 +265,7 @@ init_i2c() {
   bus_config.scl_io_num = I2C_SCL;
   bus_config.sda_io_num = I2C_SDA;
   bus_config.glitch_ignore_cnt = 7;
+  bus_config.intr_priority = 1;
+  bus_config.flags.enable_internal_pullup = false;
   ESP_ERROR_CHECK( i2c_new_master_bus( &bus_config, &m_i2c_bus ) );
 }

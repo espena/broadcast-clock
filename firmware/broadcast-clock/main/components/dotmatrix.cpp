@@ -144,6 +144,7 @@ task_loop( void *arg ) {
     }
     time_t now = time( NULL );
     struct tm timeinfo;
+
     localtime_r( &now, &timeinfo );
     
     if( inst->m_stopwatch_begin.tv_nsec != 0 || inst->m_stopwatch_end.tv_nsec != 0 ) {

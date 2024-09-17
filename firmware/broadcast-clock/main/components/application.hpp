@@ -50,6 +50,7 @@ namespace espena::broadcast_clock {
     void on_countdown_finish();
 
     static void on_press_test( void *arg );
+    static void on_start_test( void *arg );
 
   public:
 

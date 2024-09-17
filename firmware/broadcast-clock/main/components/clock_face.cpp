@@ -163,7 +163,7 @@ on_init( i2c_master_bus_handle_t i2c_bus ) {
 
   m_i2c_bus = i2c_bus;
 
-  m_ambient_sensor.init( m_i2c_bus );
+  //m_ambient_sensor.init( m_i2c_bus );
 
   init_interval_timer();
 }
@@ -388,10 +388,13 @@ lux2threshold( uint16_t lux ) {
 
 void broadcast_clock::clock_face::
 check_ambient_light() {
+  /*
   uint16_t lux = m_ambient_sensor.read();
   lux2threshold( lux );
   m_dial.set_ambient_light_level( m_threshold );
   m_dotmatrix.set_ambient_light_level( m_threshold );
+  */
+  m_dotmatrix.set_ambient_light_level( 4 );
 }
 
 void broadcast_clock::clock_face::

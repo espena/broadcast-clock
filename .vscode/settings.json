@@ -55,7 +55,12 @@
     "unordered_map": "cpp",
     "variant": "cpp",
     "vector": "cpp",
-    "algorithm": "cpp"
+    "algorithm": "cpp",
+    "i2c_master.h": "c",
+    "i2c_private.h": "c",
+    "i2c_periph.h": "c",
+    "i2c_hal.h": "c",
+    "i2c_types.h": "c"
   },
   "cmake.configureOnOpen": false
 }
