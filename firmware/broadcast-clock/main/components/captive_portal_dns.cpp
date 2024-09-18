@@ -30,7 +30,7 @@ captive_portal_dns() : m_message_queue( nullptr ),
                      m_component_name,
                      m_component_stack_size,
                      &m_task_params,
-                     2,
+                     4,
                      m_task_params.stack_buffer,
                      &m_task_params.task_buffer ); 
 }

@@ -4,6 +4,7 @@
 #include "dial.hpp"
 #include "dotmatrix.hpp"
 #include "ambient_sensor.hpp"
+#include "i_indicators.hpp"
 #include <driver/i2c_master.h>
 #include <esp_wifi.h>
 #include <esp_event.h>
@@ -102,6 +103,8 @@ namespace espena::broadcast_clock {
     void init_interval_timer();
     void set_event_loop_handle( esp_event_loop_handle_t h ) { m_event_loop_handle = h; };
     void display_ip( esp_netif_ip_info_t *ip_info );
+
+    i_indicators *get_indicators() { return &m_dial; };
 
   };
 

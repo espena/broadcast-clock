@@ -1,6 +1,7 @@
 #ifndef __DIAL_HPP__
 #define __DIAL_HPP__
 
+#include "i_indicators.hpp"
 #include "configuration.hpp"
 #include <sys/time.h>
 #include <freertos/FreeRTOS.h>
@@ -10,7 +11,7 @@
 
 namespace espena::broadcast_clock {
 
-  class dial {
+  class dial : public i_indicators {
 
     static const char *m_component_name;
     static const size_t m_component_stack_size = 8192;
@@ -71,12 +72,10 @@ namespace espena::broadcast_clock {
 
     void init_gpio();
 
-    void set_indicators( bool blue, bool green, bool yellow, bool red );
-
   public:
 
     dial();
-    ~dial();
+    virtual ~dial();
 
     void init();
     void test();
@@ -89,10 +88,11 @@ namespace espena::broadcast_clock {
     void countdown_start( struct timespec *period );
     void countdown_reset();
 
-    void set_blue_indicator( bool b ) { set_indicators( b, m_green_indicator, m_yellow_indicator, m_red_indicator ); };
-    void set_green_indicator( bool b ) { set_indicators( m_blue_indicator, b, m_yellow_indicator, m_red_indicator ); };
-    void set_yellow_indicator( bool b ) { set_indicators( m_blue_indicator, m_green_indicator, b, m_red_indicator ); };
-    void set_red_indicator( bool b ) { set_indicators( m_blue_indicator, m_green_indicator, m_yellow_indicator, b ); };
+    virtual void set_indicators( bool blue, bool green, bool yellow, bool red ) override;
+    virtual void set_blue_indicator( bool b ) override { set_indicators( b, m_green_indicator, m_yellow_indicator, m_red_indicator ); };
+    virtual void set_green_indicator( bool b ) override { set_indicators( m_blue_indicator, b, m_yellow_indicator, m_red_indicator ); };
+    virtual void set_yellow_indicator( bool b ) override { set_indicators( m_blue_indicator, m_green_indicator, b, m_red_indicator ); };
+    virtual void set_red_indicator( bool b ) override { set_indicators( m_blue_indicator, m_green_indicator, m_yellow_indicator, b ); };
 
     void blink_green_indicator();
 

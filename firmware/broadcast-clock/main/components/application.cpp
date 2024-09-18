@@ -17,8 +17,10 @@ const char *application::m_component_name = "application";
 
 application::
 application() : m_configuration( nullptr ),
+                m_clock_status( m_clock_face.get_indicators() ),
                 m_i2c_bus( nullptr ),
                 m_event_loop_handle( nullptr ) {
+
   esp_event_loop_args_t loop_args = {
     .queue_size = 100,
     .task_name = "event_loop",
@@ -26,6 +28,7 @@ application() : m_configuration( nullptr ),
     .task_stack_size = 4096,
     .task_core_id = tskNO_AFFINITY
   };
+
   esp_event_loop_create( &loop_args, &m_event_loop_handle );
 }
 

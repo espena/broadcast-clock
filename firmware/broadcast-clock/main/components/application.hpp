@@ -4,6 +4,7 @@
 #include "wifi.hpp"
 #include "configuration.hpp"
 #include "clock_face.hpp"
+#include "clock_status.hpp"
 #include "beeper.hpp"
 #include "lea_m8t.hpp"
 #include "captive_portal_dns.hpp"
@@ -27,6 +28,7 @@ namespace espena::broadcast_clock {
     captive_portal_http m_captive_portal_http;
     lea_m8t m_lea_m8t;
     clock_face m_clock_face;
+    clock_status m_clock_status;
     beeper m_beeper;
 
     i2c_master_bus_handle_t m_i2c_bus;

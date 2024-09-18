@@ -190,6 +190,7 @@ void broadcast_clock::dial::
 update() {
 
   const char style = m_config->get_str( "dial_style" )[ 0 ];
+  const bool indicators_enabled = m_config->get_bool( "indicators" );
 
   gpio_set_level( DIAL_XLAT, 0 );
   gpio_set_level( DIAL_SCLK, 0 );
@@ -240,27 +241,29 @@ update() {
         }
         else if( led_id >= 61 && led_id <= 64 ) { // Indicators
           gpio_set_level( DIAL_SOUT, 0 );
-          switch( led_id ) {
-            case 61:
-              if( k == 4 ) {
-                gpio_set_level( DIAL_SOUT, m_blue_indicator ? 1 : 0 );
-              }
-              break;
-            case 62:
-              if( k == 2 ) {
-                gpio_set_level( DIAL_SOUT, m_green_indicator ? 1 : 0 );
-              }
-              break;
-            case 63:
-              if( k == 2 ) {
-                gpio_set_level( DIAL_SOUT, m_yellow_indicator ? 1 : 0 );
-              }
-              break;
-            case 64:
-              if( k == 2 ) {
-                gpio_set_level( DIAL_SOUT, m_red_indicator ? 1 : 0 );
-              }
-              break;
+          if( indicators_enabled ) {
+            switch( led_id ) {
+              case 61:
+                if( k == 4 ) {
+                  gpio_set_level( DIAL_SOUT, m_blue_indicator ? 1 : 0 );
+                }
+                break;
+              case 62:
+                if( k == 2 ) {
+                  gpio_set_level( DIAL_SOUT, m_green_indicator ? 1 : 0 );
+                }
+                break;
+              case 63:
+                if( k == 2 ) {
+                  gpio_set_level( DIAL_SOUT, m_yellow_indicator ? 1 : 0 );
+                }
+                break;
+              case 64:
+                if( k == 2 ) {
+                  gpio_set_level( DIAL_SOUT, m_red_indicator ? 1 : 0 );
+                }
+                break;
+            }
           }
         }
         else {

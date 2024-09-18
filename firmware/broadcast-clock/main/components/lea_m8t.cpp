@@ -29,7 +29,7 @@ lea_m8t() : m_i2c_bus( nullptr ),
             m_i2c_dev( nullptr ) {
 
   spinlock_initialize( &m_spinlock );
-  
+
   memset( &m_cfg_prt_ddc, 0x00, sizeof( ubx::cfg_prt_ddc_t ) );
   memset( &m_cfg_tmode2, 0x00, sizeof( ubx::cfg_tmode2_t ) );
   memset( &m_cfg_gnss, 0x00, sizeof( ubx::cfg_gnss_t ) );
@@ -47,7 +47,7 @@ lea_m8t() : m_i2c_bus( nullptr ),
                      m_component_name,
                      m_component_stack_size,
                      &m_task_params,
-                     4,
+                     2,
                      m_task_params.stack_buffer,
                      &m_task_params.task_buffer );
 
@@ -398,54 +398,50 @@ on_ubx_nav_timeutc( ubx::nav_timeutc_t *timeutc ) {
 
   if( m_ns_timepulse > 0 ) {
 
+    struct tm now_tm;
+    memset( &now_tm, 0x00, sizeof( struct tm ) );
+    
+    now_tm.tm_year = timeutc->year - 1900; // tm_year is years since 1900
+    now_tm.tm_mon = timeutc->month - 1;    // tm_mon is 0-based
+    now_tm.tm_mday = timeutc->day;
+    now_tm.tm_hour = timeutc->hour;
+    now_tm.tm_min = timeutc->min;
+    now_tm.tm_sec = timeutc->sec;
+    now_tm.tm_isdst = -1;
+
+    char *tz = getenv( "TZ" );
+    if( tz != nullptr ) {
+      tz = strdup( tz );
+    } 
+    setenv( "TZ", "UTC0", 1 );
+    tzset();
+    time_t now_time = mktime( &now_tm );
+    if( tz != nullptr ) {
+      setenv( "TZ", tz, 1 );
+      free( tz );
+    }
+
     taskENTER_CRITICAL( &m_spinlock );
-    {
 
-      struct tm now_tm;
-      memset( &now_tm, 0x00, sizeof( struct tm ) );
-      
-      now_tm.tm_year = timeutc->year - 1900; // tm_year is years since 1900
-      now_tm.tm_mon = timeutc->month - 1;    // tm_mon is 0-based
-      now_tm.tm_mday = timeutc->day;
-      now_tm.tm_hour = timeutc->hour;
-      now_tm.tm_min = timeutc->min;
-      now_tm.tm_sec = timeutc->sec;
-      now_tm.tm_isdst = -1;
+    struct timespec now_spec;
+    clock_gettime( CLOCK_REALTIME, &now_spec );
 
-      char *tz = getenv( "TZ" );
-      if( tz ) {
-        tz = strdup( tz );
-      }
-      setenv( "TZ", "UTC", 1 );
-      tzset();
+    int64_t now_ns = now_spec.tv_sec * 1000000000 + now_spec.tv_nsec;
+    int64_t ns_since_timepulse = now_ns - m_ns_timepulse;
 
-      time_t now_time = mktime( &now_tm );
+    if( ns_since_timepulse < 1000000000 ) {
+      if( now_time != -1 ) {
 
-      if( tz ) {
-        setenv( "TZ", tz, 1 );
-        tzset();
-      }
+        const int adj_ns = 34000;
 
-      struct timespec now_spec;
-      clock_gettime( CLOCK_REALTIME, &now_spec );
-
-      int64_t now_ns = now_spec.tv_sec * 1000000000 + now_spec.tv_nsec;
-      int64_t ns_since_timepulse = now_ns - m_ns_timepulse;
-
-      if( ns_since_timepulse < 999999900 ) {
-
-        if( now_time != -1 ) {
-          const int adj_ns = 500; // < Adjust for above code execution after clock_gettime()
-          now_spec.tv_sec = now_time;
-          now_spec.tv_nsec = ns_since_timepulse + adj_ns;
-          clock_settime( CLOCK_REALTIME, &now_spec );
-          ESP_LOGI( m_component_name, "TIMEUTC: UTC time set to %s", ctime( &now_time ) );
-        }
-
-        free( tz );
+        now_spec.tv_sec = now_time;
+        now_spec.tv_nsec = ns_since_timepulse + adj_ns;
+        clock_settime( CLOCK_REALTIME, &now_spec );
       }
     }
+
     m_ns_timepulse = 0;
+    
     taskEXIT_CRITICAL( &m_spinlock );
   }
 }
@@ -494,7 +490,7 @@ init_i2c_device() {
   memset( &dev_cfg, 0x00, sizeof( i2c_device_config_t ) );
   dev_cfg.dev_addr_length = I2C_ADDR_BIT_LEN_7;
   dev_cfg.device_address = m_i2c_address;
-  dev_cfg.scl_speed_hz = 5000;
+  dev_cfg.scl_speed_hz = 5000; // 5 kHz was as fast as I could get it to work...
   dev_cfg.flags.disable_ack_check = 0; // < Must be 0 to work with u-blox module
   dev_cfg.scl_wait_us = 10000000;
   ESP_LOGI( m_component_name, "Adding device to i2c bus" );
@@ -555,8 +551,8 @@ init_ubx_normalboot() {
 
   { // Set message rate
     ubx::cfg_rate_t *payload = new ubx::cfg_rate_t;
-    payload->meas_rate = 250;
-    payload->nav_rate = 2;
+    payload->meas_rate = 500;
+    payload->nav_rate = 32;
     payload->time_ref = 1;
     lea_m8t_egress_queue_item_t ubx_cfg_rate = { sizeof( ubx::cfg_rate_t ), { ubx::message::cfg::cls, ubx::message::cfg::rate }, reinterpret_cast<uint8_t *>( payload ), true };
     xQueueSend( m_egress_queue, &ubx_cfg_rate, 0 );
