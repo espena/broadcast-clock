@@ -4,6 +4,7 @@
 #include "../utils/fletcher8.hpp"
 #include "../utils/hexdump.hpp"
 #include <string>
+#include <queue>
 #include <memory.h>
 #include <time.h>
 #include <sys/time.h>
@@ -13,20 +14,21 @@
 #include <freertos/timers.h>
 #include <freertos/queue.h>
 #include <driver/gpio.h>
-#include <driver/i2c_master.h>
+// #include <driver/i2c_master.h>
+#include <driver/i2c.h>
 #include <esp_timer.h>
 #include <esp_log.h>
 
 using namespace espena;
 
 const char *broadcast_clock::lea_m8t::m_component_name = "lea_m8t";
+const char *broadcast_clock::lea_m8t::m_event_base = "broadcast_clock_lea_m8t_event";
 
 int64_t broadcast_clock::lea_m8t::m_ns_timepulse = 0;
 int64_t broadcast_clock::lea_m8t::m_ns_mismatch = 0;
 
 broadcast_clock::lea_m8t::
-lea_m8t() : m_i2c_bus( nullptr ),
-            m_i2c_dev( nullptr ) {
+lea_m8t() : m_event_loop_handle( nullptr ) {
 
   spinlock_initialize( &m_spinlock );
 
@@ -58,7 +60,7 @@ lea_m8t() : m_i2c_bus( nullptr ),
   timer_args.name = "poll_timer";
 
   ESP_ERROR_CHECK( esp_timer_create( &timer_args, &m_poll_timer ) );
-  ESP_ERROR_CHECK( esp_timer_start_periodic( m_poll_timer, 250000 ) );
+  ESP_ERROR_CHECK( esp_timer_start_periodic( m_poll_timer, 50000 ) );
 }
 
 broadcast_clock::lea_m8t::
@@ -83,49 +85,38 @@ void broadcast_clock::lea_m8t::
 on_poll_timer( void *arg ) {
   lea_m8t *inst = static_cast<lea_m8t *>( arg );
   if( inst ) {
-    if( inst->m_i2c_dev != nullptr ) {
-      lea_m8t_task_queue_item_t item = { lea_m8t_task_message::poll, nullptr };
-      xQueueSend( inst->m_task_queue, &item, 0 );
-    }
+    lea_m8t_task_queue_item_t item = { lea_m8t_task_message::poll, nullptr };
+    xQueueSend( inst->m_task_queue, &item, 0 );
   }
 }
 
 uint16_t broadcast_clock::lea_m8t::
 get_bytes_available() {
 
-  uint8_t cmd_rx_buf[ 2 ] = { 0x00, 0x01 };
-  uint8_t addr = 0xfd;
+  uint8_t cmd_rx_buf[ 2 ] = { 0x01, 0x01 };
+  const uint8_t addr = 0xfd;
   
-  if( m_i2c_dev != nullptr ) {
+  esp_err_t res = -1;
+  uint8_t retries = 0;
+  
+  while( res != ESP_OK && retries++ < 10 ) {
+    res = i2c_master_write_read_device( I2C_NUM_0,
+                                        m_i2c_address,
+                                        &addr,
+                                        1,
+                                        cmd_rx_buf,
+                                        2,
+                                        -1 );
+  }
 
-    esp_err_t res = -1;
-    uint8_t retries = 0;
-    
-    while( res != ESP_OK && retries++ < 10 ) {
-      
-      i2c_master_bus_wait_all_done( m_i2c_bus, -1 );
-
-      res = i2c_master_transmit_receive( m_i2c_dev,
-                                         &addr,
-                                         1,
-                                         cmd_rx_buf,
-                                         2,
-                                         1000 );
-    }
-
-    if( res != ESP_OK ) {
-      ESP_LOGE( m_component_name, "Failed to read bytes available" );
-    }
+  if( res != ESP_OK ) {
+    ESP_LOGE( m_component_name, "Failed to read bytes available" );
   }
   return ( cmd_rx_buf[ 0 ] << 8 & 0xff00 ) | ( cmd_rx_buf[ 1 ] & 0x00ff );
 }
 
 void broadcast_clock::lea_m8t::
 read() {
-
-  if( m_i2c_dev == nullptr ) {
-    return;
-  }
 
   uint16_t bytes_available = get_bytes_available();
   if( bytes_available == 0 ) {
@@ -141,31 +132,14 @@ read() {
   esp_err_t res = -1;
   uint8_t retries = 0;
   
-  while( res != ESP_OK && retries++ < 10 ) {
+  res = i2c_master_write_read_device( I2C_NUM_0,
+                                      m_i2c_address,
+                                      &addr,
+                                      1,
+                                      cmd_rx_buf,
+                                      bytes_available,
+                                      -1 );
 
-    i2c_master_bus_wait_all_done( m_i2c_bus, -1 );
-    
-    res = i2c_master_transmit_receive( m_i2c_dev,
-                                       &addr,
-                                       1,
-                                       cmd_rx_buf,
-                                       bytes_available,
-                                       1000 );
-  }
-
-  if( res != ESP_OK ) {
-    ESP_LOGE( m_component_name, "Failed to read bytes available" );
-  }
-  else if( retries > 1 ) {
-    ESP_LOGW( m_component_name, "Read operation succeeded after %d attempts", retries );
-  }
-  else {
-    ESP_LOGI( m_component_name, "Read operation succeeded on first attempt" );
-  }
-
-  utils::hexdump( cmd_rx_buf, bytes_available );
-  ESP_LOGI( m_component_name, "String repr.: %s", cmd_rx_buf );
-  
   while( offset < ( bytes_available - 8 ) && cmd_rx_buf[ offset ] != 0xb5 && cmd_rx_buf[ offset + 1 ] != 0x62 ) {
     offset++; // Fast forward to first UBX message
   }
@@ -208,53 +182,68 @@ read() {
 void broadcast_clock::lea_m8t::
 write() {
   lea_m8t_egress_queue_item_t item;
-  if( m_i2c_dev != nullptr ) {
-    while( m_ack != 0xff && xQueueReceive( m_egress_queue, &item, 0 ) ) {
-      ESP_LOGI( m_component_name, "Writing message: class: 0x%02x, id: 0x%02x", item.message.cls, item.message.id );
-      uint16_t buflen = 8 + item.len;
-      uint8_t *msg = new uint8_t[ buflen ];
-      int i = 0;
-      msg[ i++ ] = 0xb5;
-      msg[ i++ ] = 0x62;
-      msg[ i++ ] = item.message.cls;
-      msg[ i++ ] = item.message.id;
-      msg[ i++ ] = item.len & 0x00ff;
-      msg[ i++ ] = ( item.len >> 8 ) & 0x00ff;
-      if( item.acked ) {
-        m_ack = 0xff; // Stop writing subsequent messages until next ack is received
-      }
-      if( item.len > 0 ) {
-        memcpy( &msg[ i ], item.deletable_payload, item.len );
-        i += item.len;
-      }
-      utils::fletcher8( &msg[ 2 ], i - 2, &msg[ i ] );
-      
-      printf( "Writing message\n" );
-      printf( "***************************************************\n" );
-      utils::hexdump( msg, buflen );
-      
-      i2c_master_bus_wait_all_done( m_i2c_bus, -1 );
-      //i2c_master_bus_reset( m_i2c_bus );
-
-      i2c_master_transmit( m_i2c_dev,
-                           msg,
-                           buflen,
-                           1000 );
-      delete [] msg;
-      delete [] item.deletable_payload;
+  while( m_ack != 0xff && xQueueReceive( m_egress_queue, &item, 0 ) ) {
+    ESP_LOGI( m_component_name, "Writing message: class: 0x%02x, id: 0x%02x", item.message.cls, item.message.id );
+    uint16_t buflen = 8 + item.len;
+    uint8_t *msg = new uint8_t[ buflen ];
+    int i = 0;
+    msg[ i++ ] = 0xb5;
+    msg[ i++ ] = 0x62;
+    msg[ i++ ] = item.message.cls;
+    msg[ i++ ] = item.message.id;
+    msg[ i++ ] = item.len & 0x00ff;
+    msg[ i++ ] = ( item.len >> 8 ) & 0x00ff;
+    if( item.acked ) {
+      m_ack = 0xff; // Stop writing subsequent messages until next ack is received
     }
+    if( item.len > 0 ) {
+      memcpy( &msg[ i ], item.deletable_payload, item.len );
+      i += item.len;
+    }
+    utils::fletcher8( &msg[ 2 ], i - 2, &msg[ i ] );
+    
+    printf( "Writing message\n" );
+    printf( "***************************************************\n" );
+    utils::hexdump( msg, buflen );
+
+    i2c_master_write_to_device( I2C_NUM_0,
+                                m_i2c_address,
+                                msg,
+                                buflen,
+                                -1 );
+
+    delete [] msg;
+    delete [] item.deletable_payload;
   }
 }
 
 void broadcast_clock::lea_m8t::
+update_status() {
+  if( m_event_loop_handle ) {
+    struct timespec now;
+    clock_gettime( CLOCK_REALTIME, &now );
+    if( now.tv_sec * 1000000000 + now.tv_nsec - m_ns_timepulse > 5000000000 ) {
+      esp_event_post_to( m_event_loop_handle,
+                        m_event_base,
+                        TIMEPULSE_ABSENT,
+                        "",
+                        0,
+                        portMAX_DELAY );
+    }
+  }
+}
+void broadcast_clock::lea_m8t::
 on_task_message( lea_m8t_task_message msg, void *arg ) {
   switch( msg ) {
     case lea_m8t_task_message::init:
-      on_init( static_cast<i2c_master_bus_handle_t>( arg ) );
+      on_init();
       break;
     case lea_m8t_task_message::poll:
-      read();
-      write();
+      if( m_i2c_installed ) {
+        read();
+        write();
+        update_status();
+      }
       break;
     case lea_m8t_task_message::timepulse:
       on_timepulse();
@@ -326,7 +315,6 @@ on_ubx_message( const uint8_t msg_class,
       }
       break;
   }
-
 }
 
 void broadcast_clock::lea_m8t::
@@ -428,21 +416,30 @@ on_ubx_nav_timeutc( ubx::nav_timeutc_t *timeutc ) {
 
     int64_t now_ns = now_spec.tv_sec * 1000000000 + now_spec.tv_nsec;
     int64_t ns_since_timepulse = now_ns - m_ns_timepulse;
-
+    bool is_time_set = false;
     if( ns_since_timepulse < 1000000000 ) {
       if( now_time != -1 ) {
-
-        const int adj_ns = 34000;
-
+        const int adj_ns = 28000;
         now_spec.tv_sec = now_time;
         now_spec.tv_nsec = ns_since_timepulse + adj_ns;
         clock_settime( CLOCK_REALTIME, &now_spec );
+        is_time_set = true;
       }
     }
 
     m_ns_timepulse = 0;
     
     taskEXIT_CRITICAL( &m_spinlock );
+
+    if( is_time_set && m_event_loop_handle ) {
+      m_seconds_with_no_timesync_data = 0;
+      esp_event_post_to( m_event_loop_handle,
+                         m_event_base,
+                         TIME_SYNC,
+                         nullptr,
+                         0,
+                         portMAX_DELAY );
+    }
   }
 }
 
@@ -466,12 +463,74 @@ timepulse_handler( void *arg ) {
 
 void broadcast_clock::lea_m8t::
 on_timepulse() {
-  ESP_LOGW( m_component_name, "Timepulse offset from system clock: %lli ns", m_ns_mismatch );
+  
+  const int offset = m_ns_mismatch > 500000000
+                   ? -( ( 1000000000 - m_ns_mismatch ) / 1000 )
+                   : m_ns_mismatch / 1000;
+
+  if( m_ns_mismatch == 0 ) {
+    ESP_LOGI( m_component_name, "Timepulse offset from system clock:  0 us" );
+  }
+  else if( m_ns_mismatch > 500000000 ) {
+    ESP_LOGI( m_component_name, "Timepulse offset from system clock: -%lli us", ( 1000000000 - m_ns_mismatch ) / 1000 );
+  }
+  else {
+    ESP_LOGI( m_component_name, "Timepulse offset from system clock: +%lli us", m_ns_mismatch / 1000 );
+  }
+  if( m_event_loop_handle ) {
+    esp_event_post_to( m_event_loop_handle,
+                       m_event_base,
+                       TIMEPULSE_PRESENT,
+                       nullptr,
+                       0,
+                       portMAX_DELAY );
+  }
+
+  if( offset >= -m_time_pulse_offset_threshold && offset <= m_time_pulse_offset_threshold ) {
+    esp_event_post_to( m_event_loop_handle,
+                       m_event_base,
+                       HIGH_ACCURACY,
+                       nullptr,
+                       0,
+                       portMAX_DELAY );
+  }
+  else {
+    esp_event_post_to( m_event_loop_handle,
+                       m_event_base,
+                       LOWER_ACCURACY,
+                       nullptr,
+                       0,
+                       portMAX_DELAY );
+  }
+
+  if( ++m_seconds_with_no_timesync_data > 60 ) {
+    esp_event_post_to( m_event_loop_handle,
+                       m_event_base,
+                       NO_TIME_SYNC,
+                       nullptr,
+                       0,
+                       portMAX_DELAY );
+  }
 }
 
 bool broadcast_clock::lea_m8t::
 is_present() {
-  return i2c_master_probe( m_i2c_bus, m_i2c_address, 1000 ) == ESP_OK;
+  i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+  i2c_master_start( cmd );
+  i2c_master_write_byte( cmd, ( m_i2c_address << 1 ) | I2C_MASTER_WRITE, true );
+  i2c_master_stop( cmd );
+  esp_err_t res = i2c_master_cmd_begin( I2C_NUM_0, cmd, 1000 );
+  i2c_cmd_link_delete( cmd );  
+  bool presence = ( res == ESP_OK );
+  if( presence ) {
+    esp_event_post_to( m_event_loop_handle,
+                       m_event_base,
+                       GNSS_INSTALLED,
+                       nullptr,
+                       0,
+                       portMAX_DELAY );
+  }
+  return presence;
 }
 
 void broadcast_clock::lea_m8t::
@@ -484,25 +543,10 @@ init_isr_timepulse() {
 }
 
 void broadcast_clock::lea_m8t::
-init_i2c_device() {
-  ESP_LOGI( m_component_name, "Initializing i2c device" );
-  i2c_device_config_t dev_cfg;
-  memset( &dev_cfg, 0x00, sizeof( i2c_device_config_t ) );
-  dev_cfg.dev_addr_length = I2C_ADDR_BIT_LEN_7;
-  dev_cfg.device_address = m_i2c_address;
-  dev_cfg.scl_speed_hz = 5000; // 5 kHz was as fast as I could get it to work...
-  dev_cfg.flags.disable_ack_check = 0; // < Must be 0 to work with u-blox module
-  dev_cfg.scl_wait_us = 10000000;
-  ESP_LOGI( m_component_name, "Adding device to i2c bus" );
-  ESP_ERROR_CHECK( i2c_master_bus_add_device( m_i2c_bus, &dev_cfg, &m_i2c_dev ) );
-  ESP_LOGI( m_component_name, "Device added, OK!" );
-}
-
-void broadcast_clock::lea_m8t::
 init_ubx_normalboot() {
 
   { // Set port configuration
-    ubx::cfg_prt_ddc_t *payload = new ubx::cfg_prt_ddc_t;
+    ubx::cfg_prt_ddc_t *payload = reinterpret_cast<ubx::cfg_prt_ddc_t *>( new uint8_t[ sizeof( ubx::cfg_prt_ddc_t ) ] );
     memset( payload, 0x00, sizeof( ubx::cfg_prt_ddc_t ));
     payload->port_id = 0x00; // DDC
     payload->tx_ready = 0x0000; // Disable tx_ready pin
@@ -550,9 +594,9 @@ init_ubx_normalboot() {
   }
 
   { // Set message rate
-    ubx::cfg_rate_t *payload = new ubx::cfg_rate_t;
+    ubx::cfg_rate_t *payload = reinterpret_cast<ubx::cfg_rate_t *>( new uint8_t[ sizeof( ubx::cfg_rate_t ) ] );
     payload->meas_rate = 500;
-    payload->nav_rate = 32;
+    payload->nav_rate = 16;
     payload->time_ref = 1;
     lea_m8t_egress_queue_item_t ubx_cfg_rate = { sizeof( ubx::cfg_rate_t ), { ubx::message::cfg::cls, ubx::message::cfg::rate }, reinterpret_cast<uint8_t *>( payload ), true };
     xQueueSend( m_egress_queue, &ubx_cfg_rate, 0 );
@@ -572,104 +616,6 @@ init_ubx_normalboot() {
 
 void broadcast_clock::lea_m8t::
 init_ubx_safeboot() {
-
-  { // Set port configuration
-    ubx::cfg_prt_ddc_t *payload = new ubx::cfg_prt_ddc_t;
-    memset( payload, 0x00, sizeof( ubx::cfg_prt_ddc_t ));
-    payload->port_id = 0x00; // DDC
-    payload->tx_ready = 0x0000; // Disable tx_ready pin
-    payload->mode = ( m_i2c_address << 1 );
-    payload->in_proto_mask |= 0x0001; // UBX
-    payload->out_proto_mask |= 0x0001; // UBX
-    payload->flags = 0x0000;
-    lea_m8t_egress_queue_item_t ubx_cfg_prt = { sizeof( ubx::cfg_prt_ddc_t ), { ubx::message::cfg::cls, ubx::message::cfg::prt }, reinterpret_cast<uint8_t *>( payload ), true };
-    xQueueSend( m_egress_queue, &ubx_cfg_prt, 0 );
-  }
-
-  { // Set message rate
-    ubx::cfg_rate_t *payload = new ubx::cfg_rate_t;
-    payload->meas_rate = 500;
-    payload->nav_rate = 1;
-    payload->time_ref = 1;
-    lea_m8t_egress_queue_item_t ubx_cfg_rate = { sizeof( ubx::cfg_rate_t ), { ubx::message::cfg::cls, ubx::message::cfg::rate }, reinterpret_cast<uint8_t *>( payload ), true };
-    xQueueSend( m_egress_queue, &ubx_cfg_rate, 0 );
-  }
-
-  { // Disable all messages
-
-
-    const uint8_t messages[][2] = {
-      {0x01, 0x07}, // NAV-PVT
-      {0x01, 0x35}, // NAV-SAT
-      {0x01, 0x03}, // NAV-STATUS
-      {0x01, 0x06}, // NAV-SOL
-      {0x01, 0x02}, // NAV-POSLLH
-      {0x01, 0x12}, // NAV-VELNED
-      {0x01, 0x21}, // NAV-TIMEUTC
-      {0x02, 0x13}, // RXM-RAWX
-      {0x02, 0x15}, // RXM-SFRBX
-      {0x0A, 0x04}, // MON-VER
-      {0x0A, 0x09}, // MON-HW
-      {0x0A, 0x06}, // MON-MSGPP
-      {0x0A, 0x07}, // MON-RXBUF
-      {0x0A, 0x08}, // MON-TXBUF
-      {0x0A, 0x21}, // MON-RF
-      // NMEA
-      {0xF0, 0x0A}, // DTM
-      {0xF0, 0x44}, // GBQ
-      {0xF0, 0x09}, // GBS
-      {0xF0, 0x00}, // GGA
-      {0xF0, 0x01}, // GLL
-      {0xF0, 0x43}, // GLQ
-      {0xF0, 0x42}, // GNQ
-      {0xF0, 0x0D}, // GNS
-      {0xF0, 0x40}, // GPQ
-      {0xF0, 0x06}, // GRS
-      {0xF0, 0x02}, // GSA
-      {0xF0, 0x07}, // GST
-      {0xF0, 0x03}, // GSV
-      {0xF0, 0x04}, // RMC
-      {0xF0, 0x0E}, // THS
-      {0xF0, 0x41}, // TXT
-      {0xF0, 0x0F}, // VLW
-      {0xF0, 0x05}, // VTG
-      {0xF0, 0x08}  // ZDA
-    };
-
-    for( size_t i = 0; i < sizeof( messages ) / sizeof( messages[ 0 ] ); ++i ) {
-        uint8_t *payload = new uint8_t[ 3 ];
-        payload[0] = messages[i][0]; // Message class
-        payload[1] = messages[i][1]; // Message ID
-        payload[2] = 0x00;           // Rate: disable message
-        lea_m8t_egress_queue_item_t ubx_cfg_msg = {3, {ubx::message::cfg::cls, ubx::message::cfg::msg}, payload, true};
-        xQueueSend(m_egress_queue, &ubx_cfg_msg, 10);
-    }
-
-  }
-
-  { // Save configuration
-    uint8_t *payload = new uint8_t[ 13 ];
-
-    payload[ 0 ] = 0b00000000;
-    payload[ 1 ] = 0b00000000;
-    payload[ 2 ] = 0b00000000;
-    payload[ 3 ] = 0b00000000;
-
-    payload[ 4 ] = 0b00001011; // Save PRT, MSG and NAV
-    payload[ 5 ] = 0b00000000;
-    payload[ 6 ] = 0b00000000;
-    payload[ 7 ] = 0b00000000;
-
-    payload[ 8 ] = 0b00000000;
-    payload[ 9 ] = 0b00000000;
-    payload[ 10 ] = 0b00000000;
-    payload[ 11 ] = 0b00000000;
-
-    payload[ 13 ] = 0b00000001; // Write to EEPROM
-
-    lea_m8t_egress_queue_item_t ubx_cfg_cfg = { 13, { ubx::message::cfg::cls, ubx::message::cfg::cfg }, payload, false };
-    xQueueSend( m_egress_queue, &ubx_cfg_cfg, 0 );
-  }
 
 }
 
@@ -1098,13 +1044,27 @@ init_ubx() {
 }
 
 void broadcast_clock::lea_m8t::
-on_init( i2c_master_bus_handle_t i2c_bus ) {
-  ESP_LOGI( m_component_name, "Initializing" );
-  m_i2c_bus = i2c_bus;
+on_init() {
+  ESP_LOGI( "application", "Initializing i2c" );
+
+
+  i2c_config_t conf;
+  memset( &conf, 0x00, sizeof( i2c_config_t ) );
+  conf.mode = I2C_MODE_MASTER;
+  conf.sda_io_num = I2C_SDA;
+  conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
+  conf.scl_io_num = I2C_SCL;
+  conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
+  conf.master.clk_speed = 400000;
+
+  ESP_ERROR_CHECK( i2c_param_config( I2C_NUM_0, &conf ) );
+  ESP_ERROR_CHECK( i2c_driver_install( I2C_NUM_0, I2C_MODE_MASTER, 0, 0, 0 ) );
+  i2c_set_timeout( I2C_NUM_0, 100000 );
+  m_i2c_installed = true;
+
   if( is_present() ) {
     ESP_LOGI( m_component_name, "LEA M8T found on i2c bus" );
     init_isr_timepulse();
-    init_i2c_device();
     vTaskDelay( 500 / portTICK_PERIOD_MS );
     init_ubx();
   }
@@ -1114,8 +1074,8 @@ on_init( i2c_master_bus_handle_t i2c_bus ) {
 }
 
 void broadcast_clock::lea_m8t::
-init( i2c_master_bus_handle_t i2c_bus ) {
+init() {
   vTaskDelay( 2000 / portTICK_PERIOD_MS );
-  lea_m8t_task_queue_item_t item = { lea_m8t_task_message::init, i2c_bus };
+  lea_m8t_task_queue_item_t item = { lea_m8t_task_message::init, nullptr };
   xQueueSend( m_task_queue, &item, 0 );
 }

@@ -7,7 +7,7 @@
 #include <string>
 #include <memory.h>
 #include <nvs_flash.h>
-#include <driver/i2c_master.h>
+//#include <driver/i2c_master.h>
 #include <esp_timer.h>
 #include <esp_log.h>
 
@@ -18,7 +18,6 @@ const char *application::m_component_name = "application";
 application::
 application() : m_configuration( nullptr ),
                 m_clock_status( m_clock_face.get_indicators() ),
-                m_i2c_bus( nullptr ),
                 m_event_loop_handle( nullptr ) {
 
   esp_event_loop_args_t loop_args = {
@@ -63,6 +62,18 @@ init() {
                                      wifi_event_handler,
                                      this );
 
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::captive_portal_http::m_event_base,
+                                     broadcast_clock::captive_portal_http::EVENT_CONFIGURATOR_START,
+                                     wifi_event_handler,
+                                     this );
+
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::captive_portal_http::m_event_base,
+                                     broadcast_clock::captive_portal_http::EVENT_CONFIGURATOR_STOP,
+                                     wifi_event_handler,
+                                     this );
+
     m_wifi.set_event_loop_handle( m_event_loop_handle );
     m_wifi.init( wifi::mode::access_point );
 
@@ -83,6 +94,18 @@ init() {
                                      broadcast_clock::wifi::LEAVE_CONFIG_MODE,
                                      wifi_event_handler,
                                      this );
+
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::wifi::m_event_base,
+                                     broadcast_clock::wifi::WIFI_EVENT_NTP_SYNC,
+                                     wifi_event_handler,
+                                     this );
+
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::wifi::m_event_base,
+                                     broadcast_clock::wifi::WIFI_EVENT_NTP_SYNC_FAILED,
+                                     wifi_event_handler,
+                                     this );
     init_ap_duration_timeout();
 
     m_beeper.init();
@@ -90,7 +113,7 @@ init() {
     
     m_clock_face.set_event_loop_handle( m_event_loop_handle );
 
-    m_clock_face.init( m_i2c_bus );
+    m_clock_face.init();
 
     esp_event_handler_register_with( m_event_loop_handle,
                                      broadcast_clock::clock_face::m_event_base,
@@ -98,7 +121,50 @@ init() {
                                      wifi_event_handler,
                                      this );
 
-    m_lea_m8t.init( m_i2c_bus );
+    m_lea_m8t.init();
+    m_lea_m8t.set_event_loop_handle( m_event_loop_handle );
+
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::lea_m8t::m_event_base,
+                                     broadcast_clock::lea_m8t::GNSS_INSTALLED,
+                                     wifi_event_handler,
+                                     this );
+
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::lea_m8t::m_event_base,
+                                     broadcast_clock::lea_m8t::TIMEPULSE_PRESENT,
+                                     wifi_event_handler,
+                                     this );
+
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::lea_m8t::m_event_base,
+                                     broadcast_clock::lea_m8t::TIMEPULSE_ABSENT,
+                                     wifi_event_handler,
+                                     this );
+
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::lea_m8t::m_event_base,
+                                     broadcast_clock::lea_m8t::TIME_SYNC,
+                                     wifi_event_handler,
+                                     this );
+
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::lea_m8t::m_event_base,
+                                     broadcast_clock::lea_m8t::NO_TIME_SYNC,
+                                     wifi_event_handler,
+                                     this );
+
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::lea_m8t::m_event_base,
+                                     broadcast_clock::lea_m8t::HIGH_ACCURACY,
+                                     wifi_event_handler,
+                                     this );
+
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::lea_m8t::m_event_base,
+                                     broadcast_clock::lea_m8t::LOWER_ACCURACY,
+                                     wifi_event_handler,
+                                     this );
 
     if( m_configuration->get_bool( "configurator" ) ) {
       m_captive_portal_http.init();
@@ -138,6 +204,38 @@ wifi_event_handler( void *handler_arg,
       case broadcast_clock::wifi::LEAVE_CONFIG_MODE:
         instance->on_leave_config_mode();
         break;
+      case broadcast_clock::wifi::WIFI_EVENT_NTP_SYNC:
+        instance->m_clock_status.sntp_sync( true );
+        break;
+      case broadcast_clock::wifi::WIFI_EVENT_NTP_SYNC_FAILED:
+        instance->m_clock_status.sntp_sync( false );
+        break;
+    }
+  }
+  else if( source == broadcast_clock::lea_m8t::m_event_base ) {
+    broadcast_clock::application *instance = static_cast<broadcast_clock::application *>( handler_arg );
+    switch( event_id ) {
+      case broadcast_clock::lea_m8t::TIMEPULSE_PRESENT:
+        instance->m_clock_status.gnss_timepulse( true );
+        break;
+      case broadcast_clock::lea_m8t::TIMEPULSE_ABSENT:
+        instance->m_clock_status.gnss_timepulse( false );
+        break;
+      case broadcast_clock::lea_m8t::TIME_SYNC:
+        instance->m_clock_status.gnss_time_sync( true );
+        break;
+      case broadcast_clock::lea_m8t::NO_TIME_SYNC:
+        instance->m_clock_status.gnss_time_sync( false );
+        break;
+      case broadcast_clock::lea_m8t::GNSS_INSTALLED:
+        instance->m_clock_status.gnss_installed();
+        break;
+      case broadcast_clock::lea_m8t::HIGH_ACCURACY:
+        instance->m_clock_status.high_accuracy( true );
+        break;
+      case broadcast_clock::lea_m8t::LOWER_ACCURACY:
+        instance->m_clock_status.high_accuracy( false );
+        break;
     }
   }
   else if( source == broadcast_clock::captive_portal_http::m_event_base ) {
@@ -148,6 +246,12 @@ wifi_event_handler( void *handler_arg,
         break;
       case broadcast_clock::captive_portal_http::EVENT_CANCEL:
         instance->on_cancel_config( std::string( ( char * ) event_params ) );
+        break;
+      case broadcast_clock::captive_portal_http::EVENT_CONFIGURATOR_START:
+        instance->m_clock_status.configurator_enabled( true );
+        break;
+      case broadcast_clock::captive_portal_http::EVENT_CONFIGURATOR_STOP:
+        instance->m_clock_status.configurator_enabled( false );
         break;
     }
   }
@@ -260,15 +364,4 @@ init_timezone() {
 
 void application::
 init_i2c() {
-  ESP_LOGI( "application", "Initializing i2c" );
-  i2c_master_bus_config_t bus_config;
-  memset( &bus_config, 0x00, sizeof( i2c_master_bus_config_t ) );
-  bus_config.clk_source = I2C_CLK_SRC_DEFAULT;
-  bus_config.i2c_port = I2C_NUM_0;
-  bus_config.scl_io_num = I2C_SCL;
-  bus_config.sda_io_num = I2C_SDA;
-  bus_config.glitch_ignore_cnt = 7;
-  bus_config.intr_priority = 1;
-  bus_config.flags.enable_internal_pullup = false;
-  ESP_ERROR_CHECK( i2c_new_master_bus( &bus_config, &m_i2c_bus ) );
 }

@@ -32,18 +32,21 @@ namespace espena::broadcast_clock {
 
     static const esp_event_base_t m_event_base;
 
-    static const uint32_t EVENT_SAVE            = 0x01u;
-    static const uint32_t EVENT_CANCEL          = 0x02u;
+    static const uint32_t EVENT_SAVE                = 0x01u;
+    static const uint32_t EVENT_CANCEL              = 0x02u;
     
-    static const uint32_t EVENT_ENTER_TIMERS    = 0x03u;
-    static const uint32_t EVENT_LEAVE_TIMERS    = 0x04u;
+    static const uint32_t EVENT_ENTER_TIMERS        = 0x03u;
+    static const uint32_t EVENT_LEAVE_TIMERS        = 0x04u;
     
-    static const uint32_t EVENT_STOPWATCH_START = 0x05u;
-    static const uint32_t EVENT_STOPWATCH_STOP  = 0x06u;
-    static const uint32_t EVENT_STOPWATCH_RESET = 0x07u;
+    static const uint32_t EVENT_CONFIGURATOR_START  = 0x05u;
+    static const uint32_t EVENT_CONFIGURATOR_STOP   = 0x06u;
 
-    static const uint32_t EVENT_COUNTDOWN_START = 0x08u;
-    static const uint32_t EVENT_COUNTDOWN_RESET = 0x09u;
+    static const uint32_t EVENT_STOPWATCH_START     = 0x07u;
+    static const uint32_t EVENT_STOPWATCH_STOP      = 0x08u;
+    static const uint32_t EVENT_STOPWATCH_RESET     = 0x09u;
+
+    static const uint32_t EVENT_COUNTDOWN_START     = 0x0au;
+    static const uint32_t EVENT_COUNTDOWN_RESET     = 0x0bu;
 
   private:
 

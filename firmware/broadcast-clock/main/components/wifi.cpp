@@ -26,6 +26,8 @@ wifi() : m_task_queue( nullptr ),
   m_app_instance = this;
   m_task_queue = xQueueCreate( 10, sizeof( wifi_task_queue_item ) );
 
+  memset( &m_last_ntp_sync_time, 0x00, sizeof( struct timespec ) );
+  
   m_task_params.instance = this;
 
   xTaskCreate( &wifi::task_loop,
@@ -330,8 +332,6 @@ init_wifi() {
 
 void broadcast_clock::wifi::
 on_ntp_sync( struct timeval *now ) {
-  ESP_LOGI( m_component_name, "Time synchronized" );
-
   if( m_app_instance && m_app_instance->m_event_loop_handle ) {
     struct tm timeinfo;
     memset( &timeinfo, 0x00, sizeof( struct tm ) );
@@ -341,6 +341,7 @@ on_ntp_sync( struct timeval *now ) {
     uint32_t e = 0;
     if( sntp_get_sync_status() == SNTP_SYNC_STATUS_COMPLETED ) {
       e = broadcast_clock::wifi::WIFI_EVENT_NTP_SYNC;
+      clock_gettime( CLOCK_MONOTONIC, &m_app_instance->m_last_ntp_sync_time );
     }
     else {
       e = wifi::WIFI_EVENT_NTP_SYNC_FAILED;

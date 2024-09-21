@@ -262,6 +262,15 @@ void broadcast_clock::captive_portal_http::start_sync() {
 
   httpd_register_uri_handler( m_server, &location );
 
+  if( m_event_loop_handle ) {
+    esp_event_post_to( m_event_loop_handle,
+                        m_event_base,
+                        EVENT_CONFIGURATOR_START,
+                        nullptr,
+                        0,
+                        portMAX_DELAY );
+  }
+
   ESP_LOGI( m_component_name, "HTTP server running" );
   
 }
@@ -351,6 +360,14 @@ void broadcast_clock::captive_portal_http::stop_sync() {
   if( m_server ) {
     httpd_stop( m_server );
     m_server = nullptr;
+  if( m_event_loop_handle ) {
+    esp_event_post_to( m_event_loop_handle,
+                        m_event_base,
+                        EVENT_CONFIGURATOR_STOP,
+                        nullptr,
+                        0,
+                        portMAX_DELAY );
+  }
     ESP_LOGI( m_component_name, "HTTP server stopped" );
   }
 }

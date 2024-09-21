@@ -11,7 +11,7 @@
 #include "captive_portal_http.hpp"
 #include <string>
 #include <esp_timer.h>
-#include <driver/i2c_master.h>
+//#include <driver/i2c_master.h>
 
 namespace espena::broadcast_clock {
 
@@ -30,8 +30,6 @@ namespace espena::broadcast_clock {
     clock_face m_clock_face;
     clock_status m_clock_status;
     beeper m_beeper;
-
-    i2c_master_bus_handle_t m_i2c_bus;
 
     esp_event_loop_handle_t m_event_loop_handle;
 

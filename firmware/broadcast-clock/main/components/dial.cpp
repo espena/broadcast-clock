@@ -336,6 +336,4 @@ set_indicators( bool blue, bool green, bool yellow, bool red ) {
   m_green_indicator = green;
   m_yellow_indicator = yellow;
   m_red_indicator = red;
-  dial_task_queue_item item = { dial_task_message::update, nullptr };
-  xQueueSend( m_task_queue, &item, 10 );
 }

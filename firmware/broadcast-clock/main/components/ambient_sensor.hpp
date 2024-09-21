@@ -1,7 +1,9 @@
 #ifndef __AMBIENT_SENSOR_HPP__
 #define __AMBIENT_SENSOR_HPP__
 
-#include <driver/i2c_master.h>
+//#include <driver/i2c_master.h>
+
+#include <freertos/FreeRTOS.h>
 
 namespace espena::broadcast_clock {
 
@@ -10,8 +12,8 @@ namespace espena::broadcast_clock {
       static const char *m_component_name;
       static const uint8_t m_i2c_address = 0x10;
 
-      i2c_master_bus_handle_t m_i2c_bus;
-      i2c_master_dev_handle_t m_i2c_dev;
+//      i2c_master_bus_handle_t m_i2c_bus;
+//      i2c_master_dev_handle_t m_i2c_dev;
 
       void init_sensor();
 
@@ -20,7 +22,7 @@ namespace espena::broadcast_clock {
         ambient_sensor();
         ~ambient_sensor();
 
-        void init( i2c_master_bus_handle_t i2c_bus );
+        void init();
         uint16_t read();
 
     };

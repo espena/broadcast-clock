@@ -21,12 +21,17 @@ namespace espena::broadcast_clock {
 
   private:
 
+    typedef enum class sync_type {
+      ntp,
+      gnss
+    } sync_type;
+
     static const char *m_component_name;
     static const int m_component_stack_size = 4096;
 
-    bool m_is_initialized;
-    bool m_test_mode;
-    struct timespec m_last_ntp_sync_time;
+    bool m_is_initialized = false;
+    bool m_test_mode = false;
+    bool m_ready = false;
 
     uint8_t m_error_flags;
     static const uint8_t ERROR_FLAG_NTP_SYNC_FAILED = 0x01u;
@@ -45,8 +50,7 @@ namespace espena::broadcast_clock {
 
     enum class clock_face_task_message {
         init,
-        test,
-        update_indicators
+        test
     };
 
     typedef struct clock_face_task_queue_item_struct {
@@ -62,8 +66,8 @@ namespace espena::broadcast_clock {
                                void *event_params );
 
     void on_message( clock_face_task_message msg, void *arg );
-    void on_ntp_sync();
-    void on_init( i2c_master_bus_handle_t i2c_bus );
+    void on_time_sync( sync_type t );
+    void on_init();
     void on_test();
 
     void on_enter_config_mode();
@@ -77,14 +81,11 @@ namespace espena::broadcast_clock {
     void on_countdown_finish();
     void on_countdown_reset();
     
-    void on_update_indicators();
-
     static void on_interval_timer( void* arg );
 
     void check_ambient_light();
     void update_indicators();
 
-    i2c_master_bus_handle_t m_i2c_bus;
     esp_timer_handle_t m_interval_timer;
 
     dial m_dial;
@@ -98,7 +99,7 @@ namespace espena::broadcast_clock {
 
     clock_face();
     ~clock_face();
-    void init( i2c_master_bus_handle_t i2c_bus );
+    void init();
     void test();
     void init_interval_timer();
     void set_event_loop_handle( esp_event_loop_handle_t h ) { m_event_loop_handle = h; };

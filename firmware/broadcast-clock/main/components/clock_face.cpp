@@ -1,5 +1,6 @@
 #include "clock_face.hpp"
 #include "configuration.hpp"
+#include "lea_m8t.hpp"
 #include "wifi.hpp"
 #include "captive_portal_http.hpp"
 #include <string>
@@ -19,12 +20,9 @@ clock_face() : m_is_initialized( false ),
                m_error_flags( 0x00u ),
                m_task_queue( nullptr ),
                m_event_loop_handle( nullptr ),
-               m_i2c_bus( nullptr ),
                m_interval_timer( nullptr ),
                m_threshold( 0 ) {
 
-  memset( &m_last_ntp_sync_time, 0x00, sizeof( struct timespec ) );
-  
   m_task_queue = xQueueCreate( 100, sizeof( clock_face_task_queue_item ) );
 
   m_task_params.instance = this;
@@ -61,13 +59,10 @@ void broadcast_clock::clock_face::
 on_message( clock_face_task_message msg, void *arg ) {
   switch( msg ) {
     case clock_face_task_message::init:
-      on_init( *static_cast<i2c_master_bus_handle_t *>( arg ) );
+      on_init();
       break;
     case clock_face_task_message::test:
       on_test();
-      break;
-    case clock_face_task_message::update_indicators:
-      on_update_indicators();
       break;
   }
 }
@@ -81,10 +76,16 @@ on_test() {
 }
 
 void broadcast_clock::clock_face::
-on_init( i2c_master_bus_handle_t i2c_bus ) {
+on_init() {
   ESP_LOGI( m_component_name, "Initializing" );
 
   if( m_event_loop_handle ) {
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::lea_m8t::m_event_base,
+                                     broadcast_clock::lea_m8t::TIME_SYNC,
+                                     event_handler,
+                                     this );
+
     esp_event_handler_register_with( m_event_loop_handle,
                                      broadcast_clock::wifi::m_event_base,
                                      broadcast_clock::wifi::WIFI_EVENT_NTP_SYNC,
@@ -161,8 +162,6 @@ on_init( i2c_master_bus_handle_t i2c_bus ) {
   m_dotmatrix.set_event_loop_handle( m_event_loop_handle );
   m_dotmatrix.init();
 
-  m_i2c_bus = i2c_bus;
-
   //m_ambient_sensor.init( m_i2c_bus );
 
   init_interval_timer();
@@ -179,7 +178,7 @@ event_handler( void *handler_arg,
   if( source == broadcast_clock::wifi::m_event_base ) {
     switch( event_id ) {
       case broadcast_clock::wifi::WIFI_EVENT_NTP_SYNC:
-        instance->on_ntp_sync();
+        instance->on_time_sync( sync_type::ntp );
         break;
       case broadcast_clock::wifi::ENTER_CONFIG_MODE:
         instance->on_enter_config_mode();
@@ -222,17 +221,23 @@ event_handler( void *handler_arg,
         break;
     }
   }
+  else if( source == broadcast_clock::lea_m8t::m_event_base ) {
+    switch( event_id ) {
+      case broadcast_clock::lea_m8t::TIME_SYNC:
+        instance->on_time_sync( sync_type::gnss );
+        break;
+    }
+  }
 }
 
 void broadcast_clock::clock_face::
-on_ntp_sync() {
-  ESP_LOGI( m_component_name, "NTP sync" );
-  if( !m_is_initialized ) {
+on_time_sync( sync_type t ) {
+  if( !m_is_initialized && m_ready ) {
     m_dial.init();
     m_dotmatrix.start();
     m_is_initialized = true;
   }
-  clock_gettime( CLOCK_MONOTONIC, &m_last_ntp_sync_time );
+  ESP_LOGI( m_component_name, "Time synchronized from %s", t == sync_type::ntp ? "NTP" : "GNSS" );
 }
 
 void broadcast_clock::clock_face::
@@ -297,41 +302,19 @@ on_countdown_finish() {
 }
 
 void broadcast_clock::clock_face::
-on_update_indicators() {
-  if( m_is_initialized ) {
-    broadcast_clock::configuration *c = broadcast_clock::configuration::get_instance();
-    if( c ) {
-      int ntp_interval_ms = c->get_int( "update_interval" );
-      struct timespec now;
-      clock_gettime( CLOCK_MONOTONIC, &now );
-      if( ( now.tv_sec - m_last_ntp_sync_time.tv_sec ) > ( ( ntp_interval_ms / 1000 ) + 60 ) ) {
-        m_error_flags |= ERROR_FLAG_NTP_SYNC_FAILED;
-      }
-      else {
-        m_error_flags &= ~ERROR_FLAG_NTP_SYNC_FAILED;
-      }
-    }
-    m_dial.set_red_indicator( m_error_flags > 0 );
-  }
-}
-
-void broadcast_clock::clock_face::
 on_interval_timer( void* arg ) {
   clock_face *instance = static_cast<clock_face *>( arg );
   instance->check_ambient_light();
-  instance->update_indicators();
 }
 
 void broadcast_clock::clock_face::
 update_indicators() {
-  clock_face_task_queue_item item = { clock_face_task_message::update_indicators, nullptr };
-  xQueueSend( m_task_queue, &item, 10 );
+  // deprecated
 }
 
 void broadcast_clock::clock_face::
-init( i2c_master_bus_handle_t i2c_bus ) {
-  static i2c_master_bus_handle_t current_i2c_bus = i2c_bus;
-  clock_face_task_queue_item item = { clock_face_task_message::init, &current_i2c_bus };
+init() {
+  clock_face_task_queue_item item = { clock_face_task_message::init, nullptr };
   xQueueSend( m_task_queue, &item, 10 );
 }
 
@@ -410,4 +393,5 @@ display_ip( esp_netif_ip_info_t *ip_info ) {
     vTaskDelay( 2000 / portTICK_PERIOD_MS );
   }
   m_dotmatrix.display( nullptr );
+  m_ready = true;
 } 
