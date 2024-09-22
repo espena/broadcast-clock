@@ -11,7 +11,6 @@ namespace ubx {
     uint8_t id;
   } message_t;
 
-  /*
   const static char *gnss_id[ ] = {
     "GPS",
     "SBAS",
@@ -35,7 +34,6 @@ namespace ubx {
     "National Physics Laboratory India (NPLI)",
     "Unknown"
   };
-  */
 
   namespace message {
 

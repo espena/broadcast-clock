@@ -15,6 +15,7 @@
 
 #include "../utils/get_query_field.hpp"
 #include "../utils/span_to_timespec.hpp"
+#include "../utils/replace_substring.hpp"
 
 using namespace espena;
 
@@ -22,7 +23,9 @@ const char *broadcast_clock::captive_portal_http::m_component_name = "captive_po
 const esp_event_base_t broadcast_clock::captive_portal_http::m_event_base = "CAPTIVE_PORTAL_HTTP_EVENT";
 
 broadcast_clock::captive_portal_http::captive_portal_http() : m_message_queue( nullptr ),
-                                                              m_server( nullptr )
+                                                              m_server( nullptr ),
+                                                              m_event_loop_handle( nullptr ),
+                                                              m_gnss_state( nullptr )
 {    
   m_cfg.uri_match_fn = httpd_uri_match_wildcard;
   m_cfg.lru_purge_enable = true;
@@ -31,6 +34,7 @@ broadcast_clock::captive_portal_http::captive_portal_http() : m_message_queue( n
 
   m_task_params.stack_buffer = ( StackType_t * ) heap_caps_malloc( m_component_stack_size,
                                                                    MALLOC_CAP_SPIRAM );
+  update_json_gnss_status();
 
   xTaskCreateStatic( &broadcast_clock::captive_portal_http::task_loop,
                      m_component_name,
@@ -38,8 +42,24 @@ broadcast_clock::captive_portal_http::captive_portal_http() : m_message_queue( n
                      &m_task_params,
                      22,
                      m_task_params.stack_buffer,
-                     &m_task_params.task_buffer ); 
+                     &m_task_params.task_buffer );
+}
 
+void broadcast_clock::captive_portal_http::update_json_gnss_status() {
+  if( m_gnss_state ) {
+    m_json_gnss_status = "{ \
+                            \"status\": \"ok\", \
+                            \"gnss_chip_installed\": \"__gnss_chip_installed__\", \
+                            \"gnss_system\": \"__gnss_system__\", \
+                            \"satellites_found\": __gnss_satellite_count__ \
+                          }";
+    utils::replace_substring( m_json_gnss_status, "__gnss_chip_installed__", m_gnss_state->gnss_chip_installed_str() );
+    utils::replace_substring( m_json_gnss_status, "__gnss_system__", m_gnss_state->gnss_current_system_str() );
+    utils::replace_substring( m_json_gnss_status, "__gnss_satellite_count__", m_gnss_state->gnss_satellite_count_str() );
+  }
+  else {
+    m_json_gnss_status = "{ \"status\": \"initializing\" }";
+  }
 }
 
 void broadcast_clock::captive_portal_http::enqueue_simple_message( captive_portal_http_task_message msg ) {
@@ -180,21 +200,27 @@ on_request( httpd_req_t *req ) {
            uri.starts_with( "/stopwatch/stop" ) ||
            uri.starts_with( "/stopwatch/reset" ) ) {
     httpd_resp_set_status( req, "302 Found" ); 
-    httpd_resp_set_type( req, "text/html; charset=is08859-1;" );
+    httpd_resp_set_type( req, "text/html; charset=iso8859-1;" );
     stopwatch_handler( req );
   }
   else if( uri.starts_with( "/countdown/start" ) ||
            uri.starts_with( "/countdown/reset" ) ) {
     httpd_resp_set_status( req, "302 Found" ); 
-    httpd_resp_set_type( req, "text/html; charset=is08859-1;" );
+    httpd_resp_set_type( req, "text/html; charset=iso8859-1;" );
     countdown_handler( req );
   }
   else if( uri == "/styles.css" ) {
     httpd_resp_set_status( req, "302 Found" ); 
-    httpd_resp_set_type( req, "text/css; charset=is08859-1;" );
+    httpd_resp_set_type( req, "text/css; charset=iso8859-1;" );
     const char *buf_st = ( char * ) broadcast_clock::resources::html::styles_css_start;
     const size_t buf_st_len = broadcast_clock::resources::html::styles_css_end - broadcast_clock::resources::html::styles_css_start;
     httpd_resp_send( req, buf_st, buf_st_len );
+  }
+  else if( uri == "/gnss-status" ) {
+    update_json_gnss_status();
+    httpd_resp_set_status( req, "302 Found" ); 
+    httpd_resp_set_type( req, "application/json; charset=iso8859-1" );
+    httpd_resp_send( req, m_json_gnss_status.c_str(), m_json_gnss_status.length() );
   }
   else if( uri == "/favicon.ico" ) {
     httpd_resp_set_status( req, "302 Found" ); 
@@ -243,10 +269,12 @@ void broadcast_clock::captive_portal_http::start_sync() {
 
   httpd_uri_t location;
 
+  /*
   location.uri = "/timers",
   location.handler = request_handler,
   location.user_ctx = this;
   location.method = HTTP_POST,
+  */
 
   location.uri = "/save",
   location.handler = request_handler,

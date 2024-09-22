@@ -25,6 +25,7 @@ namespace espena::broadcast_clock {
     static const uint32_t NO_TIME_SYNC = 0x05u;
     static const uint32_t HIGH_ACCURACY = 0x06u;
     static const uint32_t LOWER_ACCURACY = 0x07u;
+    static const uint32_t UBX_NAV_SAT = 0x08u;
 
   private:
 

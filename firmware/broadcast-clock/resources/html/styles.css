@@ -66,11 +66,12 @@ form .time { z-index: 1; }
 form .stopwatch legend { left: 0; }
 form .countdown legend { left: 75px; }
 
-form .time legend { left: 0; }
-form .display legend { left: 75px; }
-form .wifi legend { left: 150px; }
-form .ntp legend { left: 225px; }
-form .opts legend { left: 300px; }
+form fieldset:nth-of-type( 1 ) legend { left: 0; }
+form fieldset:nth-of-type( 2 ) legend { left: 75px; }
+form fieldset:nth-of-type( 3 ) legend { left: 150px; }
+form fieldset:nth-of-type( 4 ) legend { left: 225px; }
+form fieldset:nth-of-type( 5 ) legend { left: 300px; }
+form fieldset:nth-of-type( 6 ) legend { left: 375px; }
 fieldset {
   display: block;
   position: absolute;
@@ -219,4 +220,8 @@ p.links {
 a.back {
   display: inline-block;
   z-index: 10;
+}
+.disabled {
+  color: #bbb;
+  pointer-events: none;
 }

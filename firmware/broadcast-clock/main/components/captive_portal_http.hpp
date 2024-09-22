@@ -7,6 +7,8 @@
 #include <esp_http_server.h>
 #include <esp_event.h>
 
+#include "i_gnss_state.hpp"
+
 namespace espena::broadcast_clock {
 
   namespace resources {
@@ -57,10 +59,16 @@ namespace espena::broadcast_clock {
     httpd_handle_t m_server;
 
     esp_event_loop_handle_t m_event_loop_handle;
+    i_gnss_state *m_gnss_state;
 
     httpd_config_t m_cfg = HTTPD_DEFAULT_CONFIG();
 
     std::string m_json_network_list;
+    std::string m_json_gnss_status;
+
+    bool m_gnss_installed = false;
+
+    void update_json_gnss_status();
 
     static void task_loop( void *arg );
 
@@ -106,12 +114,14 @@ namespace espena::broadcast_clock {
     public:
 
       void set_event_loop_handle( esp_event_loop_handle_t h ) { m_event_loop_handle = h; };
+      void set_gnss_state( i_gnss_state *gnss_state ) { m_gnss_state = gnss_state; };
 
       captive_portal_http();
 
       void set_network_list( char *json );
 
       void init();
+      void update_gnss_status();
       void start();
       void stop();
 

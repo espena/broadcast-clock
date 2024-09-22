@@ -60,7 +60,7 @@ lea_m8t() : m_event_loop_handle( nullptr ) {
   timer_args.name = "poll_timer";
 
   ESP_ERROR_CHECK( esp_timer_create( &timer_args, &m_poll_timer ) );
-  ESP_ERROR_CHECK( esp_timer_start_periodic( m_poll_timer, 50000 ) );
+  ESP_ERROR_CHECK( esp_timer_start_periodic( m_poll_timer, 250000 ) );
 }
 
 broadcast_clock::lea_m8t::
@@ -130,7 +130,6 @@ read() {
   uint16_t offset = 0;
 
   esp_err_t res = -1;
-  uint8_t retries = 0;
   
   res = i2c_master_write_read_device( I2C_NUM_0,
                                       m_i2c_address,
@@ -203,14 +202,21 @@ write() {
     utils::fletcher8( &msg[ 2 ], i - 2, &msg[ i ] );
     
     printf( "Writing message\n" );
-    printf( "***************************************************\n" );
     utils::hexdump( msg, buflen );
+    i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+    i2c_master_start( cmd );
+    i2c_master_write_byte( cmd, ( m_i2c_address << 1 ) | I2C_MASTER_WRITE, true );
+    i2c_master_write( cmd, msg, buflen, true );
+    i2c_master_stop( cmd );
+    esp_err_t res = i2c_master_cmd_begin( I2C_NUM_0, cmd, 1000 );
+    i2c_cmd_link_delete( cmd );
 
-    i2c_master_write_to_device( I2C_NUM_0,
-                                m_i2c_address,
-                                msg,
-                                buflen,
-                                -1 );
+    if( res != ESP_OK ) {
+      ESP_LOGE( m_component_name, "Failed to write message" );
+    }
+    else {
+      ESP_LOGI( m_component_name, "Message written!" );
+    }
 
     delete [] msg;
     delete [] item.deletable_payload;
@@ -321,15 +327,6 @@ void broadcast_clock::lea_m8t::
 on_ubx_cfg_ant( ubx::cfg_ant_t *ant ) {
   ESP_LOGI( m_component_name, "UBX_CFG_ANT" );
   memcpy( &m_cfg_ant, ant, sizeof( ubx::cfg_ant_t ) );
-  ESP_LOGI( m_component_name, "Antenna supply voltage control enabled: 0x%02x", ant->flags.svcs );
-  ESP_LOGI( m_component_name, "Antenna short circuit detection enabled: 0x%02x", ant->flags.scd );
-  ESP_LOGI( m_component_name, "Antenna open circuit detection enabled: 0x%02x", ant->flags.ocd );
-  ESP_LOGI( m_component_name, "Power down antenna supply on short circuit: 0x%02x", ant->flags.pdwn_on_scd );
-  ESP_LOGI( m_component_name, "Enable automatic recovery from short circuit: 0x%02x", ant->flags.recovery );
-  ESP_LOGI( m_component_name, "PIO pin used for switching antenna supply: %d", ant->pins.pin_switch );
-  ESP_LOGI( m_component_name, "PIO pin used for detecting short circuit: %d", ant->pins.pin_scd );
-  ESP_LOGI( m_component_name, "PIO pin used for detecting open or not connected: %d", ant->pins.pin_ocd );
-  ESP_LOGI( m_component_name, "Reconfiguring: 0x%02x", ant->pins.reconfig );
 }
 
 void broadcast_clock::lea_m8t::
@@ -342,16 +339,6 @@ void broadcast_clock::lea_m8t::
 on_ubx_cfg_tmode2( ubx::cfg_tmode2_t *tmode2 ) {
   ESP_LOGI( m_component_name, "UBX_CFG_TMODE2" );
   memcpy( &m_cfg_tmode2, tmode2, sizeof( ubx::cfg_tmode2_t ) );
-  const char *loc_fmt = tmode2->flags.lla == 0 ? "ECEF" : "LAT/LON";
-  ESP_LOGI( m_component_name, "Time mode: %s", tmode2->time_mode == 0 ? "Disabled" : ( tmode2->time_mode == 1 ? "Survey-in" : "Fixed mode" ) );
-  ESP_LOGI( m_component_name, "Location format: %s", loc_fmt );
-  ESP_LOGI( m_component_name, "Altitude valid: %s", tmode2->flags.alt_inv == 0 ? "No" : "Yes" );
-  ESP_LOGI( m_component_name, "%s X: %lu", loc_fmt, tmode2->ecef_x_or_lat );
-  ESP_LOGI( m_component_name, "%s Y: %lu", loc_fmt, tmode2->ecef_y_or_lon );
-  ESP_LOGI( m_component_name, "%s Z: %lu", loc_fmt, tmode2->ecef_z_or_alt );
-  ESP_LOGI( m_component_name, "Fixed pos. accuracy (mm): %lu", tmode2->fixed_pos_acc );
-  ESP_LOGI( m_component_name, "Survey-in minimum duration: %lu", tmode2->svin_min_dur );
-  ESP_LOGI( m_component_name, "Survey-in position accuracy limit: %lu", tmode2->svin_acc_limit );
 }
 
 void broadcast_clock::lea_m8t::
@@ -361,7 +348,6 @@ on_ubx_cfg_gnss( ubx::cfg_gnss_t *gnss ) {
 
 void broadcast_clock::lea_m8t::
 on_ubx_mon_hw( ubx::mon_hw_t *hw ) {
-  ESP_LOGI( m_component_name, "UBX_MON_HW" );
   uint8_t safeboot_active = ( hw->flags & 0b00000010 ) >> 1;
   ESP_LOGI( m_component_name, "Safeboot active: %d", safeboot_active );
   if( safeboot_active ) {
@@ -379,6 +365,14 @@ on_ubx_nav_sat( ubx::nav_sat_t *sat ) {
   ESP_LOGI( m_component_name, "UBX_NAV_SAT" );
   ESP_LOGI( m_component_name, "Number of satellites: %d", sat->num_svs );
   memcpy( &m_nav_sat, sat, sizeof( ubx::nav_sat_t ) );
+  if( m_event_loop_handle ) {
+    esp_event_post_to( m_event_loop_handle,
+                        m_event_base,
+                        UBX_NAV_SAT,
+                        &m_nav_sat,
+                        sizeof( ubx::nav_sat_t ),
+                        portMAX_DELAY );
+  }
 }
 
 void broadcast_clock::lea_m8t::
@@ -554,7 +548,7 @@ init_ubx_normalboot() {
     payload->in_proto_mask |= 0x0001; // UBX
     payload->out_proto_mask |= 0x0001; // UBX
     payload->flags = 0x0000;
-    lea_m8t_egress_queue_item_t ubx_cfg_prt = { sizeof( ubx::cfg_prt_ddc_t ), { ubx::message::cfg::cls, ubx::message::cfg::prt }, reinterpret_cast<uint8_t *>( payload ), false };
+    lea_m8t_egress_queue_item_t ubx_cfg_prt = { sizeof( ubx::cfg_prt_ddc_t ), { ubx::message::cfg::cls, ubx::message::cfg::prt }, reinterpret_cast<uint8_t *>( payload ), true };
     xQueueSend( m_egress_queue, &ubx_cfg_prt, 0 );
   }
 
@@ -587,7 +581,7 @@ init_ubx_normalboot() {
         payload[0] = messages[i][0]; // Message class
         payload[1] = messages[i][1]; // Message ID
         payload[2] = 0x00;           // Rate: disable message
-        lea_m8t_egress_queue_item_t ubx_cfg_msg = {3, {ubx::message::cfg::cls, ubx::message::cfg::msg}, payload, false};
+        lea_m8t_egress_queue_item_t ubx_cfg_msg = {3, { ubx::message::cfg::cls, ubx::message::cfg::msg }, payload, true };
         xQueueSend(m_egress_queue, &ubx_cfg_msg, 10);
     }
 
@@ -611,6 +605,15 @@ init_ubx_normalboot() {
     xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
   }
 
+  { // Poll UBX-NAV-SAT
+    uint8_t *payload = new uint8_t[ 3 ];
+    payload[ 0 ] = ubx::message::nav::cls;
+    payload[ 1 ] = ubx::message::nav::sat;
+    payload[ 2 ] = 0x08;
+    lea_m8t_egress_queue_item_t ubx_cfg_msg = { 3, { ubx::message::cfg::cls, ubx::message::cfg::msg }, payload, true };
+    xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
+  }
+
 
 }
 
@@ -621,426 +624,7 @@ init_ubx_safeboot() {
 
 void broadcast_clock::lea_m8t::
 init_ubx() {
-
   init_ubx_normalboot();
-  
-
-  /*
-
-  { // Poll UBX-MON-HW
-    lea_m8t_egress_queue_item_t ubx_mon_hw = { 0, { ubx::message::mon::cls, ubx::message::mon::hw }, nullptr, false };
-    xQueueSend( m_egress_queue, &ubx_mon_hw, 0 );
-  }
-
-  { // Poll UBX-NAV-SAT
-    lea_m8t_egress_queue_item_t ubx_nav_sat = { 0, { ubx::message::nav::cls, ubx::message::nav::sat }, nullptr, false };
-    xQueueSend( m_egress_queue, &ubx_nav_sat, 0 );
-  }
-
-  { // Poll UBX-NAV-SAT
-    lea_m8t_egress_queue_item_t ubx_nav_sat = { 0, { ubx::message::nav::cls, ubx::message::nav::sat }, nullptr, false };
-    xQueueSend( m_egress_queue, &ubx_nav_sat, 0 );
-  }
-
-
-  { // Poll UBX-NAV-SAT
-    lea_m8t_egress_queue_item_t ubx_nav_sat = { 0, { ubx::message::nav::cls, ubx::message::nav::sat }, nullptr, false };
-    xQueueSend( m_egress_queue, &ubx_nav_sat, 0 );
-  }
-
-
-  { // Set port configuration
-    ubx::cfg_prt_ddc_t *payload = new ubx::cfg_prt_ddc_t;
-    memset( payload, 0x00, sizeof( ubx::cfg_prt_ddc_t ));
-    payload->port_id = 0x00; // DDC
-    payload->tx_ready = 0x0000; // Disable tx_ready pin
-    payload->mode = ( m_i2c_address << 1 );
-    payload->in_proto_mask |= 0x0001; // UBX
-    payload->out_proto_mask |= 0x0001; // UBX
-    payload->flags = 0x0000;
-    lea_m8t_egress_queue_item_t ubx_cfg_prt = { sizeof( ubx::cfg_prt_ddc_t ), { ubx::message::cfg::cls, ubx::message::cfg::prt }, reinterpret_cast<uint8_t *>( payload ), false };
-    xQueueSend( m_egress_queue, &ubx_cfg_prt, 0 );
-  }
-
-  { // Get software and hardware versions
-    lea_m8t_egress_queue_item_t ubx_mon_ver = { 0, { ubx::message::mon::cls, ubx::message::mon::ver }, nullptr, false };
-    xQueueSend( m_egress_queue, &ubx_mon_ver, 10 );
-  }
-
-  { // Get port configuration
-    uint8_t *payload = new uint8_t;
-    *payload = 0x00; // Port ID (DDC)
-    lea_m8t_egress_queue_item_t ubx_cfg_prt = { 1, { ubx::message::cfg::cls, ubx::message::cfg::prt }, payload, false };
-    xQueueSend( m_egress_queue, &ubx_cfg_prt, 0 );
-  }
-
-
-
-  { // Poll UBX-NAV-TIMEGPS
-    uint8_t *payload = new uint8_t[ 3 ];
-    payload[ 0 ] = ubx::message::nav::cls;
-    payload[ 1 ] = ubx::message::nav::timegps;
-    payload[ 2 ] = 0x01;
-    lea_m8t_egress_queue_item_t ubx_cfg_msg = { 3, { ubx::message::cfg::cls, ubx::message::cfg::msg }, payload, true };
-    xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
-  }
-
-  { // Set message rate
-    ubx::cfg_rate_t *payload = new ubx::cfg_rate_t;
-    payload->meas_rate = 50;
-    payload->nav_rate = 1;
-    payload->time_ref = 1;
-    lea_m8t_egress_queue_item_t ubx_cfg_rate = { sizeof( ubx::cfg_rate_t ), { ubx::message::cfg::cls, ubx::message::cfg::rate }, reinterpret_cast<uint8_t *>( payload ), true };
-    xQueueSend( m_egress_queue, &ubx_cfg_rate, 0 );
-  }
-
-  { // Poll UBX-NAV-TIMEGPS
-    uint8_t *payload = new uint8_t[ 3 ];
-    payload[ 0 ] = ubx::message::nav::cls;
-    payload[ 1 ] = ubx::message::nav::timegps;
-    payload[ 2 ] = 0x01;
-    lea_m8t_egress_queue_item_t ubx_cfg_msg = { 3, { ubx::message::cfg::cls, ubx::message::cfg::msg }, payload, true };
-    xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
-  }
-
-  { // Poll UBX-NAV-SAT
-    uint8_t *payload = new uint8_t[ 3 ];
-    payload[ 0 ] = ubx::message::nav::cls;
-    payload[ 1 ] = ubx::message::nav::sat;
-    payload[ 2 ] = 0x01;
-    lea_m8t_egress_queue_item_t ubx_cfg_msg = { 3, { ubx::message::cfg::cls, ubx::message::cfg::msg }, payload, true };
-    xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
-  }
-
-
-  { // Poll UBX-NAV-SAT
-    lea_m8t_egress_queue_item_t ubx_nav_sat = { 0, { ubx::message::nav::cls, ubx::message::nav::sat }, nullptr, false };
-    xQueueSend( m_egress_queue, &ubx_nav_sat, 0 );
-  }
-
-
-  
-  { // Get software and hardware versions
-    lea_m8t_egress_queue_item_t ubx_mon_ver = { 0, { ubx::message::mon::cls, ubx::message::mon::ver }, nullptr, false };
-    xQueueSend( m_egress_queue, &ubx_mon_ver, 10 );
-  }
-
-
-  { // Get software and hardware versions
-    lea_m8t_egress_queue_item_t ubx_mon_ver = { 0, { ubx::message::mon::cls, ubx::message::mon::ver }, nullptr, false };
-    xQueueSend( m_egress_queue, &ubx_mon_ver, 10 );
-  }
-
-
-
-  ESP_LOGI( m_component_name, "Initializing UBX" );
-
-  { // Hardware status
-    lea_m8t_egress_queue_item_t ubx_mon_hw = { 0, { ubx::message::mon::cls, ubx::message::mon::hw }, nullptr, false };
-    xQueueSend( m_egress_queue, &ubx_mon_hw, 10 );
-  }
-
-
-
-
-  { // Set port configuration
-    ubx::cfg_prt_ddc_t *payload = new ubx::cfg_prt_ddc_t;
-    memset( payload, 0x00, sizeof( ubx::cfg_prt_ddc_t ));
-    payload->port_id = 0x00; // DDC
-    payload->tx_ready.enable = 0;
-    payload->mode.slave_addr = 66;
-    payload->in_proto_mask.ubx = 1;
-    payload->out_proto_mask.ubx = 1;
-    lea_m8t_egress_queue_item_t ubx_cfg_prt = { sizeof( ubx::cfg_prt_ddc_t ), { ubx::message::cfg::cls, ubx::message::cfg::prt }, reinterpret_cast<uint8_t *>( payload ), true };
-    xQueueSend( m_egress_queue, &ubx_cfg_prt, 10 );
-  }
-
-  { // Get antenna settings
-    lea_m8t_egress_queue_item_t ubx_cfg_ant = { 0, { ubx::message::cfg::cls, ubx::message::cfg::ant }, nullptr, true };
-    xQueueSend( m_egress_queue, &ubx_cfg_ant, 0 );
-  }
-
-  { // Set antenna settings
-    ubx::cfg_ant_t *payload = new ubx::cfg_ant_t;
-    memcpy( payload, &m_cfg_ant, sizeof( ubx::cfg_ant_t ) );
-    payload->flags.svcs = 0x00;
-    payload->flags.scd = 0x00;
-    payload->flags.ocd = 0x00;
-    payload->flags.pdwn_on_scd = 0x00;
-    payload->flags.recovery = 0x00;
-    lea_m8t_egress_queue_item_t ubx_cfg_ant = { sizeof( ubx::cfg_ant_t ), { ubx::message::cfg::cls, ubx::message::cfg::ant }, reinterpret_cast<uint8_t *>( payload ), true };
-    xQueueSend( m_egress_queue, &ubx_cfg_ant, 10 );
-  }
-
-  { // Get antenna settings
-    lea_m8t_egress_queue_item_t ubx_cfg_ant = { 0, { ubx::message::cfg::cls, ubx::message::cfg::ant }, nullptr, true };
-    xQueueSend( m_egress_queue, &ubx_cfg_ant, 0 );
-  }
-
-  { // Hardware status
-    lea_m8t_egress_queue_item_t ubx_mon_hw = { 0, { ubx::message::mon::cls, ubx::message::mon::hw }, nullptr, false };
-    xQueueSend( m_egress_queue, &ubx_mon_hw, 10 );
-  }
-
-  { // Poll UBX-NAV-SAT
-    lea_m8t_egress_queue_item_t ubx_nav_sat = { 0, { ubx::message::nav::cls, ubx::message::nav::sat }, nullptr, false };
-    xQueueSend( m_egress_queue, &ubx_nav_sat, 0 );
-  }
-
-
-
-  */
-
-
-
-  /*
-  { // Set message rate
-    ubx::cfg_rate_t *payload = new ubx::cfg_rate_t;
-    payload->meas_rate = 1000;
-    payload->nav_rate = 10;
-    payload->time_ref = 0;
-    lea_m8t_egress_queue_item_t ubx_cfg_rate = { sizeof( ubx::cfg_rate_t ), { ubx::message::cfg::cls, ubx::message::cfg::rate }, reinterpret_cast<uint8_t *>( payload ), true };
-    xQueueSend( m_egress_queue, &ubx_cfg_rate, 0 );
-  }
-
-  { // Get software and hardware versions
-    lea_m8t_egress_queue_item_t ubx_mon_ver = { 0, { ubx::message::mon::cls, ubx::message::mon::ver }, nullptr, false };
-    xQueueSend( m_egress_queue, &ubx_mon_ver, 10 );
-  }
-
-  {
-    // Get time mode
-    lea_m8t_egress_queue_item_t ubx_cfg_tmode2 = { 0, { ubx::message::cfg::cls, ubx::message::cfg::tmode3 }, nullptr, true };
-    ubx::cfg_tmode2_t *tmode2 = new ubx::cfg_tmode2_t;
-    memset( tmode2, 0x00, sizeof( ubx::cfg_tmode2_t ) );
-    tmode2->time_mode = 1; // Survey-in
-    tmode2->flags.lla = 1;
-    tmode2->flags.alt_inv = 1;
-    tmode2->ecef_x_or_lat = 0;
-    tmode2->ecef_y_or_lon = 0;
-    tmode2->ecef_z_or_alt = 0;
-    tmode2->fixed_pos_acc = 10000;
-    tmode2->svin_min_dur = 60;
-    tmode2->svin_acc_limit = 10000;
-    ubx_cfg_tmode2.len = sizeof( ubx::cfg_tmode2_t );
-    ubx_cfg_tmode2.deletable_payload = reinterpret_cast<uint8_t *>( tmode2 );
-    ubx_cfg_tmode2.acked = true;
-    xQueueSend( m_egress_queue, &ubx_cfg_tmode2, 10 );
-  }
-  */
-
-  /*
-  { // Start GNSS
-    ubx::cfg_rst_t *payload = new ubx::cfg_rst_t; // Reset
-    memset( payload, 0x00, sizeof( ubx::cfg_rst_t ) );
-    payload->nav_bbr_mask = 0x0000; // Warm start
-    payload->reset_mode = 0x09; // Controlled GNSS start
-    lea_m8t_egress_queue_item_t ubx_cfg_prt = { sizeof( ubx::cfg_rst_t ), { ubx::message::cfg::cls, ubx::message::cfg::rst }, reinterpret_cast<uint8_t *>( payload ), false };
-    xQueueSend( m_egress_queue, &ubx_cfg_prt, 10 );
-  }
-
-  {
-    // Get GNSS
-    lea_m8t_egress_queue_item_t ubx_cfg_gnss = { 0, { ubx::message::cfg::cls, ubx::message::cfg::gnss }, nullptr, true };
-    xQueueSend( m_egress_queue, &ubx_cfg_gnss, 10 );
-  }
-
-  */
-
-  /*
-
-  { // Set port configuration
-    ubx::cfg_prt_ddc_t *payload = new ubx::cfg_prt_ddc_t;
-    memset( payload, 0x00, sizeof( ubx::cfg_prt_ddc_t ));
-    payload->port_id = 0x00; // DDC
-    payload->tx_ready.enable = 0;
-    payload->mode.slave_addr = 66;
-    payload->in_proto_mask.ubx = 1;
-    payload->out_proto_mask.ubx = 1;
-    lea_m8t_egress_queue_item_t ubx_cfg_prt = { sizeof( ubx::cfg_prt_ddc_t ), { ubx::message::cfg::cls, ubx::message::cfg::prt }, reinterpret_cast<uint8_t *>( payload ), true };
-    xQueueSend( m_egress_queue, &ubx_cfg_prt, 10 );
-  }
-
-
-  { // Enable UBX-NAV-SAT
-    uint8_t *payload = new uint8_t[ 3 ];
-    //payload[ 0 ] = 0x0a;
-    //payload[ 1 ] = 0x06;
-    //payload[ 2 ] = 0x01;
-    payload[ 0 ] = ubx::message::nav::cls;
-    payload[ 1 ] = ubx::message::nav::sat;
-    payload[ 2 ] = 0x01;
-    lea_m8t_egress_queue_item_t ubx_cfg_msg = { 3, { ubx::message::cfg::cls, ubx::message::cfg::msg }, reinterpret_cast<uint8_t *>( payload ), true };
-    xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
-  }
-
-  { // Poll UBX-NAV-SAT
-    lea_m8t_egress_queue_item_t ubx_nav_sat = { 0, { ubx::message::nav::cls, ubx::message::nav::sat }, nullptr, false };
-    xQueueSend( m_egress_queue, &ubx_nav_sat, 0 );
-  }
-
-  
-
-
-
-  */
-
-
-  /*
-
-  {
-    ubx::cfg_tmode2_t *payload = new ubx::cfg_tmode2_t;
-    memset( payload, 0x00, sizeof( ubx::cfg_tmode2_t ));
-    payload->time_mode = 2; // Survey-in mode
-    payload->flags.lla = 1;
-    payload->flags.alt_inv = 1;
-    payload->ecef_x_or_lat = 102931153; // Example fixed position latitude
-    payload->ecef_y_or_lon = 600942397; // Example fixed position longitude
-    payload->ecef_z_or_alt = 0; // Example fixed position altitude
-    payload->fixed_pos_acc = 10000; // Fixed position accuracy
-    payload->svin_min_dur = 60; // Survey-in minimum duration
-    payload->svin_acc_limit = 10000; // Survey-in accuracy limit
-    lea_m8t_egress_queue_item_t ubx_cfg_tmode2 = {
-        sizeof(ubx::cfg_tmode2_t),
-        {
-            ubx::message::cfg::cls,
-            ubx::message::cfg::tmode2
-        },
-        reinterpret_cast<uint8_t *>(payload),
-        true
-    };
-  }
-
-
-  {
-    ubx::cfg_tmode2_t *payload = new ubx::cfg_tmode2_t;
-    memset( payload, 0x00, sizeof( ubx::cfg_tmode2_t ));
-    payload->time_mode = 1; // Survey-in mode
-    payload->flags.lla = 1;
-    payload->flags.alt_inv = 1;
-    payload->ecef_x_or_lat = 102931153; // Example fixed position latitude
-    payload->ecef_y_or_lon = 600942397; // Example fixed position longitude
-    payload->ecef_z_or_alt = 0; // Example fixed position altitude
-    payload->fixed_pos_acc = 10000; // Fixed position accuracy
-    payload->svin_min_dur = 60; // Survey-in minimum duration
-    payload->svin_acc_limit = 10000; // Survey-in accuracy limit
-    lea_m8t_egress_queue_item_t ubx_cfg_tmode2 = {
-        sizeof(ubx::cfg_tmode2_t),
-        {
-            ubx::message::cfg::cls,
-            ubx::message::cfg::tmode2
-        },
-        reinterpret_cast<uint8_t *>(payload),
-        true
-    };
-  }
-  
-
-  { // Survey-in data
-    lea_m8t_egress_queue_item_t ubx_tim_svin = { 0, { ubx::message::tim::cls, ubx::message::tim::svin }, nullptr, false };
-    xQueueSend( m_egress_queue, &ubx_tim_svin, 10 );
-  }
-
-  { // Enable
-    uint8_t *payload = new uint8_t[ 3 ];
-    //payload[ 0 ] = 0x0a;
-    //payload[ 1 ] = 0x06;
-    //payload[ 2 ] = 0x01;
-    payload[ 0 ] = 0x01;
-    payload[ 1 ] = 0x22;
-    payload[ 2 ] = 0x01;
-    lea_m8t_egress_queue_item_t ubx_cfg_msg = { 3, { ubx::message::cfg::cls, ubx::message::cfg::msg }, reinterpret_cast<uint8_t *>( payload ), true };
-    xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
-  }
-  { // Get port configuration
-    uint8_t *payload = new uint8_t[ 1 ];
-    *payload = 0x00;
-    lea_m8t_egress_queue_item_t ubx_cfg_prt = { 1, { ubx::message::cfg::cls, ubx::message::cfg::prt }, payload, true };
-    xQueueSend( m_egress_queue, &ubx_cfg_prt, 10 );
-  }
-  */
-
-  /*
-  { // Enable
-    uint8_t *payload = new uint8_t[ 3 ];
-    payload[ 0 ] = ubx::message::cfg::cls;
-    payload[ 1 ] = ubx::message::cfg::prt;
-    payload[ 2 ] = 0x01;
-    lea_m8t_egress_queue_item_t ubx_cfg_msg = { 3, { ubx::message::cfg::cls, ubx::message::cfg::msg }, reinterpret_cast<uint8_t *>( payload ), true };
-    xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
-  }
-  */
-
-  /*
-  { // Poll
-    lea_m8t_egress_queue_item_t ubx_cfg_msg = { 0, { ubx::message::cfg::cls, ubx::message::cfg::prt }, nullptr, false };
-    xQueueSend( m_egress_queue, &ubx_cfg_msg, 10 );
-  }
-
-  { // Enable UBX_TIM_SVIN messages
-    uint8_t *payload = new uint8_t[ 3 ];
-    payload[ 0 ] = ubx::message::tim::cls;
-    payload[ 1 ] = ubx::message::tim::svin;
-    payload[ 2 ] = 0x01;
-    lea_m8t_egress_queue_item_t ubx_cfg_msg = { 3, { ubx::message::cfg::cls, ubx::message::cfg::msg }, payload, true };
-    xQueueSend( m_egress_queue, &ubx_cfg_msg, 10 );
-  }
-
-  { // Set message rate
-    ubx::cfg_rate_t *payload = new ubx::cfg_rate_t;
-    payload->meas_rate = 200;
-    payload->nav_rate = 10;
-    payload->time_ref = 0;
-    lea_m8t_egress_queue_item_t ubx_cfg_rate = { sizeof( ubx::cfg_rate_t ), { ubx::message::cfg::cls, ubx::message::cfg::rate }, reinterpret_cast<uint8_t *>( payload ), true };
-    xQueueSend( m_egress_queue, &ubx_cfg_rate, 0 );
-  }
-  */
-
-
-
-  /*
-  { // Enable UBX_NAV_SAT messages
-    uint8_t *payload = new uint8_t[ 3 ];
-    payload[ 0 ] = ubx::message::nav::cls;
-    payload[ 1 ] = ubx::message::nav::sat;
-    payload[ 2 ] = 0x10;
-    payload[ 3 ] = 0x10;
-    payload[ 4 ] = 0x10;
-    payload[ 5 ] = 0x10;
-    payload[ 6 ] = 0x10;
-    payload[ 7 ] = 0x10;
-    lea_m8t_egress_queue_item_t ubx_cfg_msg = { 8, { ubx::message::cfg::cls, ubx::message::cfg::msg }, payload, true };
-    xQueueSend( m_egress_queue, &ubx_cfg_msg, 10 );
-  }
-  */
-
-  /*
-  { // Enable UBX_NAV_STATUS messages
-    uint8_t *payload = new uint8_t[ 3 ];
-    payload[ 0 ] = ubx::message::nav::cls;
-    payload[ 1 ] = ubx::message::nav::status;
-    payload[ 2 ] = 0x10;
-    payload[ 3 ] = 0x10;
-    payload[ 4 ] = 0x10;
-    payload[ 5 ] = 0x10;
-    payload[ 6 ] = 0x10;
-    payload[ 7 ] = 0x10;
-    lea_m8t_egress_queue_item_t ubx_cfg_msg = { 8, { ubx::message::cfg::cls, ubx::message::cfg::msg }, payload, true };
-    xQueueSend( m_egress_queue, &ubx_cfg_msg, 10 );
-  }
-  */
-
-
-  /*
-  { // Get port configuration
-    uint8_t *payload = new uint8_t[ 1 ];
-    *payload = 0x00;
-    lea_m8t_egress_queue_item_t ubx_cfg_prt = { 1, { ubx::message::cfg::cls, ubx::message::cfg::prt }, payload, true };
-    xQueueSend( m_egress_queue, &ubx_cfg_prt, 10 );
-  }
-  */
-
-
 }
 
 void broadcast_clock::lea_m8t::

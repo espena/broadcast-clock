@@ -13,6 +13,15 @@
       if( p.pop() == 'save' ) {
         window.location.href = '/';
       }
+      fetch( '/gnss-status' )
+        .then( ( response ) => response.json() )
+        .then( ( data ) => {
+          console.log( data );
+          if( data.gnss_installed == 'yes' ) {
+            document.querySelector( 'fieldset.tab.gnss' ).classList.remove( 'disabled' );
+          }
+        } )
+        .catch( ( error ) => console.error( error ) );
     </script>
     <div>
       <header>
@@ -128,6 +137,13 @@
                 <span><label for="30min">30 minutes</label><input |update_interval:1800000| type="radio" value="1800000" name="update_interval" id="30min" /></span>
                 <span><label for="60min">60 minutes</label><input |update_interval:3600000| type="radio" value="3600000" name="update_interval" id="60min" /></span>
               </div>
+            </div>
+          </fieldset>
+          <fieldset class="tab gnss disabled">
+            <legend>GNSS</legend>
+            <div>
+              <label>Satellite time</label>
+
             </div>
           </fieldset>
           <fieldset class="tab opts">

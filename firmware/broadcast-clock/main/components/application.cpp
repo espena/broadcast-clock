@@ -29,6 +29,7 @@ application() : m_configuration( nullptr ),
   };
 
   esp_event_loop_create( &loop_args, &m_event_loop_handle );
+  m_clock_status.set_event_loop_handle( m_event_loop_handle );
 }
 
 application::
@@ -50,6 +51,8 @@ init() {
     esp_event_loop_create_default();
 
     m_captive_portal_http.set_event_loop_handle( m_event_loop_handle );
+    m_captive_portal_http.set_gnss_state( &m_clock_status );
+
     esp_event_handler_register_with( m_event_loop_handle,
                                      broadcast_clock::captive_portal_http::m_event_base,
                                      broadcast_clock::captive_portal_http::EVENT_SAVE,
@@ -108,8 +111,8 @@ init() {
                                      this );
     init_ap_duration_timeout();
 
-    m_beeper.init();
     m_beeper.set_event_loop_handle( m_event_loop_handle );
+    m_beeper.init();
     
     m_clock_face.set_event_loop_handle( m_event_loop_handle );
 
@@ -121,7 +124,6 @@ init() {
                                      wifi_event_handler,
                                      this );
 
-    m_lea_m8t.init();
     m_lea_m8t.set_event_loop_handle( m_event_loop_handle );
 
     esp_event_handler_register_with( m_event_loop_handle,
@@ -165,6 +167,8 @@ init() {
                                      broadcast_clock::lea_m8t::LOWER_ACCURACY,
                                      wifi_event_handler,
                                      this );
+
+    m_lea_m8t.init();
 
     if( m_configuration->get_bool( "configurator" ) ) {
       m_captive_portal_http.init();
