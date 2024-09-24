@@ -35,6 +35,16 @@ h2 {
   font-size: 1em;
   padding-bottom: 5px;
 }
+table {
+  font-size: 13px;
+}
+table tr td:first-of-type:after {
+  content: ":";
+  padding-right: 5px;
+}
+table td.number {
+  text-align: right;
+}
 .form {
   margin: 40px 0 0 0;
   padding: 0;
@@ -50,9 +60,9 @@ form legend {
   display: block;
   text-align: center;
   position: absolute;
-  padding: 5px;
+  padding: 5px 0;
   top: -25px;
-  width: 75px;
+  width: 60px;
   height: 26px;
   border-radius: 5px 5px 0 0;
   background-color: #eee;
@@ -67,11 +77,12 @@ form .stopwatch legend { left: 0; }
 form .countdown legend { left: 75px; }
 
 form fieldset:nth-of-type( 1 ) legend { left: 0; }
-form fieldset:nth-of-type( 2 ) legend { left: 75px; }
-form fieldset:nth-of-type( 3 ) legend { left: 150px; }
-form fieldset:nth-of-type( 4 ) legend { left: 225px; }
-form fieldset:nth-of-type( 5 ) legend { left: 300px; }
-form fieldset:nth-of-type( 6 ) legend { left: 375px; }
+form fieldset:nth-of-type( 2 ) legend { left: 60px; }
+form fieldset:nth-of-type( 3 ) legend { left: 120px; }
+form fieldset:nth-of-type( 4 ) legend { left: 180px; }
+form fieldset:nth-of-type( 5 ) legend { left: 240px; }
+form fieldset:nth-of-type( 6 ) legend { left: 300px; }
+
 fieldset {
   display: block;
   position: absolute;
@@ -155,6 +166,28 @@ input[type="submit"] {
   clear: both;
   display: block;
   float: none;
+}
+.page {
+  display: none;
+  min-height: 195px;
+}
+.page.active {
+  display: block;
+}
+.gnss-pages button {
+  display: inline-block;
+  width: 75px;
+  cursor: pointer;
+  padding: 5px 0;
+  border: solid 1px #bbb;
+  border-radius: 5px;
+  background-color: #eee;
+}
+.gnss-pages button.active {
+  font-weight: bold;
+  cursor: default;
+  color: #555;
+  background-color: #ddd;
 }
 .pwshow {
   display: inline-block;

@@ -21,15 +21,18 @@ namespace espena::broadcast_clock {
     static const uint32_t GNSS_INSTALLED = 0x01u;
     static const uint32_t TIMEPULSE_PRESENT = 0x02u;
     static const uint32_t TIMEPULSE_ABSENT = 0x03u;
-    static const uint32_t TIME_SYNC = 0x04u;
-    static const uint32_t NO_TIME_SYNC = 0x05u;
-    static const uint32_t HIGH_ACCURACY = 0x06u;
-    static const uint32_t LOWER_ACCURACY = 0x07u;
+    static const uint32_t NO_TIME_SYNC = 0x04u;
+    static const uint32_t HIGH_ACCURACY = 0x05u;
+    static const uint32_t LOWER_ACCURACY = 0x06u;
+    static const uint32_t UBX_NAV_TIMEUTC = 0x07u;
     static const uint32_t UBX_NAV_SAT = 0x08u;
+    static const uint32_t UBX_MON_VER = 0x09u;
+    static const uint32_t UBX_CFG_TMODE2 = 0x0au;
+    static const uint32_t UBX_TIM_SVIN = 0x0bu;
 
   private:
 
-    static const int m_time_pulse_offset_threshold = 15;
+    static const int m_time_pulse_offset_threshold = 25;
 
     static const char *m_component_name;
     static const size_t m_component_stack_size = 8192;
@@ -49,12 +52,16 @@ namespace espena::broadcast_clock {
     
     static int64_t m_ns_timepulse;
     static int64_t m_ns_mismatch;
+    static int64_t m_ns_since_timepulse;
 
+    ubx::mon_ver_t m_mon_ver;
     ubx::nav_sat_t m_nav_sat;
     ubx::cfg_prt_ddc_t m_cfg_prt_ddc;
     ubx::cfg_tmode2_t m_cfg_tmode2;
     ubx::cfg_gnss_t m_cfg_gnss;
     ubx::cfg_ant_t m_cfg_ant;
+    ubx::nav_timeutc_t m_nav_timeutc;
+    ubx::tim_svin_t m_tim_svin;
 
     char m_software_version[ 30 ] = { 0x00 };
     char m_hardware_version[ 10 ] = { 0x00 };
@@ -74,6 +81,8 @@ namespace espena::broadcast_clock {
     enum class lea_m8t_task_message {
       init,
       poll,
+      start_time_mode,
+      stop_time_mode,
       timepulse
     };
 
@@ -91,6 +100,8 @@ namespace espena::broadcast_clock {
 
     static void task_loop( void *arg );
     static void on_poll_timer( void *arg );
+
+    void set_time_mode( bool enable );
 
     void on_init();
 
@@ -120,10 +131,13 @@ namespace espena::broadcast_clock {
     void on_ubx_cfg_tmode2( ubx::cfg_tmode2_t *payload );
     void on_ubx_cfg_gnss( ubx::cfg_gnss_t *payload );
 
+    void on_ubx_mon_ver( ubx::mon_ver_t *payload );
     void on_ubx_mon_hw( ubx::mon_hw_t *payload );
 
     void on_ubx_nav_sat( ubx::nav_sat_t *payload );
     void on_ubx_nav_timeutc( ubx::nav_timeutc_t *payload );
+
+    void on_ubx_tim_svin( ubx::tim_svin_t *payload );
 
   public:
 
@@ -132,6 +146,8 @@ namespace espena::broadcast_clock {
 
     bool is_present();
     void init();
+    void start_time_mode();
+    void stop_time_mode();
     void set_event_loop_handle( esp_event_loop_handle_t h ) { m_event_loop_handle = h; };
 
   };

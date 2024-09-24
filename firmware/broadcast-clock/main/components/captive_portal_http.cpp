@@ -29,6 +29,7 @@ broadcast_clock::captive_portal_http::captive_portal_http() : m_message_queue( n
 {    
   m_cfg.uri_match_fn = httpd_uri_match_wildcard;
   m_cfg.lru_purge_enable = true;
+  m_cfg.enable_so_linger = false;
   m_message_queue = xQueueCreate( 50, sizeof( captive_portal_http_task_queue_item ) );
   m_task_params.instance = this;
 
@@ -47,15 +48,46 @@ broadcast_clock::captive_portal_http::captive_portal_http() : m_message_queue( n
 
 void broadcast_clock::captive_portal_http::update_json_gnss_status() {
   if( m_gnss_state ) {
+
     m_json_gnss_status = "{ \
-                            \"status\": \"ok\", \
-                            \"gnss_chip_installed\": \"__gnss_chip_installed__\", \
-                            \"gnss_system\": \"__gnss_system__\", \
-                            \"satellites_found\": __gnss_satellite_count__ \
+                            \"status\": \"updated\", \
+                            \"chip_installed\": \"__gnss_chip_installed__\", \
+                            \"software_version\": \"__gnss_software_version__\", \
+                            \"hardware_version\": \"__gnss_hardware_version__\", \
+                            \"system\": \"__gnss_system__\", \
+                            \"satellites_found\": __gnss_satellite_count__, \
+                            \"got_timepulse\": \"__gnss_got_timepulse__\", \
+                            \"utc_standard\": \"__gnss_utc_standard__\", \
+                            \"time_mode\": \"__gnss_time_mode__\" \
+                            \"survey-in\": {\
+                              \"active\": \"__gnss_svin_active__\", \
+                              \"valid\": \"__gnss_svin_valid__\", \
+                              \"duration\": __gnss_svin_dur__, \
+                              \"observations\": __gnss_svin_obs__, \
+                              \"mean_x\": __gnss_svin_mean_x__, \
+                              \"mean_y\": __gnss_svin_mean_y__, \
+                              \"mean_z\": __gnss_svin_mean_z__, \
+                              \"mean_v\": __gnss_svin_mean_v__ \
+                            }\
                           }";
+
     utils::replace_substring( m_json_gnss_status, "__gnss_chip_installed__", m_gnss_state->gnss_chip_installed_str() );
+    utils::replace_substring( m_json_gnss_status, "__gnss_software_version__", m_gnss_state->gnss_software_version_str() );
+    utils::replace_substring( m_json_gnss_status, "__gnss_hardware_version__", m_gnss_state->gnss_hardware_version_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_system__", m_gnss_state->gnss_current_system_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_satellite_count__", m_gnss_state->gnss_satellite_count_str() );
+    utils::replace_substring( m_json_gnss_status, "__gnss_got_timepulse__", m_gnss_state->gnss_got_timepulse_str() );
+    utils::replace_substring( m_json_gnss_status, "__gnss_utc_standard__", m_gnss_state->gnss_utc_standard_str() );
+    utils::replace_substring( m_json_gnss_status, "__gnss_time_mode__", m_gnss_state->gnss_time_mode_str() );
+    utils::replace_substring( m_json_gnss_status, "__gnss_svin_active__", m_gnss_state->gnss_svin_active_str() );
+    utils::replace_substring( m_json_gnss_status, "__gnss_svin_valid__", m_gnss_state->gnss_svin_valid_str() );
+    utils::replace_substring( m_json_gnss_status, "__gnss_svin_dur__", m_gnss_state->gnss_svin_dur_str() );
+    utils::replace_substring( m_json_gnss_status, "__gnss_svin_obs__", m_gnss_state->gnss_svin_obs_str() );
+    utils::replace_substring( m_json_gnss_status, "__gnss_svin_mean_x__", m_gnss_state->gnss_svin_mean_x_str() );
+    utils::replace_substring( m_json_gnss_status, "__gnss_svin_mean_y__", m_gnss_state->gnss_svin_mean_y_str() );
+    utils::replace_substring( m_json_gnss_status, "__gnss_svin_mean_z__", m_gnss_state->gnss_svin_mean_z_str() );
+    utils::replace_substring( m_json_gnss_status, "__gnss_svin_mean_v__", m_gnss_state->gnss_svin_mean_v_str() );
+
   }
   else {
     m_json_gnss_status = "{ \"status\": \"initializing\" }";
@@ -113,6 +145,24 @@ save_handler( httpd_req_t *req ) {
     else { // AP mode, exit from configuration
       httpd_resp_send( req, buf_ex, buf_ex_len );
     }
+}
+
+
+void broadcast_clock::captive_portal_http::
+survey_in_handler( httpd_req_t *req ) {
+
+    static std::string post_data;
+    post_data.resize( req->content_len + 1 );
+    httpd_req_recv( req, &post_data[ 0 ], req->content_len );
+
+    esp_event_post_to( m_event_loop_handle,
+                        m_event_base,
+                        post_data.find( "time_mode_enable=1" ) != std::string::npos ? EVENT_START_TIME_MODE : EVENT_STOP_TIME_MODE,
+                        post_data.c_str(),
+                        post_data.length(),
+                        portMAX_DELAY );
+
+    httpd_resp_send( req, "OK", 3 );
 }
 
 void broadcast_clock::captive_portal_http::
@@ -190,6 +240,11 @@ on_request( httpd_req_t *req ) {
     httpd_resp_set_status( req, "302 Found" ); 
     httpd_resp_set_type( req, "text/html; charset=is08859-1;" );
     save_handler( req );
+  }
+  else if( uri == "/survey_in" && req->content_len > 0 && m_event_loop_handle ) {
+    httpd_resp_set_status( req, "302 Found" ); 
+    httpd_resp_set_type( req, "text/html; charset=is08859-1;" );
+    survey_in_handler( req );
   }
   else if( uri == "/timers" && m_event_loop_handle ) {
     httpd_resp_set_status( req, "302 Found" ); 
@@ -277,6 +332,13 @@ void broadcast_clock::captive_portal_http::start_sync() {
   */
 
   location.uri = "/save",
+  location.handler = request_handler,
+  location.user_ctx = this;
+  location.method = HTTP_POST,
+
+  httpd_register_uri_handler( m_server, &location );
+
+  location.uri = "/survey_in",
   location.handler = request_handler,
   location.user_ctx = this;
   location.method = HTTP_POST,

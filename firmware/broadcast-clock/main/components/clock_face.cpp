@@ -82,7 +82,7 @@ on_init() {
   if( m_event_loop_handle ) {
     esp_event_handler_register_with( m_event_loop_handle,
                                      broadcast_clock::lea_m8t::m_event_base,
-                                     broadcast_clock::lea_m8t::TIME_SYNC,
+                                     broadcast_clock::lea_m8t::UBX_NAV_TIMEUTC,
                                      event_handler,
                                      this );
 
@@ -223,7 +223,7 @@ event_handler( void *handler_arg,
   }
   else if( source == broadcast_clock::lea_m8t::m_event_base ) {
     switch( event_id ) {
-      case broadcast_clock::lea_m8t::TIME_SYNC:
+      case broadcast_clock::lea_m8t::UBX_NAV_TIMEUTC:
         instance->on_time_sync( sync_type::gnss );
         break;
     }

@@ -67,6 +67,18 @@ init() {
 
     esp_event_handler_register_with( m_event_loop_handle,
                                      broadcast_clock::captive_portal_http::m_event_base,
+                                     broadcast_clock::captive_portal_http::EVENT_START_TIME_MODE,
+                                     wifi_event_handler,
+                                     this );
+
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::captive_portal_http::m_event_base,
+                                     broadcast_clock::captive_portal_http::EVENT_STOP_TIME_MODE,
+                                     wifi_event_handler,
+                                     this );
+
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     broadcast_clock::captive_portal_http::m_event_base,
                                      broadcast_clock::captive_portal_http::EVENT_CONFIGURATOR_START,
                                      wifi_event_handler,
                                      this );
@@ -146,7 +158,7 @@ init() {
 
     esp_event_handler_register_with( m_event_loop_handle,
                                      broadcast_clock::lea_m8t::m_event_base,
-                                     broadcast_clock::lea_m8t::TIME_SYNC,
+                                     broadcast_clock::lea_m8t::UBX_NAV_TIMEUTC,
                                      wifi_event_handler,
                                      this );
 
@@ -225,7 +237,7 @@ wifi_event_handler( void *handler_arg,
       case broadcast_clock::lea_m8t::TIMEPULSE_ABSENT:
         instance->m_clock_status.gnss_timepulse( false );
         break;
-      case broadcast_clock::lea_m8t::TIME_SYNC:
+      case broadcast_clock::lea_m8t::UBX_NAV_TIMEUTC:
         instance->m_clock_status.gnss_time_sync( true );
         break;
       case broadcast_clock::lea_m8t::NO_TIME_SYNC:
@@ -250,6 +262,12 @@ wifi_event_handler( void *handler_arg,
         break;
       case broadcast_clock::captive_portal_http::EVENT_CANCEL:
         instance->on_cancel_config( std::string( ( char * ) event_params ) );
+        break;
+      case broadcast_clock::captive_portal_http::EVENT_START_TIME_MODE:
+        instance->m_lea_m8t.start_time_mode();
+        break;
+      case broadcast_clock::captive_portal_http::EVENT_STOP_TIME_MODE:
+        instance->m_lea_m8t.stop_time_mode();
         break;
       case broadcast_clock::captive_portal_http::EVENT_CONFIGURATOR_START:
         instance->m_clock_status.configurator_enabled( true );

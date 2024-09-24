@@ -11,6 +11,13 @@ namespace ubx {
     uint8_t id;
   } message_t;
 
+  const static char *time_mode[ ] = {
+    "Disabled",
+    "Surevey-in",
+    "Fixed mode",
+    "Unknown"
+  };
+
   const static char *gnss_id[ ] = {
     "GPS",
     "SBAS",
@@ -306,11 +313,7 @@ namespace ubx {
   typedef struct cfg_tmode3_struct {
     uint8_t version;
     uint8_t reserved0;
-    struct {
-      uint16_t mode : 8;
-      uint16_t lla : 1;
-      uint16_t reserved : 7;
-    } flags;
+    uint16_t flags;
     int32_t ecef_x_or_lat;
     int32_t ecef_y_or_lon;
     int32_t ecef_z_or_alt;
@@ -327,11 +330,7 @@ namespace ubx {
   typedef struct cfg_tmode2_struct {
     uint8_t time_mode;
     uint8_t reserved1;
-    struct {
-      uint16_t lla     : 1;
-      uint16_t alt_inv : 1;
-      uint16_t reserved : 14;
-    } flags;
+    uint16_t flags;
     int32_t ecef_x_or_lat;
     int32_t ecef_y_or_lon;
     int32_t ecef_z_or_alt;

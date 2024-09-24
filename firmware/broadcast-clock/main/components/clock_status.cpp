@@ -4,6 +4,7 @@
 
 #include <map>
 #include <memory.h>
+#include <string.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <freertos/task.h>
@@ -14,9 +15,34 @@ using namespace espena::broadcast_clock;
 void clock_status::
 set_event_loop_handle( esp_event_loop_handle_t event_loop_handle ) {
   m_event_loop_handle = event_loop_handle;
+
   esp_event_handler_register_with( m_event_loop_handle,
                                    lea_m8t::m_event_base,
                                    lea_m8t::UBX_NAV_SAT,
+                                   event_handler,
+                                   this );
+
+  esp_event_handler_register_with( m_event_loop_handle,
+                                   lea_m8t::m_event_base,
+                                   lea_m8t::UBX_NAV_TIMEUTC,
+                                   event_handler,
+                                   this );
+
+  esp_event_handler_register_with( m_event_loop_handle,
+                                   lea_m8t::m_event_base,
+                                   lea_m8t::UBX_MON_VER,
+                                   event_handler,
+                                   this );
+
+  esp_event_handler_register_with( m_event_loop_handle,
+                                   lea_m8t::m_event_base,
+                                   lea_m8t::UBX_CFG_TMODE2,
+                                   event_handler,
+                                   this );
+
+  esp_event_handler_register_with( m_event_loop_handle,
+                                   lea_m8t::m_event_base,
+                                   lea_m8t::UBX_TIM_SVIN,
                                    event_handler,
                                    this );
 }
@@ -31,6 +57,18 @@ event_handler( void *handler_arg,
     switch( event_id ) {
       case lea_m8t::UBX_NAV_SAT:
         inst->ubx_nav_sat( static_cast<ubx::nav_sat_t *>( event_params ) );
+        break;
+      case lea_m8t::UBX_NAV_TIMEUTC:
+        inst->ubx_nav_timeutc( static_cast<ubx::nav_timeutc_t *>( event_params ) );
+        break;
+      case lea_m8t::UBX_MON_VER:
+        inst->ubx_mon_ver( static_cast<ubx::mon_ver_t *>( event_params ) );
+        break;
+      case lea_m8t::UBX_CFG_TMODE2:
+        inst->ubx_cfg_tmode2( static_cast<ubx::cfg_tmode2_t *>( event_params ) );
+        break;
+      case lea_m8t::UBX_TIM_SVIN:
+        inst->ubx_tim_svin( static_cast<ubx::tim_svin_t *>( event_params ) );
         break;
     }
   }
@@ -73,6 +111,31 @@ configurator_enabled( bool ok ) {
 }
 
 void clock_status::
+ubx_mon_ver( ubx::mon_ver_t *mon_ver ) {
+  memcpy( m_gnss_software_version, mon_ver->sw_version, sizeof( m_gnss_software_version ) );
+  memcpy( m_gnss_hardware_version, mon_ver->hw_version, sizeof( m_gnss_software_version ) );
+}
+
+void clock_status::
+ubx_cfg_tmode2( ubx::cfg_tmode2_t *cfg_tmode2 ) {
+  uint8_t time_mode = cfg_tmode2->time_mode > 2 ? 3 : cfg_tmode2->time_mode;
+  m_gnss_time_mode = cfg_tmode2->time_mode;
+  strncpy( m_gnss_time_mode_str, ubx::time_mode[ time_mode ], sizeof( m_gnss_time_mode_str ) );
+}
+
+void clock_status::
+ubx_tim_svin( ubx::tim_svin_t *tim_svin ) {
+  m_gnss_svin_active = tim_svin->active;
+  m_gnss_svin_dur = tim_svin->dur;
+  m_gnss_svin_mean_x = tim_svin->mean_x;
+  m_gnss_svin_mean_y = tim_svin->mean_y;
+  m_gnss_svin_mean_z = tim_svin->mean_z;
+  m_gnss_svin_mean_v = tim_svin->mean_v;
+  m_gnss_svin_obs = tim_svin->obs;
+  m_gnss_svin_valid = tim_svin->valid;
+}
+
+void clock_status::
 ubx_nav_sat( ubx::nav_sat_t *nav_sat ) {
   m_gnss_satellite_count = nav_sat->num_svs;
   std::map<uint8_t, uint8_t> gnss_systems;
@@ -81,15 +144,20 @@ ubx_nav_sat( ubx::nav_sat_t *nav_sat ) {
     gnss_systems[ nav_sat->satellites[ i ].gnss_id ]++;
   }
   i = 0;
-  m_gnss_current_system_str = "";
+  memset( m_gnss_current_system_str, 0x00, sizeof( m_gnss_current_system_str ) );
   memset( m_gnss_current_system, 0x00, sizeof( m_gnss_current_system ) );
   for( auto &system : gnss_systems ) {
-    if( system.first < ( sizeof( ubx::gnss_id ) / sizeof( ubx::gnss_id[ 0 ] ) ) ) {
+    if( system.first < sizeof( ubx::gnss_id ) ) {
       m_gnss_current_system[ i ] = system.first;
-      m_gnss_current_system_str += m_gnss_current_system_str.empty() ? "" : ", ";
-      m_gnss_current_system_str = ubx::gnss_id[ system.first ];
+      strncpy( m_gnss_current_system_str, ubx::gnss_id[ system.first ], sizeof( m_gnss_current_system_str ) );
+      i++;
     }
-    if( ++i == sizeof( m_gnss_current_system ) ) break;
   }
-  ESP_LOGI( "clock_status", "GNSS system: %s", m_gnss_current_system_str.c_str() );
+}
+
+void clock_status::
+ubx_nav_timeutc( ubx::nav_timeutc_t *nav_timeutc ) {
+  m_gnss_utc_standard = ( nav_timeutc->valid & 0xf0 ) >> 4;
+  const uint8_t id = m_gnss_utc_standard > 8 ? 9 : m_gnss_utc_standard;
+  strncpy( m_gnss_utc_standard_str, ubx::utc_standard_timesource[ id ], sizeof( m_gnss_utc_standard_str ) );
 }

@@ -26,6 +26,7 @@ const char *broadcast_clock::lea_m8t::m_event_base = "broadcast_clock_lea_m8t_ev
 
 int64_t broadcast_clock::lea_m8t::m_ns_timepulse = 0;
 int64_t broadcast_clock::lea_m8t::m_ns_mismatch = 0;
+int64_t broadcast_clock::lea_m8t::m_ns_since_timepulse = 0xffffffffffffffff;
 
 broadcast_clock::lea_m8t::
 lea_m8t() : m_event_loop_handle( nullptr ) {
@@ -37,7 +38,12 @@ lea_m8t() : m_event_loop_handle( nullptr ) {
   memset( &m_cfg_gnss, 0x00, sizeof( ubx::cfg_gnss_t ) );
   memset( &m_cfg_ant, 0x00, sizeof( ubx::cfg_ant_t ) );
   
+  memset( &m_mon_ver, 0x00, sizeof( ubx::mon_ver_t ) );
+  
+  memset( &m_nav_timeutc, 0x00, sizeof( ubx::nav_timeutc_t ) );
   memset( &m_nav_sat, 0x00, sizeof( ubx::nav_sat_t ) );  
+
+  memset( &m_tim_svin, 0x00, sizeof( ubx::tim_svin_t ) );
 
   m_task_queue = xQueueCreate( 8192, sizeof( lea_m8t_task_queue_item_t ) );
   m_egress_queue = xQueueCreate( 4096, sizeof( lea_m8t_egress_queue_item_t ) );
@@ -156,11 +162,15 @@ read() {
       break;
     } 
 
+    uint8_t fletcher_sum[ 2 ] = { 0x00, 0x00 };
     const uint8_t fletcher_a = cmd_rx_buf[ offset + len + 6 ];
     const uint8_t fletcher_b = cmd_rx_buf[ offset + len + 7 ];
-    utils::fletcher8( &cmd_rx_buf[ offset + 2 ], len + 4, &cmd_rx_buf[ offset + len + 6 ] );
-    if( fletcher_a != cmd_rx_buf[ offset + len + 6 ] || fletcher_b != cmd_rx_buf[ offset + len + 7 ] ) {
-      ESP_LOGE( m_component_name, "Fletcher checksum failed for cls %d id %d", msg_class, msg_id );
+    utils::fletcher8( &cmd_rx_buf[ offset + 2 ], len + 4, fletcher_sum );
+
+    if( fletcher_sum[ 0 ] != fletcher_a || fletcher_sum[ 1 ] != fletcher_b ) {
+      ESP_LOGE( m_component_name, "Fletcher checksum failed for cls 0x%02x id 0x%02x", msg_class, msg_id );
+      ESP_LOGE( m_component_name, "LEA M8T passed 0x%02x 0x%02x while 0x%02x 0x%02x was expected", fletcher_a, fletcher_b, fletcher_sum[ 0 ], fletcher_sum[ 1 ] );
+      utils::hexdump( &cmd_rx_buf[ offset ], len + 8 );
       offset += len + 8;
       continue;
     }
@@ -228,7 +238,7 @@ update_status() {
   if( m_event_loop_handle ) {
     struct timespec now;
     clock_gettime( CLOCK_REALTIME, &now );
-    if( now.tv_sec * 1000000000 + now.tv_nsec - m_ns_timepulse > 5000000000 ) {
+    if( m_ns_since_timepulse > 5000000000 ) {
       esp_event_post_to( m_event_loop_handle,
                         m_event_base,
                         TIMEPULSE_ABSENT,
@@ -238,6 +248,7 @@ update_status() {
     }
   }
 }
+
 void broadcast_clock::lea_m8t::
 on_task_message( lea_m8t_task_message msg, void *arg ) {
   switch( msg ) {
@@ -251,10 +262,40 @@ on_task_message( lea_m8t_task_message msg, void *arg ) {
         update_status();
       }
       break;
+    case lea_m8t_task_message::start_time_mode:
+      set_time_mode( true );
+      break;
+    case lea_m8t_task_message::stop_time_mode:
+      set_time_mode( false );
+      break;
     case lea_m8t_task_message::timepulse:
       on_timepulse();
       break;
   }
+}
+
+void broadcast_clock::lea_m8t::
+set_time_mode( bool enable ) {
+
+  { // Set time mode
+    ubx::cfg_tmode2_t *payload = reinterpret_cast<ubx::cfg_tmode2_t *>( new uint8_t[ sizeof( ubx::cfg_tmode2_t ) ] );
+    memset( payload, 0x00, sizeof( ubx::cfg_tmode2_t ) );
+    payload->time_mode = enable ? 0x01 : 0x00; // < survey-in if enabled
+    payload->svin_min_dur = 120;
+    payload->svin_acc_limit = 15000;
+    lea_m8t_egress_queue_item_t ubx_cfg_tmode2 = { sizeof( ubx::cfg_tmode2_t ), { ubx::message::cfg::cls, ubx::message::cfg::tmode2 }, reinterpret_cast<uint8_t *>( payload ), true };
+    xQueueSend( m_egress_queue, &ubx_cfg_tmode2, 0 );
+  }
+
+  { // Poll periodic UBX-CFG-SVIN message
+    uint8_t *payload = new uint8_t[ 3 ];
+    payload[ 0 ] = ubx::message::tim::cls;
+    payload[ 1 ] = ubx::message::tim::svin;
+    payload[ 2 ] = 0x02;
+    lea_m8t_egress_queue_item_t ubx_cfg_msg = { 3, { ubx::message::cfg::cls, ubx::message::cfg::msg }, payload, true };
+    xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
+  }
+
 }
 
 void broadcast_clock::lea_m8t::
@@ -300,6 +341,9 @@ on_ubx_message( const uint8_t msg_class,
         case ubx::message::mon::hw:
           on_ubx_mon_hw( static_cast<ubx::mon_hw_t *>( payload ) );
           break;
+        case ubx::message::mon::ver:
+          on_ubx_mon_ver( static_cast<ubx::mon_ver_t *>( payload ) );
+          break;
       }
       break;
     case ubx::message::nav::cls:
@@ -309,6 +353,13 @@ on_ubx_message( const uint8_t msg_class,
           break;
         case ubx::message::nav::timeutc:
           on_ubx_nav_timeutc( static_cast<ubx::nav_timeutc_t *>( payload ) );
+          break;
+      }
+      break;
+    case ubx::message::tim::cls:
+      switch( msg_id ) {
+        case ubx::message::tim::svin:
+          on_ubx_tim_svin( static_cast<ubx::tim_svin_t *>( payload ) );
           break;
       }
       break;
@@ -339,6 +390,14 @@ void broadcast_clock::lea_m8t::
 on_ubx_cfg_tmode2( ubx::cfg_tmode2_t *tmode2 ) {
   ESP_LOGI( m_component_name, "UBX_CFG_TMODE2" );
   memcpy( &m_cfg_tmode2, tmode2, sizeof( ubx::cfg_tmode2_t ) );
+  if( m_event_loop_handle ) {
+    esp_event_post_to( m_event_loop_handle,
+                        m_event_base,
+                        UBX_CFG_TMODE2,
+                        &m_cfg_tmode2,
+                        sizeof( ubx::cfg_tmode2_t ),
+                        portMAX_DELAY );
+  }
 }
 
 void broadcast_clock::lea_m8t::
@@ -357,6 +416,20 @@ on_ubx_mon_hw( ubx::mon_hw_t *hw ) {
   else {
     ESP_LOGI( m_component_name, "Initializing normal boot" );
     init_ubx_normalboot();
+  }
+}
+
+void broadcast_clock::lea_m8t::
+on_ubx_mon_ver( ubx::mon_ver_t *ver ) {
+  ESP_LOGI( m_component_name, "UBX_MON_VER" );
+  memcpy( &m_mon_ver, ver, sizeof( ubx::mon_ver_t ) );
+  if( m_event_loop_handle ) {
+    esp_event_post_to( m_event_loop_handle,
+                        m_event_base,
+                        UBX_MON_VER,
+                        &m_mon_ver,
+                        sizeof( ubx::mon_ver_t ),
+                        portMAX_DELAY );
   }
 }
 
@@ -409,13 +482,13 @@ on_ubx_nav_timeutc( ubx::nav_timeutc_t *timeutc ) {
     clock_gettime( CLOCK_REALTIME, &now_spec );
 
     int64_t now_ns = now_spec.tv_sec * 1000000000 + now_spec.tv_nsec;
-    int64_t ns_since_timepulse = now_ns - m_ns_timepulse;
+    m_ns_since_timepulse = now_ns - m_ns_timepulse;
     bool is_time_set = false;
-    if( ns_since_timepulse < 1000000000 ) {
+    if( m_ns_since_timepulse < 1000000000 ) {
       if( now_time != -1 ) {
         const int adj_ns = 28000;
         now_spec.tv_sec = now_time;
-        now_spec.tv_nsec = ns_since_timepulse + adj_ns;
+        now_spec.tv_nsec = m_ns_since_timepulse + adj_ns;
         clock_settime( CLOCK_REALTIME, &now_spec );
         is_time_set = true;
       }
@@ -427,13 +500,28 @@ on_ubx_nav_timeutc( ubx::nav_timeutc_t *timeutc ) {
 
     if( is_time_set && m_event_loop_handle ) {
       m_seconds_with_no_timesync_data = 0;
+      memcpy( &m_nav_timeutc, timeutc, sizeof( ubx::nav_timeutc_t ) );
       esp_event_post_to( m_event_loop_handle,
                          m_event_base,
-                         TIME_SYNC,
-                         nullptr,
-                         0,
+                         UBX_NAV_TIMEUTC,
+                         &m_nav_timeutc,
+                         sizeof( ubx::nav_timeutc_t ),
                          portMAX_DELAY );
     }
+  }
+}
+
+void broadcast_clock::lea_m8t::
+on_ubx_tim_svin( ubx::tim_svin_t *payload ) {
+  ESP_LOGI( m_component_name, "UBX_TIM_SVIN" );
+  memcpy( &m_tim_svin, payload, sizeof( ubx::tim_svin_t ) );
+  if( m_event_loop_handle ) {
+    esp_event_post_to( m_event_loop_handle,
+                        m_event_base,
+                        UBX_TIM_SVIN,
+                        &m_tim_svin,
+                        sizeof( ubx::tim_svin_t ),
+                        portMAX_DELAY );
   }
 }
 
@@ -596,7 +684,7 @@ init_ubx_normalboot() {
     xQueueSend( m_egress_queue, &ubx_cfg_rate, 0 );
   }
 
-  { // Poll UBX-NAV-TIMEUTC
+  { // Poll periodic UBX-NAV-TIMEUTC
     uint8_t *payload = new uint8_t[ 3 ];
     payload[ 0 ] = ubx::message::nav::cls;
     payload[ 1 ] = ubx::message::nav::timeutc;
@@ -605,12 +693,23 @@ init_ubx_normalboot() {
     xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
   }
 
-  { // Poll UBX-NAV-SAT
+  { // Poll periodic UBX-NAV-SAT
     uint8_t *payload = new uint8_t[ 3 ];
     payload[ 0 ] = ubx::message::nav::cls;
     payload[ 1 ] = ubx::message::nav::sat;
     payload[ 2 ] = 0x08;
     lea_m8t_egress_queue_item_t ubx_cfg_msg = { 3, { ubx::message::cfg::cls, ubx::message::cfg::msg }, payload, true };
+    xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
+  }
+
+  { // Poll UBX-CFG_TMODE2
+    uint8_t *payload = new uint8_t[ 3 ];
+    lea_m8t_egress_queue_item_t ubx_cfg_msg = { 0, { ubx::message::cfg::cls, ubx::message::cfg::tmode2 }, nullptr, true };
+    xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
+  }
+
+  { // Poll UBX-MON-VER
+    lea_m8t_egress_queue_item_t ubx_cfg_msg = { 0, { ubx::message::mon::cls, ubx::message::mon::ver }, nullptr, false };
     xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
   }
 
@@ -639,7 +738,7 @@ on_init() {
   conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
   conf.scl_io_num = I2C_SCL;
   conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
-  conf.master.clk_speed = 400000;
+  conf.master.clk_speed = 200000;
 
   ESP_ERROR_CHECK( i2c_param_config( I2C_NUM_0, &conf ) );
   ESP_ERROR_CHECK( i2c_driver_install( I2C_NUM_0, I2C_MODE_MASTER, 0, 0, 0 ) );
@@ -661,5 +760,17 @@ void broadcast_clock::lea_m8t::
 init() {
   vTaskDelay( 2000 / portTICK_PERIOD_MS );
   lea_m8t_task_queue_item_t item = { lea_m8t_task_message::init, nullptr };
+  xQueueSend( m_task_queue, &item, 0 );
+}
+
+void broadcast_clock::lea_m8t::
+start_time_mode() {
+  lea_m8t_task_queue_item_t item = { lea_m8t_task_message::start_time_mode, nullptr };
+  xQueueSend( m_task_queue, &item, 0 );
+}
+
+void broadcast_clock::lea_m8t::
+stop_time_mode() {
+  lea_m8t_task_queue_item_t item = { lea_m8t_task_message::stop_time_mode, nullptr };
   xQueueSend( m_task_queue, &item, 0 );
 }

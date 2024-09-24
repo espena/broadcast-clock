@@ -50,6 +50,9 @@ namespace espena::broadcast_clock {
     static const uint32_t EVENT_COUNTDOWN_START     = 0x0au;
     static const uint32_t EVENT_COUNTDOWN_RESET     = 0x0bu;
 
+    static const uint32_t EVENT_START_TIME_MODE     = 0x0cu;
+    static const uint32_t EVENT_STOP_TIME_MODE      = 0x0du;
+
   private:
 
     static const char *m_component_name;
@@ -76,6 +79,7 @@ namespace espena::broadcast_clock {
 
     esp_err_t on_request( httpd_req_t *req );
     void save_handler( httpd_req_t *req );
+    void survey_in_handler( httpd_req_t *req );
     void timers_handler( httpd_req_t *req );
 
     void stopwatch_handler( httpd_req_t *req );
@@ -121,7 +125,6 @@ namespace espena::broadcast_clock {
       void set_network_list( char *json );
 
       void init();
-      void update_gnss_status();
       void start();
       void stop();
 
