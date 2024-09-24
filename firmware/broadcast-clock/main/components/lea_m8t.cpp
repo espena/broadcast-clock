@@ -287,15 +287,6 @@ set_time_mode( bool enable ) {
     xQueueSend( m_egress_queue, &ubx_cfg_tmode2, 0 );
   }
 
-  { // Poll periodic UBX-CFG-SVIN message
-    uint8_t *payload = new uint8_t[ 3 ];
-    payload[ 0 ] = ubx::message::tim::cls;
-    payload[ 1 ] = ubx::message::tim::svin;
-    payload[ 2 ] = 0x02;
-    lea_m8t_egress_queue_item_t ubx_cfg_msg = { 3, { ubx::message::cfg::cls, ubx::message::cfg::msg }, payload, true };
-    xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
-  }
-
 }
 
 void broadcast_clock::lea_m8t::
@@ -675,9 +666,14 @@ init_ubx_normalboot() {
 
   }
 
+  { // Poll UBX-MON-VER
+    lea_m8t_egress_queue_item_t ubx_cfg_msg = { 0, { ubx::message::mon::cls, ubx::message::mon::ver }, nullptr, false };
+    xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
+  }
+
   { // Set message rate
     ubx::cfg_rate_t *payload = reinterpret_cast<ubx::cfg_rate_t *>( new uint8_t[ sizeof( ubx::cfg_rate_t ) ] );
-    payload->meas_rate = 500;
+    payload->meas_rate = 100;
     payload->nav_rate = 16;
     payload->time_ref = 1;
     lea_m8t_egress_queue_item_t ubx_cfg_rate = { sizeof( ubx::cfg_rate_t ), { ubx::message::cfg::cls, ubx::message::cfg::rate }, reinterpret_cast<uint8_t *>( payload ), true };
@@ -688,7 +684,7 @@ init_ubx_normalboot() {
     uint8_t *payload = new uint8_t[ 3 ];
     payload[ 0 ] = ubx::message::nav::cls;
     payload[ 1 ] = ubx::message::nav::timeutc;
-    payload[ 2 ] = 0x01;
+    payload[ 2 ] = 0x05;
     lea_m8t_egress_queue_item_t ubx_cfg_msg = { 3, { ubx::message::cfg::cls, ubx::message::cfg::msg }, payload, true };
     xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
   }
@@ -697,7 +693,16 @@ init_ubx_normalboot() {
     uint8_t *payload = new uint8_t[ 3 ];
     payload[ 0 ] = ubx::message::nav::cls;
     payload[ 1 ] = ubx::message::nav::sat;
-    payload[ 2 ] = 0x08;
+    payload[ 2 ] = 0x0a;
+    lea_m8t_egress_queue_item_t ubx_cfg_msg = { 3, { ubx::message::cfg::cls, ubx::message::cfg::msg }, payload, true };
+    xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
+  }
+
+  { // Poll periodic UBX-CFG-SVIN message
+    uint8_t *payload = new uint8_t[ 3 ];
+    payload[ 0 ] = ubx::message::tim::cls;
+    payload[ 1 ] = ubx::message::tim::svin;
+    payload[ 2 ] = 0x01;
     lea_m8t_egress_queue_item_t ubx_cfg_msg = { 3, { ubx::message::cfg::cls, ubx::message::cfg::msg }, payload, true };
     xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
   }
@@ -708,7 +713,7 @@ init_ubx_normalboot() {
     xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
   }
 
-  { // Poll UBX-MON-VER
+  { // Poll UBX-MON-VER another time
     lea_m8t_egress_queue_item_t ubx_cfg_msg = { 0, { ubx::message::mon::cls, ubx::message::mon::ver }, nullptr, false };
     xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
   }
@@ -729,6 +734,7 @@ init_ubx() {
 void broadcast_clock::lea_m8t::
 on_init() {
   ESP_LOGI( "application", "Initializing i2c" );
+  vTaskDelay( 2000 / portTICK_PERIOD_MS );
 
 
   i2c_config_t conf;
@@ -758,7 +764,6 @@ on_init() {
 
 void broadcast_clock::lea_m8t::
 init() {
-  vTaskDelay( 2000 / portTICK_PERIOD_MS );
   lea_m8t_task_queue_item_t item = { lea_m8t_task_message::init, nullptr };
   xQueueSend( m_task_queue, &item, 0 );
 }

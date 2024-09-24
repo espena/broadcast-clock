@@ -38,6 +38,9 @@ h2 {
 table {
   font-size: 13px;
 }
+td.number {
+  text-align: right;
+}
 table tr td:first-of-type:after {
   content: ":";
   padding-right: 5px;

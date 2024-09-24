@@ -1,5 +1,6 @@
 #include "clock_status.hpp"
 #include "ubx_types.hpp"
+#include "captive_portal_http.hpp"
 #include "lea_m8t.hpp"
 
 #include <map>
@@ -41,6 +42,18 @@ set_event_loop_handle( esp_event_loop_handle_t event_loop_handle ) {
                                    this );
 
   esp_event_handler_register_with( m_event_loop_handle,
+                                   captive_portal_http::m_event_base,
+                                   captive_portal_http::EVENT_START_TIME_MODE,
+                                   event_handler,
+                                   this );
+
+  esp_event_handler_register_with( m_event_loop_handle,
+                                   captive_portal_http::m_event_base,
+                                   captive_portal_http::EVENT_STOP_TIME_MODE,
+                                   event_handler,
+                                   this );
+
+  esp_event_handler_register_with( m_event_loop_handle,
                                    lea_m8t::m_event_base,
                                    lea_m8t::UBX_TIM_SVIN,
                                    event_handler,
@@ -69,6 +82,16 @@ event_handler( void *handler_arg,
         break;
       case lea_m8t::UBX_TIM_SVIN:
         inst->ubx_tim_svin( static_cast<ubx::tim_svin_t *>( event_params ) );
+        break;
+    }
+  }
+  else if( captive_portal_http::m_event_base == event_base ) {
+    switch( event_id ) {
+      case captive_portal_http::EVENT_START_TIME_MODE:
+        inst->m_gnss_time_mode_started = 1;
+        break;
+      case captive_portal_http::EVENT_STOP_TIME_MODE:
+        inst->m_gnss_time_mode_started = 0;
         break;
     }
   }
@@ -120,6 +143,9 @@ void clock_status::
 ubx_cfg_tmode2( ubx::cfg_tmode2_t *cfg_tmode2 ) {
   uint8_t time_mode = cfg_tmode2->time_mode > 2 ? 3 : cfg_tmode2->time_mode;
   m_gnss_time_mode = cfg_tmode2->time_mode;
+  if( m_gnss_time_mode_started == -1 ) {
+    m_gnss_time_mode_started = m_gnss_time_mode > 0 ? 1 : 0;
+  }
   strncpy( m_gnss_time_mode_str, ubx::time_mode[ time_mode ], sizeof( m_gnss_time_mode_str ) );
 }
 

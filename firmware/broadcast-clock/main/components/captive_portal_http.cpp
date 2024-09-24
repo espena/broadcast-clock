@@ -58,8 +58,9 @@ void broadcast_clock::captive_portal_http::update_json_gnss_status() {
                             \"satellites_found\": __gnss_satellite_count__, \
                             \"got_timepulse\": \"__gnss_got_timepulse__\", \
                             \"utc_standard\": \"__gnss_utc_standard__\", \
-                            \"time_mode\": \"__gnss_time_mode__\" \
-                            \"survey-in\": {\
+                            \"time_mode_started\": \"__gnss_time_mode_started__\", \
+                            \"time_mode_status\": \"__gnss_time_mode__\", \
+                            \"survey_in\": {\
                               \"active\": \"__gnss_svin_active__\", \
                               \"valid\": \"__gnss_svin_valid__\", \
                               \"duration\": __gnss_svin_dur__, \
@@ -78,6 +79,7 @@ void broadcast_clock::captive_portal_http::update_json_gnss_status() {
     utils::replace_substring( m_json_gnss_status, "__gnss_satellite_count__", m_gnss_state->gnss_satellite_count_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_got_timepulse__", m_gnss_state->gnss_got_timepulse_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_utc_standard__", m_gnss_state->gnss_utc_standard_str() );
+    utils::replace_substring( m_json_gnss_status, "__gnss_time_mode_started__", m_gnss_state->gnss_time_mode_started_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_time_mode__", m_gnss_state->gnss_time_mode_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_svin_active__", m_gnss_state->gnss_svin_active_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_svin_valid__", m_gnss_state->gnss_svin_valid_str() );

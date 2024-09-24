@@ -30,6 +30,9 @@ namespace espena::broadcast_clock {
     virtual bool gnss_got_timepulse() = 0;
     virtual std::string gnss_got_timepulse_str() = 0;
 
+    virtual uint8_t gnss_time_mode_started() = 0;
+    virtual std::string gnss_time_mode_started_str() = 0;
+
     virtual uint8_t gnss_time_mode() = 0;
     virtual std::string gnss_time_mode_str() = 0;
 

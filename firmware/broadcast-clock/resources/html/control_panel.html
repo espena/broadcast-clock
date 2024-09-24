@@ -9,6 +9,13 @@
   </head>
   <body>
     <script>
+      function secondsToHMS( seconds ) {
+        const date = new Date( seconds * 1000 );
+        const h = String( date.getUTCHours() ).padStart( 2, '0' );
+        const m = String( date.getUTCMinutes() ).padStart( 2, '0' );
+        const s = String( date.getUTCSeconds() ).padStart( 2, '0' );
+        return `${h}:${m}:${s}`;
+      }
       var p = window.location.pathname.split( '/' );
       if( p.pop() == 'save' ) {
         window.location.href = '/';
@@ -19,6 +26,11 @@
         .then( ( data ) => {
           console.log( data );
           if( data.chip_installed == 'Yes' ) {
+
+            const time_mode_status = ( data.time_mode_status == 'Disabled' && data.survey_id_started == 'Yes' )
+                                   ? 'Pending...'
+                                   : data.time_mode_status;
+
             document.querySelector( 'fieldset.tab.gnss' ).classList.remove( 'disabled' );
             document.getElementById( 'hardware_version' ).innerText = data.hardware_version;
             document.getElementById( 'software_version' ).innerText = data.software_version;
@@ -26,9 +38,16 @@
             document.getElementById( 'system' ).innerText = data.system;
             document.getElementById( 'got_timepulse' ).innerText = data.got_timepulse;
             document.getElementById( 'utc_standard' ).innerText = data.utc_standard;
-            document.getElementById( 'time_mode' ).innerText = data.time_mode;
+            document.getElementById( 'time_mode' ).innerText = time_mode_status;
             document.getElementById( 'time_mode_enable' ).disabled = false;
-            document.getElementById( 'time_mode_enable' ).checked = data.time_mode != 'Disabled';
+            document.getElementById( 'time_mode_enable' ).checked = data.time_mode_started == 'Yes';
+            document.getElementById( 'gnss_svin_mean_x' ).innerText = data.survey_in.mean_x;
+            document.getElementById( 'gnss_svin_mean_y' ).innerText = data.survey_in.mean_y;
+            document.getElementById( 'gnss_svin_mean_z' ).innerText = data.survey_in.mean_z;
+            document.getElementById( 'gnss_svin_valid' ).innerText = data.survey_in.valid;
+            document.getElementById( 'gnss_svin_active' ).innerText = data.survey_in.active;
+            document.getElementById( 'gnss_svin_dur' ).innerText = secondsToHMS( data.survey_in.duration );
+            document.getElementById( 'gnss_svin_obs' ).innerText = data.survey_in.observations;
           }
         } )
         .catch( ( error ) => console.error( error ) );
@@ -168,7 +187,15 @@
             <div class="page setup">
               <label>GNSS setup</label>
               <div><input type="checkbox" disabled name="time_mode_enable" id="time_mode_enable"><label for="time_mode_enable">Fixed antenna position (survey-in)</label></div>
-
+              <table>
+                <tr><td>Survey-in active</td><td id="gnss_svin_active"></td></tr>
+                <tr><td>Position valid</td><td id="gnss_svin_valid"></td></tr>
+                <tr><td>Survey-in duration</td><td id="gnss_svin_dur"></td></tr>
+                <tr><td>Observations</td><td class="number" id="gnss_svin_obs"></td></tr>
+                <tr><td>ECEF mean X</td><td class="number" id="gnss_svin_mean_x"></td></tr>
+                <tr><td>ECEF mean Y</td><td class="number" id="gnss_svin_mean_y"></td></tr>
+                <tr><td>ECEF mean Z</td><td class="number" id="gnss_svin_mean_z"></td></tr>
+              </table>
             </div>
             <div class="gnss-pages">
               <button class="status active">Status</button> <button class="setup">Setup</button>

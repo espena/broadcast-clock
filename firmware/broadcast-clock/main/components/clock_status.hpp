@@ -57,6 +57,8 @@ namespace espena::broadcast_clock {
 
     uint8_t m_gnss_satellite_count = 0;
 
+    int8_t m_gnss_time_mode_started = -1;
+
     bool is_blue() { return m_got_time_sync && m_got_timepulse && m_gnss_installed; };
     bool is_green() { return m_sntp_sync; };
     bool is_yellow() { return m_configurator_enabled; };
@@ -107,6 +109,9 @@ namespace espena::broadcast_clock {
 
     bool gnss_got_timepulse() override { return m_got_timepulse; };
     std::string gnss_got_timepulse_str() override { return m_got_timepulse ? "Yes" : "No"; };
+
+    uint8_t gnss_time_mode_started() override { return m_gnss_time_mode_started; };
+    std::string gnss_time_mode_started_str() override { return m_gnss_time_mode_started == 1 ? "Yes" : "No"; };
 
     uint8_t gnss_time_mode() override { return m_gnss_time_mode; };
     std::string gnss_time_mode_str() override { return m_gnss_time_mode_str; };
