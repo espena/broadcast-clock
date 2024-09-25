@@ -13,7 +13,7 @@ namespace ubx {
 
   const static char *time_mode[ ] = {
     "Disabled",
-    "Surevey-in",
+    "Survey-in",
     "Fixed mode",
     "Unknown"
   };
