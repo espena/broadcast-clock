@@ -10,4 +10,5 @@ drawings/*.stl
 drawings/*.wrl
 drawings/*.stp
 drawings/*.step
+firmware/broadcast-clock/main/debug
 ~*

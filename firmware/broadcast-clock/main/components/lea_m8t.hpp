@@ -32,18 +32,24 @@ namespace espena::broadcast_clock {
 
   private:
 
-    static const int m_time_pulse_offset_threshold = 25;
+    static const int m_time_pulse_offset_threshold = 50;
 
     static const char *m_component_name;
     static const size_t m_component_stack_size = 8192;
 
     static const uint8_t m_i2c_address = 0x42; // u-blox DDC address
 
+    static void event_handler( void *handler_arg,
+                               esp_event_base_t event_base,
+                               int32_t event_id,
+                               void *event_params );
+
     esp_event_loop_handle_t m_event_loop_handle;
     portMUX_TYPE m_spinlock;
 
     uint8_t m_ack = ubx::message::ack::ack;
 
+    bool m_configuration_updated = true; // Force update_status() on first run
     bool m_is_initialized = false;
     int m_seconds_with_no_timesync_data = 0;
     bool m_i2c_installed = false;
@@ -80,6 +86,7 @@ namespace espena::broadcast_clock {
 
     enum class lea_m8t_task_message {
       init,
+      soft_init,
       poll,
       start_time_mode,
       stop_time_mode,
@@ -116,6 +123,8 @@ namespace espena::broadcast_clock {
     void write();
     void update_status();
 
+    void reset();
+
     static void timepulse_handler( void *arg );
     void on_timepulse();
 
@@ -146,9 +155,10 @@ namespace espena::broadcast_clock {
 
     bool is_present();
     void init();
+    void soft_init();
     void start_time_mode();
     void stop_time_mode();
-    void set_event_loop_handle( esp_event_loop_handle_t h ) { m_event_loop_handle = h; };
+    void set_event_loop_handle( esp_event_loop_handle_t h );
 
   };
 

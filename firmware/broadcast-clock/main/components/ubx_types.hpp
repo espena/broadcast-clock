@@ -58,11 +58,11 @@ namespace ubx {
       static const uint8_t prt = 0x00;
       static const uint8_t msg = 0x01;
       static const uint8_t tp5 = 0x31;
-      static const uint8_t rst = 0x04;
       static const uint8_t tmode2 = 0x3d;
       static const uint8_t tmode3 = 0x71;
       static const uint8_t gnss = 0x3e;
       static const uint8_t rate = 0x08;
+      static const uint8_t rst = 0x04;
 
     }
 

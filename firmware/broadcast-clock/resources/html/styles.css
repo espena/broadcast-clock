@@ -9,16 +9,31 @@ html, body {
   color: #000;
   background-color: #fff;
   position: relative;
+  height: 100%;
+  width: 100%;
 }
+@media (min-width: 401px) {
+  body>div {
+    width: 100%;
+    margin: 0;
+    left: 0;
+  }
+}
+@media (min-width: 400px) {
+  body>div {
+    width: 400px;
+    left: 50%;
+    margin: 0 0 0 -200px;
+  }
+}
+
 body>div {
   height: 30em;
   position: absolute;
   top: 0;
-  right: 0;
+  right: auto;
   bottom: auto;
-  left: 0;
   padding: 0 10px;
-  margin: 0 !important;
   background-color: #fff;
 }
 header {
@@ -53,7 +68,6 @@ table td.number {
   padding: 0;
   position: relative;
   height: 330px;
-
 }
 form legend {
   box-sizing: border-box;
@@ -75,9 +89,6 @@ form legend {
   border-color: #aaa;
 }
 form .time { z-index: 1; }
-
-form .stopwatch legend { left: 0; }
-form .countdown legend { left: 75px; }
 
 form fieldset:nth-of-type( 1 ) legend { left: 0; }
 form fieldset:nth-of-type( 2 ) legend { left: 60px; }
@@ -120,9 +131,9 @@ fieldset label {
 }
 fieldset span>label {
   display: inline-block;
-  min-width: 6.5em;
+  min-width: 4em;
   margin-bottom: 0.5em;
-  text-align: right;
+  padding-left: 2px;
 }
 fieldset>div>label {
   display: inline-block;
@@ -138,13 +149,12 @@ fieldset>div {
   margin-bottom: 1em;
 }
 fieldset>div>div {
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
+  padding-top: 0.25em;
+  padding-bottom: 0.25em;
 }
 fieldset>div>div>label {
   display: inline-block;
-  min-width: 5em;
-  text-align: right;
+  min-width: 4em;
 }
 select,
 input[type="text"],
@@ -152,7 +162,7 @@ input[type="password"] {
   display: block;
   padding: 5px;
 }
-.opts.tab label {
+.misc.tab label {
   padding-left: 5px;
 }
 input[type="submit"] {
@@ -170,6 +180,10 @@ input[type="submit"] {
   display: block;
   float: none;
 }
+.page .timers {
+  padding-top: 0.75em;
+  margin: 0;
+}
 .page {
   display: none;
   min-height: 195px;
@@ -177,16 +191,29 @@ input[type="submit"] {
 .page.active {
   display: block;
 }
-.gnss-pages button {
+.page.timer {
+  position: relative;
+  padding-top: 1em;
+}
+.page.timer>label {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.pages {
+  text-align: center;
+  white-space: nowrap;
+}
+.pages button {
   display: inline-block;
-  width: 75px;
+  width: 80px;
   cursor: pointer;
   padding: 5px 0;
   border: solid 1px #bbb;
   border-radius: 5px;
   background-color: #eee;
 }
-.gnss-pages button.active {
+.pages button.active {
   font-weight: bold;
   cursor: default;
   color: #555;
@@ -207,6 +234,9 @@ input[type="submit"] {
 ul li,
 .pwshow>span {
   font-size: 12px;
+}
+.timers {
+  padding-top: 0;
 }
 .countdown.period {
   padding-top: 1em;
@@ -231,8 +261,8 @@ ul li,
 .stopwatch.buttons button {
   display: inline-block;
   width: 100px;
-  padding: 2em 1em;
-  margin-top: 1.9em;
+  padding: 1.5em 1em;
+  margin-top: 1em;
   font-weight: bold;
   text-transform: uppercase;
   border-radius: 5px;

@@ -406,7 +406,15 @@ std::string broadcast_clock::captive_portal_http::create_html_response() {
     else if( c == '|' ) {
       if( is_tag ) {
         if( is_sel ) {
-          htm += cnf->get_str( tag ) == sel ? ( ele == "option" ? "selected" : "checked" ) : "";
+          if( ele == "option" ) {
+            htm += cnf->get_str( tag ) == sel ? "selected" : "";
+          }
+          else if ( ele == "input" ) {
+            htm += cnf->get_str( tag ) == sel ? "checked" : "";
+          }
+          else if ( ele == "table" ) {
+            htm += cnf->get_str( tag ) == sel ? "enabled" : "disabled";
+          }
         }
         else {
           htm += cnf->get_str( tag );

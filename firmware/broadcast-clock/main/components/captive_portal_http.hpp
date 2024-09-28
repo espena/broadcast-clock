@@ -56,7 +56,7 @@ namespace espena::broadcast_clock {
   private:
 
     static const char *m_component_name;
-    static const size_t m_component_stack_size = 4096;
+    static const size_t m_component_stack_size = 8192;
 
     QueueHandle_t m_message_queue;
     httpd_handle_t m_server;

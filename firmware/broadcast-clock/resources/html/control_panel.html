@@ -20,7 +20,7 @@
       if( p.pop() == 'save' ) {
         window.location.href = '/';
       }
-      setInterval( () => {
+      function update() {
         fetch( '/gnss-status' )
         .then( ( response ) => response.json() )
         .then( ( data ) => {
@@ -40,7 +40,6 @@
             document.getElementById( 'utc_standard' ).innerText = data.utc_standard;
             document.getElementById( 'time_mode' ).innerText = time_mode_status;
             document.getElementById( 'time_mode_enable' ).disabled = false;
-            document.getElementById( 'time_mode_enable' ).checked = data.time_mode_started == 'Yes';
             document.getElementById( 'gnss_svin_mean_x' ).innerText = data.survey_in.mean_x;
             document.getElementById( 'gnss_svin_mean_y' ).innerText = data.survey_in.mean_y;
             document.getElementById( 'gnss_svin_mean_z' ).innerText = data.survey_in.mean_z;
@@ -51,7 +50,8 @@
           }
         } )
         .catch( ( error ) => console.error( error ) );
-      }, 5000 );
+      }
+      setInterval( update, 5000 );
     </script>
     <div>
       <header>
@@ -108,18 +108,18 @@
             <div>
               <label>Dial style</label>
               <div>
-                <label for="countup">Count up</label><input |dial_style:u| type="radio" value="u" name="dial_style" id="countup" />
-                <label for="countdown">Count down</label><input |dial_style:d| type="radio" value="d" name="dial_style" id="countdown" />
+                <input |dial_style:u| type="radio" value="u" name="dial_style" id="countup" /><label for="countup">Count up</label>
+                <input |dial_style:d| type="radio" value="d" name="dial_style" id="countdown" /><label for="countdown">Count down</label>
               </div>
             </div>
             <div>
               <label>Brightness</label>
               <div>
-                <span><label for="auto">Auto adjust</label><input |brightness:0| type="radio" value="0" name="brightness" id="auto" /></span>
-                <span><label for="level1">Level 1</label><input |brightness:1| type="radio" value="1" name="brightness" id="level1" /></span>
-                <span><label for="level2">Level 2</label><input |brightness:2| type="radio" value="2" name="brightness" id="level2" /></span>
-                <span><label for="level3">Level 3</label><input |brightness:3| type="radio" value="3" name="brightness" id="level3" /></span>
-                <span><label for="level4">Level 4</label><input |brightness:4| type="radio" value="4" name="brightness" id="level4" /></span>
+                <span><input |brightness:0| type="radio" value="0" name="brightness" id="auto" /><label for="auto">Auto adjust</label></span>
+                <span><input |brightness:1| type="radio" value="1" name="brightness" id="level1" /><label for="level1">Level 1</label></span>
+                <span><input |brightness:2| type="radio" value="2" name="brightness" id="level2" /><label for="level2">Level 2</label></span>
+                <span><input |brightness:3| type="radio" value="3" name="brightness" id="level3" /><label for="level3">Level 3</label></span>
+                <span><input |brightness:4| type="radio" value="4" name="brightness" id="level4" /><label for="level4">Level 4</label></span>
               </div>
             </div>
           </fieldset>
@@ -162,17 +162,16 @@
             <div>
               <label>Update interval</label>
               <div>
-                <span><label for="5min">5 minutes</label><input |update_interval:300000| type="radio" value="300000" name="update_interval" id="5min" /></span>
-                <span><label for="15min">15 minutes</label><input |update_interval:900000| type="radio" value="900000" name="update_interval" id="15min" /></span>
-                <span><label for="30min">30 minutes</label><input |update_interval:1800000| type="radio" value="1800000" name="update_interval" id="30min" /></span>
-                <span><label for="60min">60 minutes</label><input |update_interval:3600000| type="radio" value="3600000" name="update_interval" id="60min" /></span>
+                <span><input |update_interval:300000| type="radio" value="300000" name="update_interval" id="5min" /><label for="5min">5 min.</label></span>
+                <span><input |update_interval:900000| type="radio" value="900000" name="update_interval" id="15min" /><label for="15min">15 min.</label></span>
+                <span><input |update_interval:1800000| type="radio" value="1800000" name="update_interval" id="30min" /><label for="30min">30 min.</label></span>
+                <span><input |update_interval:3600000| type="radio" value="3600000" name="update_interval" id="60min" /><label for="60min">60 min.</label></span>
               </div>
             </div>
           </fieldset>
-          <!-- fieldset class="tab gnss disabled" -->
-          <fieldset class="tab gnss">
+          <fieldset class="tab gnss disabled">
             <legend>GNSS</legend>
-            <div class="page status active">
+            <div class="page status">
               <label>LEA M8T system status</label>
               <table>
                 <tr><td>Hardware version</td><td id="hardware_version"></td></tr>
@@ -186,8 +185,8 @@
             </div>
             <div class="page setup">
               <label>GNSS setup</label>
-              <div><input type="checkbox" disabled name="time_mode_enable" id="time_mode_enable"><label for="time_mode_enable">Fixed antenna position (survey-in)</label></div>
-              <table>
+              <div><input |time_mode_enable:on| type="checkbox" disabled name="time_mode_enable" id="time_mode_enable"><label for="time_mode_enable">Fixed antenna position (survey-in)</label></div>
+              <table class="sys-status |time_mode_enable:on|">
                 <tr><td>Survey-in active</td><td id="gnss_svin_active"></td></tr>
                 <tr><td>Position valid</td><td id="gnss_svin_valid"></td></tr>
                 <tr><td>Survey-in duration</td><td id="gnss_svin_dur"></td></tr>
@@ -197,22 +196,47 @@
                 <tr><td>ECEF mean Z</td><td class="number" id="gnss_svin_mean_z"></td></tr>
               </table>
             </div>
-            <div class="gnss-pages">
-              <button class="status active">Status</button> <button class="setup">Setup</button>
+            <div class="gnss pages">
+              <button class="status">Status</button> <button class="setup">Setup</button>
             </div>
-        </fieldset>
-          <fieldset class="tab opts">
+          </fieldset>
+          <fieldset class="tab misc">
             <legend>Misc</legend>
-            <div>
-              <label>General options</label>
+            <div class="page interface">
+              <label>User interface</label>
               <div><input |configurator:on| type="checkbox" name="configurator" id="configurator"><label for="configurator">Enable web configurator after boot</label></div>
               <div><input |indicators:on| type="checkbox" name="indicators" id="indicators"><label for="indicators">Enable status indicators</label></div>
             </div>
-            <div>
-              <label>Other functions</label>
-              <ul>
-                <li><a title="Goto timers" href="/timers">Stopwatch and timers</a></li>
-              </ul>
+            <div class="page stopwatch">
+              <label>Stopwatch</label>
+              <div class="timers" id="timers-stopwatch">
+                <div class="stopwatch buttons">
+                  <button type="button" class="start">Start</button>
+                  <button type="button" class="stop">Stop</button>
+                </div>
+                <div class="stopwatch buttons">
+                  <button type="button" class="reset">Reset</button>
+                </div>
+              </div>
+            </div>
+            <div class="page timer active">
+              <label>Timer</label>
+              <div class="timers" id="timers-countdown">
+                <div class="countdown buttons">
+                  <button type="button" class="start">Start</button>
+                  <button type="button" class="reset">Reset</button>
+                </div>
+                <div class="countdown period">
+                  <label for="period">Period (hh:mm:ss)</label> <input type="time" id="period" name="period" value="00:05:00" step="1" />
+                </div>
+              </div>
+            </div>
+            <div class="page reboot">
+              <label>Reboot system</label>
+              
+            </div>
+            <div class="misc pages">
+              <button class="interface">Interface</button> <button class="stopwatch">Stopwatch</button> <button class="timer active">Timer</button> <button class="reboot">Reboot</button>
             </div>
           </fieldset>
           <fieldset class="actions">
@@ -223,6 +247,7 @@
       </div>
     </div>
     <script>
+      update();
       var tabs = document.querySelectorAll( 'form fieldset.tab' );
       tabs.forEach( ( tab ) => {
         tab.addEventListener( 'click', ( event ) => {
@@ -238,38 +263,72 @@
         if (pw.type === 'password') { pw.type = 'text'; }
         else { pw.type = 'password'; }
       }
+      function configure_subpages( cls ) {
+        var active_tab = window.localStorage.getItem( `active_tab_${cls}` ) ?? 'status';
+        var buttons = document.querySelectorAll( `.${cls}.pages button` );
+        var pages = document.querySelectorAll( `.tab.${cls} .page` );
+        document.querySelector( `.${cls}.pages button.${active_tab}` )?.classList.add( 'active' );
+        document.querySelector( `.tab.${cls} .page.${active_tab}` )?.classList.add( 'active' );
+        buttons.forEach( ( button ) => {
+          button.addEventListener( 'click', ( event ) => {
+            buttons.forEach( ( b ) => {
+              b.classList.remove( 'active' );
+            } );
+            pages.forEach( ( p ) => {
+              p.classList.remove( 'active' );
+            } );
+            var page = document.querySelector( `.tab.${cls} .page.${event.target.classList[ 0 ]}` );
+            page.classList.add( 'active' );
+            button.classList.add( 'active' );
+            window.localStorage.setItem( `active_tab_${cls}`, event.target.classList[ 0 ] );
+            event.preventDefault();
+          } );
+        } );
+      }
       var active_tab = window.localStorage.getItem( 'active_tab' ) ?? 'time';
       document.querySelector( 'form fieldset.tab.' + active_tab ).classList.add( 'active' );
-      var gnss_buttons = document.querySelectorAll( '.gnss-pages button' );
-      var gnss_pages = document.querySelectorAll( '.tab.gnss .page' );
-      gnss_buttons.forEach( ( button ) => {
-        button.addEventListener( 'click', ( event ) => {
-          gnss_buttons.forEach( ( b ) => {
-            b.classList.remove( 'active' );
-          } );
-          gnss_pages.forEach( ( p ) => {
-            p.classList.remove( 'active' );
-          } );
-          var page = document.querySelector( `.tab.gnss .page.${event.target.classList[ 0 ]}` );
-          page.classList.add( 'active' );
-          button.classList.add( 'active' );
-          event.preventDefault();
-        } );
-      } );
+      configure_subpages( 'gnss' );
+      configure_subpages( 'misc' );
+
       var time_mode_enable = document.getElementById( 'time_mode_enable' );
       time_mode_enable.addEventListener( 'change', ( event ) => {
-        fetch( '/survey_in', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: `time_mode_enable=${event.target.checked ? '1' : '0'}`
-        } )
-        .then( ( response ) => response.json() )
-        .then( ( data ) => {
-          console.log( data );
-        } )
-        .catch( ( error ) => console.error( error ) );
+        document.querySelector( '.sys-status' ).classList.remove( event.target.checked ? 'disabled' : 'enabled' );
+        document.querySelector( '.sys-status' ).classList.add( event.target.checked ? 'enabled' : 'disabled' );
+      } );
+
+      var coundown_input = document.getElementById( 'period' );
+      coundown_input.addEventListener( 'keydown', ( e ) => {
+        if( e.key == 'Enter' ) {
+          e.preventDefault();
+          var start_button = document.querySelector( '.countdown.buttons .start' );
+          start_button.focus();
+        }
+      } );
+
+      var buttons_sw = document.querySelectorAll( '.stopwatch button' );
+      buttons_sw.forEach( ( button ) => {
+        button.addEventListener( 'click', ( e ) => {
+          var action = button.classList[ 0 ];
+          var ts = ( new Date() ).getTime();
+          fetch( `/stopwatch/${action}?ts=${ts}`, { cache: 'no-store' } )
+            .then( response => response.text() )
+            .then( data => console.log( data ) );
+          e.preventDefault();
+        } );
+      } );
+
+      var buttons_cd = document.querySelectorAll( '.countdown button' );
+      buttons_cd.forEach( ( button ) => {
+        button.addEventListener( 'click', ( e ) => {
+          var action = button.classList[ 0 ];
+          var ts = ( new Date() ).getTime();
+          var period = document.getElementById( 'period' ).value;
+          window.localStorage.setItem( 'most_recent_period', period );
+          fetch( `/countdown/${action}?ts=${ts}&period=${period}`, { cache: 'no-store' } )
+            .then( response => response.text() )
+            .then( data => console.log( data ) );
+          e.preventDefault();
+        } );
       } );
     </script>
   </body>
