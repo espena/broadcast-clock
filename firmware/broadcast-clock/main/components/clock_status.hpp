@@ -2,6 +2,7 @@
 #define __I_CLOCK_STATUS_HPP__
 
 #include <esp_event.h>
+#include <esp_timer.h>
 
 #include "i_indicators.hpp"
 #include "i_gnss_ubx.hpp"
@@ -21,6 +22,11 @@ namespace espena::broadcast_clock {
                                esp_event_base_t event_base,
                                int32_t event_id,
                                void *event_params );
+
+    static void on_blink_timer( void *arg );
+
+    bool m_blink = false;
+    esp_timer_handle_t m_blink_timer;
 
     bool m_status_gnss_sync_ok;
     bool m_status_ntp_sync_ok;
@@ -59,15 +65,19 @@ namespace espena::broadcast_clock {
 
     int8_t m_gnss_time_mode_started = -1;
 
-    bool is_blue() { return m_got_time_sync && m_got_timepulse && m_gnss_installed; };
-    bool is_green() { return m_sntp_sync; };
-    bool is_yellow() { return m_configurator_enabled; };
-    bool is_red() { return m_high_accuracy; };
+    bool blue_blinker() { return m_gnss_svin_active ? m_blink : true; };
+    bool green_blinker() { return true; };
+    bool yellow_blinker() { return true; };
+    bool red_blinker() { return true; };
+
+    bool is_blue() { return m_gnss_installed && m_got_time_sync && m_got_timepulse && blue_blinker(); };
+    bool is_green() { return m_sntp_sync && green_blinker(); };
+    bool is_yellow() { return m_configurator_enabled && yellow_blinker(); };
+    bool is_red() { return m_high_accuracy && red_blinker(); };
 
   public:
 
-    clock_status( i_indicators *indicators ) : m_indicators( indicators ),
-                                               m_event_loop_handle( nullptr ) { }
+    clock_status( i_indicators *indicators );
     virtual ~clock_status() = default; // Virtual destructor for proper cleanup
 
     void set_event_loop_handle( esp_event_loop_handle_t h );

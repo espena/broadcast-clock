@@ -9,9 +9,30 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <freertos/task.h>
+#include <esp_timer.h>
 #include <esp_log.h>
 
 using namespace espena::broadcast_clock;
+
+clock_status::
+clock_status( i_indicators *indicators ) : m_indicators( indicators ),
+                                           m_event_loop_handle( nullptr ),
+                                           m_blink_timer( nullptr ) {
+  esp_timer_create_args_t timer_args;
+  memset( &timer_args, 0x00, sizeof( timer_args ) );
+  timer_args.callback = on_blink_timer;
+  timer_args.arg = this;
+  timer_args.name = "clock_status_blink_timer";
+  ESP_ERROR_CHECK( esp_timer_create( &timer_args, &m_blink_timer ) );
+  ESP_ERROR_CHECK( esp_timer_start_periodic( m_blink_timer, 1000000 ) );
+}
+
+void clock_status::
+on_blink_timer( void *arg ) {
+  ESP_LOGW( "clock_status", "on_blink_timer" );
+  clock_status *inst = static_cast<clock_status *>( arg );
+  inst->m_blink = !inst->m_blink;
+}
 
 void clock_status::
 set_event_loop_handle( esp_event_loop_handle_t event_loop_handle ) {
