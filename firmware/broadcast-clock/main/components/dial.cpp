@@ -168,12 +168,13 @@ refresh() {
   localtime_r( &now, &timeinfo );
   if( m_stopwatch_begin.tv_nsec > 0 ||
       m_stopwatch_begin.tv_sec > 0 ) {
-      update();
+      //update();
   }
   else if( m_current_seconds != timeinfo.tm_sec ) {
       m_current_seconds = timeinfo.tm_sec;
-      update();
+      //update();
   }
+  update();
 
   gpio_set_level( DIAL_BLANK, 1 );
   gpio_set_level( DIAL_BLANK, 0 );
