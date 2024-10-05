@@ -13,6 +13,7 @@
 #include <driver/ledc.h>
 #include <esp_task_wdt.h>
 #include <esp_log.h>
+#include <esp_heap_caps.h>
 
 using namespace espena;
 
@@ -173,6 +174,7 @@ refresh() {
       m_current_seconds = timeinfo.tm_sec;
       update();
   }
+
   gpio_set_level( DIAL_BLANK, 1 );
   gpio_set_level( DIAL_BLANK, 0 );
 

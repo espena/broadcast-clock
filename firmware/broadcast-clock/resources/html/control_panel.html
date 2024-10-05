@@ -219,7 +219,7 @@
                 </div>
               </div>
             </div>
-            <div class="page timer active">
+            <div class="page timer">
               <label>Timer</label>
               <div class="timers" id="timers-countdown">
                 <div class="countdown buttons">
@@ -232,11 +232,12 @@
               </div>
             </div>
             <div class="page reboot">
-              <label>Reboot system</label>
-              
+              <label>REBOOT system</label>
+              <div><button type="button" class="reboot cpu">CPU only</button></div>
+              <div><button type="button" class="reboot gnss">CPU and GNSS</button></div>
             </div>
             <div class="misc pages">
-              <button class="interface">Interface</button> <button class="stopwatch">Stopwatch</button> <button class="timer active">Timer</button> <button class="reboot">Reboot</button>
+              <button class="interface">Interface</button> <button class="stopwatch">Stopwatch</button> <button class="timer">Timer</button> <button class="reboot">Reboot</button>
             </div>
           </fieldset>
           <fieldset class="actions">
@@ -325,6 +326,17 @@
           var period = document.getElementById( 'period' ).value;
           window.localStorage.setItem( 'most_recent_period', period );
           fetch( `/countdown/${action}?ts=${ts}&period=${period}`, { cache: 'no-store' } )
+            .then( response => response.text() )
+            .then( data => console.log( data ) );
+          e.preventDefault();
+        } );
+      } );
+
+      var buttons_rb = document.querySelectorAll( '.reboot button' );
+      buttons_rb.forEach( ( button ) => {
+        button.addEventListener( 'click', ( e ) => {
+          var action = button.classList[ 1 ];
+          fetch( `/reboot/${action}`, { cache: 'no-store' } )
             .then( response => response.text() )
             .then( data => console.log( data ) );
           e.preventDefault();

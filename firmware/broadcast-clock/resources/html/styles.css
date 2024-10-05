@@ -235,6 +235,45 @@ ul li,
 .pwshow>span {
   font-size: 12px;
 }
+.reboot>label {
+  color: #700;
+}
+.reboot>label::before {
+  position: relative;
+  content: "\26A0";
+  font-size: 1.5em;
+  top: 2px;
+  margin-right: 3px;
+}
+.reboot>div {
+  padding-top: 5px;
+  text-align: center;
+}
+.reboot button {
+  text-align: left;
+  padding-left: 32px;
+  position: relative;
+  margin: 0.5em 0;
+  width: 155px;
+  height: 50px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #000;
+  background-color: #eaa;
+  border-radius: 5px;
+  border: solid 2px #000;
+}
+.reboot button::before {
+  position: absolute;
+  top: 11px;
+  left: 11px;
+  content: "\23fb";
+  font-size: 1.5em;
+  margin-right: 3px;
+}
+.reboot button:hover {
+  color: #f00;
+}
 .timers {
   padding-top: 0;
 }
@@ -277,7 +316,7 @@ ul li,
 }
 .stopwatch.buttons .stop,
 .countdown.buttons .stop {
-  background-color: #b88;
+  background-color: #eaa;
 }
 p.links {
   text-align: center;

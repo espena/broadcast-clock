@@ -11,14 +11,14 @@ namespace ubx {
     uint8_t id;
   } message_t;
 
-  const static char *time_mode[ ] = {
+  [[maybe_unused]] const static char *time_mode[ ] = {
     "Disabled",
     "Survey-in",
     "Fixed mode",
     "Unknown"
   };
 
-  const static char *gnss_id[ ] = {
+  [[maybe_unused]] const static char *gnss_id[ ] = {
     "GPS",
     "SBAS",
     "Galileo",
@@ -29,7 +29,7 @@ namespace ubx {
     "Reserved"
   };
 
-  const static char *utc_standard_timesource[ ] = {
+  [[maybe_unused]] const static char *utc_standard_timesource[ ] = {
     "Information not available",
     "Communications Research Labratory (CRL), Tokyo, Japan",
     "National Institute of Standards and Technology (NIST)",
@@ -41,7 +41,7 @@ namespace ubx {
     "National Physics Laboratory India (NPLI)",
     "Unknown"
   };
-
+  
   namespace message {
 
     namespace ack {

@@ -24,14 +24,17 @@ clock_status( i_indicators *indicators ) : m_indicators( indicators ),
   timer_args.arg = this;
   timer_args.name = "clock_status_blink_timer";
   ESP_ERROR_CHECK( esp_timer_create( &timer_args, &m_blink_timer ) );
-  ESP_ERROR_CHECK( esp_timer_start_periodic( m_blink_timer, 1000000 ) );
+  ESP_ERROR_CHECK( esp_timer_start_periodic( m_blink_timer, 250000 ) );
 }
 
 void clock_status::
 on_blink_timer( void *arg ) {
-  ESP_LOGW( "clock_status", "on_blink_timer" );
   clock_status *inst = static_cast<clock_status *>( arg );
   inst->m_blink = !inst->m_blink;
+  inst->m_indicators->set_indicators( inst->is_blue(),
+                                      inst->is_green(),
+                                      inst->is_yellow(),
+                                      inst->is_red() );
 }
 
 void clock_status::
@@ -121,37 +124,31 @@ event_handler( void *handler_arg,
 void clock_status::
 gnss_timepulse( bool ok ) {
   m_got_timepulse = ok;
-  m_indicators->set_blue_indicator( is_blue() );
 }
 
 void clock_status::
 gnss_time_sync( bool ok ) {
   m_got_time_sync = ok;
-  m_indicators->set_blue_indicator( is_blue() );
 }
 
 void clock_status::
 gnss_installed() {
   m_gnss_installed = true;
-  m_indicators->set_blue_indicator( is_blue() );
 }
 
 void clock_status::
 high_accuracy( bool ok ) {
   m_high_accuracy = ok;
-  m_indicators->set_red_indicator( is_red() );
 }
 
 void clock_status::
 sntp_sync( bool ok ) {
   m_sntp_sync = ok;
-  m_indicators->set_green_indicator( is_green() );
 }
 
 void clock_status::
 configurator_enabled( bool ok ) {
   m_configurator_enabled = ok;
-  m_indicators->set_yellow_indicator( is_yellow() );
 }
 
 void clock_status::

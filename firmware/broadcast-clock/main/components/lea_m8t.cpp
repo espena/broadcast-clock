@@ -14,33 +14,12 @@
 #include <freertos/timers.h>
 #include <freertos/queue.h>
 #include <driver/gpio.h>
-// #include <driver/i2c_master.h>
 #include <driver/i2c.h>
 #include <esp_timer.h>
 #include <esp_log.h>
+#include <esp_heap_caps.h>
 
 using namespace espena;
-
-//#define BCLCK_DEBUG 1
-const uint8_t DEBUG_BYTEARRAY[] = { 0xb5, 0x62, 0x01, 0x35, 0x1c, 0x01, 0x80, 0x70,  0x26, 0x1b, 0x01, 0x17, 0x00, 0x00, 0x00, 0x02,
-                                    0x27, 0x4d, 0xb1, 0x00, 0xf4, 0xff, 0x1f, 0x19,  0x00, 0x00, 0x00, 0x03, 0x24, 0x2c, 0xeb, 0x00,
-                                    0x14, 0x00, 0x1f, 0x19, 0x00, 0x00, 0x00, 0x08,  0x00, 0x09, 0xb0, 0x00, 0x00, 0x00, 0x11, 0x19,
-                                    0x00, 0x00, 0x00, 0x0a, 0x22, 0x08, 0x43, 0x00,  0xdb, 0xff, 0x1f, 0x19, 0x00, 0x00, 0x00, 0x0e,
-                                    0x00, 0x0c, 0x0c, 0x01, 0x00, 0x00, 0x11, 0x19,  0x00, 0x00, 0x00, 0x11, 0x24, 0x23, 0x31, 0x01,
-                                    0xe2, 0xff, 0x1f, 0x19, 0x00, 0x00, 0x00, 0x13,  0x00, 0x0d, 0x41, 0x01, 0x00, 0x00, 0x10, 0x12,
-                                    0x00, 0x00, 0x00, 0x15, 0x1d, 0x3c, 0x8c, 0x00,  0x15, 0x00, 0x1f, 0x19, 0x00, 0x00, 0x00, 0x16,
-                                    0x20, 0x15, 0x21, 0x01, 0xf6, 0xff, 0x1f, 0x19,  0x00, 0x00, 0x00, 0x18, 0x00, 0x01, 0x62, 0x01,
-                                    0x00, 0x00, 0x11, 0x19, 0x00, 0x00, 0x06, 0xff,  0x1e, 0xa5, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00,
-                                    0xf8, 0x69, 0xff, 0x3f, 0x7f, 0x17, 0x00, 0x00,  0x64, 0x43, 0xfe, 0x3f, 0x64, 0x43, 0xfe, 0x3f,
-                                    0x00, 0x02, 0x28, 0x4d, 0xb1, 0x00, 0xef, 0xff,  0x1f, 0x19, 0x00, 0x00, 0x00, 0x03, 0x20, 0x2c,
-                                    0xeb, 0x00, 0x33, 0x00, 0x1f, 0x19, 0x00, 0x00,  0x00, 0x08, 0x00, 0x09, 0xb0, 0x00, 0x00, 0x00,
-                                    0x11, 0x19, 0x00, 0x00, 0x00, 0x0a, 0x21, 0x08,  0x43, 0x00, 0xdf, 0xff, 0x1f, 0x19, 0x00, 0x00,
-                                    0x00, 0x0e, 0x00, 0x0c, 0x0c, 0x01, 0x00, 0x00,  0x40, 0x6a, 0xff, 0x3f, 0x37, 0x17, 0x00, 0x00,
-                                    0x64, 0x43, 0xfe, 0x3f, 0x64, 0x43, 0xfe, 0x3f,  0x00, 0x13, 0x00, 0x0d, 0x41, 0x01, 0x00, 0x00,
-                                    0x11, 0x12, 0x00, 0x00, 0x00, 0x15, 0x1d, 0x3c,  0x8c, 0x00, 0x11, 0x00, 0x1f, 0x19, 0x00, 0x00,
-                                    0x00, 0x16, 0x1f, 0x15, 0x21, 0x01, 0x18, 0x00,  0x1f, 0x19, 0x00, 0x00, 0x00, 0x18, 0x00, 0x01,
-                                    0x62, 0x01, 0x00, 0x00, 0x11, 0x12, 0x00, 0x00,  0x00, 0x1c, 0x00, 0x0b, 0x62, 0x00, 0x00, 0x00,
-                                    0x88, 0x6a, 0xff, 0x3f };
 
 const char *broadcast_clock::lea_m8t::m_component_name = "lea_m8t";
 const char *broadcast_clock::lea_m8t::m_event_base = "broadcast_clock_lea_m8t_event";
@@ -134,7 +113,7 @@ task_loop( void *arg ) {
   memset( &item, 0x00, sizeof( lea_m8t_task_queue_item_t ) );
   while( 1 ) {
     if( xQueueReceive( inst->m_task_queue, &item, -1 ) ) {
-      inst->on_task_message( item.message, item.arg );
+      inst->on_task_message( item.message, item.arg ); // DEBUG 1
     }
   }
 }
@@ -150,12 +129,6 @@ on_poll_timer( void *arg ) {
 
 uint16_t broadcast_clock::lea_m8t::
 get_bytes_available() {
-
-#ifdef BCLCK_DEBUG
-
-  return sizeof( DEBUG_BYTEARRAY );
-
-#endif
 
   uint8_t cmd_rx_buf[ 2 ] = { 0x01, 0x01 };
   const uint8_t addr = 0xfd;
@@ -189,34 +162,18 @@ read() {
 
   ESP_LOGI( m_component_name, "Bytes available: %d", bytes_available );
 
-  uint8_t *cmd_rx_buf = new uint8_t[ bytes_available ];
+  uint8_t *cmd_rx_buf = static_cast<uint8_t *>( heap_caps_malloc( bytes_available, MALLOC_CAP_SPIRAM ) );
+  //uint8_t *cmd_rx_buf = new uint8_t[ bytes_available ];
   uint8_t addr = 0xff;
   uint16_t offset = 0;
 
-#ifdef BCLCK_DEBUG
-
-  memcpy( cmd_rx_buf, DEBUG_BYTEARRAY, sizeof( DEBUG_BYTEARRAY ) );
-
-  uint8_t fletcher_sum[ 2 ] = { 0x00, 0x00 };
-  for( int i = 6; i < sizeof( DEBUG_BYTEARRAY ) - 2; i++ ) {
-    fletcher_sum[ 0 ] = fletcher_sum[ 0 ] + cmd_rx_buf[ i ];
-    fletcher_sum[ 1 ] = fletcher_sum[ 1 ] + fletcher_sum[ 0 ];
-  }
-  ESP_LOGI( m_component_name, "DEBUG checksum: 0x%02x 0x%02x", fletcher_sum[ 0 ], fletcher_sum[ 1 ] );
-
-#else
-
-  esp_err_t res = -1;
-  
-  res = i2c_master_write_read_device( I2C_NUM_0,
-                                      m_i2c_address,
-                                      &addr,
-                                      1,
-                                      cmd_rx_buf,
-                                      bytes_available,
-                                      -1 );
-
-#endif
+  i2c_master_write_read_device( I2C_NUM_0,
+                                m_i2c_address,
+                                &addr,
+                                1,
+                                cmd_rx_buf,
+                                bytes_available,
+                                -1 );
 
   while( offset < ( bytes_available - 8 ) && cmd_rx_buf[ offset ] != 0xb5 && cmd_rx_buf[ offset + 1 ] != 0x62 ) {
     offset++; // Fast forward to first UBX message
@@ -261,11 +218,15 @@ read() {
     }
     
     utils::hexdump( &cmd_rx_buf[ offset ], len + 8 );
-    on_ubx_message( msg_class, msg_id, len > 0 ? &cmd_rx_buf[ offset + 6 ] : nullptr, len );
+    on_ubx_message( msg_class, msg_id, len > 0 ? &cmd_rx_buf[ offset + 6 ] : nullptr, len ); // DEBUG 3
 
     offset += len + 8;
   }
-  delete [] cmd_rx_buf;
+
+  //delete [] cmd_rx_buf;
+  if( cmd_rx_buf != nullptr ) {
+    heap_caps_free( cmd_rx_buf );
+  }
 
 }
 
@@ -275,7 +236,9 @@ write() {
   while( m_ack != 0xff && xQueueReceive( m_egress_queue, &item, 0 ) ) {
     ESP_LOGI( m_component_name, "Writing message: class: 0x%02x, id: 0x%02x", item.message.cls, item.message.id );
     uint16_t buflen = 8 + item.len;
-    uint8_t *msg = new uint8_t[ buflen ];
+    ESP_LOGI( m_component_name, "Read message length: %d", buflen );
+    //uint8_t *msg = new uint8_t[ buflen ];
+    uint8_t *msg = static_cast<uint8_t *>( heap_caps_malloc( buflen, MALLOC_CAP_SPIRAM ) );
     int i = 0;
     msg[ i++ ] = 0xb5;
     msg[ i++ ] = 0x62;
@@ -309,8 +272,15 @@ write() {
       ESP_LOGI( m_component_name, "Message written!" );
     }
 
-    delete [] msg;
-    delete [] item.deletable_payload;
+    //delete [] msg;
+    if( msg != nullptr ) {
+      heap_caps_free( msg );
+    }    
+    //delete [] item.deletable_payload;
+    if( item.deletable_payload != nullptr ) {
+      heap_caps_free( item.deletable_payload );
+      item.deletable_payload = nullptr;
+    }
   }
 }
 
@@ -379,7 +349,8 @@ void broadcast_clock::lea_m8t::
 reset() {
   ESP_LOGI( m_component_name, "Resetting device..." );
   { // Reset device
-    uint8_t *payload = new uint8_t[ 4 ];
+    //uint8_t *payload = new uint8_t[ 4 ];
+    uint8_t *payload = static_cast<uint8_t *>( heap_caps_malloc( 4, MALLOC_CAP_SPIRAM ) );
     memset( payload, 0x00, 4 );
     lea_m8t_egress_queue_item_t ubx_cfg_rst = { 4, { ubx::message::cfg::cls, ubx::message::cfg::rst }, payload, false };
     xQueueSend( m_egress_queue, &ubx_cfg_rst, 0 );
@@ -390,18 +361,22 @@ void broadcast_clock::lea_m8t::
 set_time_mode( bool enable ) {
 
   { // Set time mode
-    ubx::cfg_tmode2_t *payload = reinterpret_cast<ubx::cfg_tmode2_t *>( new uint8_t[ sizeof( ubx::cfg_tmode2_t ) ] );
+    //ubx::cfg_tmode2_t *payload = reinterpret_cast<ubx::cfg_tmode2_t *>( new uint8_t[ sizeof( ubx::cfg_tmode2_t ) ] );
+    ubx::cfg_tmode2_t *payload = static_cast<ubx::cfg_tmode2_t *>( heap_caps_malloc( sizeof( ubx::cfg_tmode2_t ), MALLOC_CAP_SPIRAM ) );
+
     memset( payload, 0x00, sizeof( ubx::cfg_tmode2_t ) );
     payload->time_mode = enable ? 0x01 : 0x00; // < survey-in if enabled
-    payload->svin_min_dur = 120;
-    payload->svin_acc_limit = 15000;
+    payload->svin_min_dur = 3600;
+    payload->svin_acc_limit = 3000;
+    payload->fixed_pos_acc = 1000;
     lea_m8t_egress_queue_item_t ubx_cfg_tmode2 = { sizeof( ubx::cfg_tmode2_t ), { ubx::message::cfg::cls, ubx::message::cfg::tmode2 }, reinterpret_cast<uint8_t *>( payload ), true };
     ESP_LOGI( m_component_name, "Setting time mode to %s", enable ? "on" : "off" );
     xQueueSend( m_egress_queue, &ubx_cfg_tmode2, 0 );
   }
   if( enable ) {
     // Start polling UBX_TIM_SVIN more frequently
-    uint8_t *payload = new uint8_t[ 3 ];
+    //uint8_t *payload = new uint8_t[ 3 ];
+    uint8_t *payload = static_cast<uint8_t *>( heap_caps_malloc( 3, MALLOC_CAP_SPIRAM ) );
     payload[ 0 ] = ubx::message::tim::cls;
     payload[ 1 ] = ubx::message::tim::svin;
     payload[ 2 ] = 0x01;
@@ -410,7 +385,7 @@ set_time_mode( bool enable ) {
   }
   else {
     // Lower UBX_TIM_SVIN poll frequency
-    uint8_t *payload = new uint8_t[ 3 ];
+    uint8_t *payload = static_cast<uint8_t *>( heap_caps_malloc( 3, MALLOC_CAP_SPIRAM ) );
     payload[ 0 ] = ubx::message::tim::cls;
     payload[ 1 ] = ubx::message::tim::svin;
     payload[ 2 ] = 0x08;
@@ -473,7 +448,7 @@ on_ubx_message( const uint8_t msg_class,
           on_ubx_nav_sat( static_cast<ubx::nav_sat_t *>( payload ) );
           break;
         case ubx::message::nav::timeutc:
-          on_ubx_nav_timeutc( static_cast<ubx::nav_timeutc_t *>( payload ) );
+          on_ubx_nav_timeutc( static_cast<ubx::nav_timeutc_t *>( payload ) ); // DEBUG 4
           break;
       }
       break;
@@ -513,7 +488,8 @@ on_ubx_cfg_tmode2( ubx::cfg_tmode2_t *tmode2 ) {
   memcpy( &m_cfg_tmode2, tmode2, sizeof( ubx::cfg_tmode2_t ) );
   if( m_cfg_tmode2.time_mode == 0x01 ) {
     // Start polling UBX_TIM_SVIN
-    uint8_t *payload = new uint8_t[ 3 ];
+    //uint8_t *payload = new uint8_t[ 3 ];
+    uint8_t *payload = static_cast<uint8_t *>( heap_caps_malloc( 3, MALLOC_CAP_SPIRAM ) );
     payload[ 0 ] = ubx::message::tim::cls;
     payload[ 1 ] = ubx::message::tim::svin;
     payload[ 2 ] = 0x01;
@@ -522,7 +498,8 @@ on_ubx_cfg_tmode2( ubx::cfg_tmode2_t *tmode2 ) {
   }
   else {
     // Stop polling UBX_TIM_SVIN
-    uint8_t *payload = new uint8_t[ 3 ];
+    //uint8_t *payload = new uint8_t[ 3 ];
+    uint8_t *payload = static_cast<uint8_t *>( heap_caps_malloc( 3, MALLOC_CAP_SPIRAM ) );
     payload[ 0 ] = ubx::message::tim::cls;
     payload[ 1 ] = ubx::message::tim::svin;
     payload[ 2 ] = 0x00;
@@ -615,10 +592,8 @@ on_ubx_nav_timeutc( ubx::nav_timeutc_t *timeutc ) {
       free( tz );
     }
 
-    taskENTER_CRITICAL( &m_spinlock );
-
     struct timespec now_spec;
-    clock_gettime( CLOCK_REALTIME, &now_spec );
+    clock_gettime( CLOCK_REALTIME, &now_spec ); // DEBUG 5
 
     int64_t now_ns = now_spec.tv_sec * 1000000000 + now_spec.tv_nsec;
     m_ns_since_timepulse = now_ns - m_ns_timepulse;
@@ -635,8 +610,6 @@ on_ubx_nav_timeutc( ubx::nav_timeutc_t *timeutc ) {
 
     m_ns_timepulse = 0;
     
-    taskEXIT_CRITICAL( &m_spinlock );
-
     if( is_time_set && m_event_loop_handle ) {
       m_seconds_with_no_timesync_data = 0;
       memcpy( &m_nav_timeutc, timeutc, sizeof( ubx::nav_timeutc_t ) );
@@ -667,14 +640,10 @@ on_ubx_tim_svin( ubx::tim_svin_t *payload ) {
 void broadcast_clock::lea_m8t::
 timepulse_handler( void *arg ) {
 
-  UBaseType_t critical_section = taskENTER_CRITICAL_FROM_ISR();
-  {
-    struct timespec now;
-    clock_gettime( CLOCK_REALTIME, &now );
-    m_ns_timepulse = now.tv_sec * 1000000000 + now.tv_nsec;
-    m_ns_mismatch = now.tv_nsec; //< Should be as close to zero as possible
-  }
-  taskEXIT_CRITICAL_FROM_ISR( critical_section );
+  struct timespec now;
+  clock_gettime( CLOCK_REALTIME, &now );
+  m_ns_timepulse = now.tv_sec * 1000000000 + now.tv_nsec;
+  m_ns_mismatch = now.tv_nsec; //< Should be as close to zero as possible
 
   lea_m8t *inst = static_cast<lea_m8t *>( arg );
   lea_m8t::lea_m8t_task_queue_item_t item = { lea_m8t::lea_m8t_task_message::timepulse, nullptr };
@@ -732,6 +701,7 @@ on_timepulse() {
                        0,
                        portMAX_DELAY );
   }
+
 }
 
 bool broadcast_clock::lea_m8t::
@@ -767,7 +737,8 @@ void broadcast_clock::lea_m8t::
 init_ubx_normalboot() {
 
   { // Set port configuration
-    ubx::cfg_prt_ddc_t *payload = reinterpret_cast<ubx::cfg_prt_ddc_t *>( new uint8_t[ sizeof( ubx::cfg_prt_ddc_t ) ] );
+    //ubx::cfg_prt_ddc_t *payload = reinterpret_cast<ubx::cfg_prt_ddc_t *>( new uint8_t[ sizeof( ubx::cfg_prt_ddc_t ) ] );
+    ubx::cfg_prt_ddc_t *payload = static_cast<ubx::cfg_prt_ddc_t *>( heap_caps_malloc( sizeof( ubx::cfg_prt_ddc_t ), MALLOC_CAP_SPIRAM ) );
     memset( payload, 0x00, sizeof( ubx::cfg_prt_ddc_t ));
     payload->port_id = 0x00; // DDC
     payload->tx_ready = 0x0000; // Disable tx_ready pin
@@ -804,7 +775,8 @@ init_ubx_normalboot() {
     };
 
     for( size_t i = 0; i < sizeof( messages ) / sizeof( messages[ 0 ] ); ++i ) {
-        uint8_t *payload = new uint8_t[3];
+        //uint8_t *payload = new uint8_t[3];
+        uint8_t *payload = static_cast<uint8_t *>( heap_caps_malloc( 3, MALLOC_CAP_SPIRAM ) );
         payload[0] = messages[i][0]; // Message class
         payload[1] = messages[i][1]; // Message ID
         payload[2] = 0x00;           // Rate: disable message
@@ -815,7 +787,8 @@ init_ubx_normalboot() {
   }
 
   { // Set message rate
-    ubx::cfg_rate_t *payload = reinterpret_cast<ubx::cfg_rate_t *>( new uint8_t[ sizeof( ubx::cfg_rate_t ) ] );
+    //ubx::cfg_rate_t *payload = reinterpret_cast<ubx::cfg_rate_t *>( new uint8_t[ sizeof( ubx::cfg_rate_t ) ] );
+    ubx::cfg_rate_t *payload = static_cast<ubx::cfg_rate_t *>( heap_caps_malloc( sizeof( ubx::cfg_rate_t ), MALLOC_CAP_SPIRAM ) );
     payload->meas_rate = 100;
     payload->nav_rate = 16;
     payload->time_ref = 1;
@@ -824,7 +797,8 @@ init_ubx_normalboot() {
   }
 
   { // Poll periodic UBX-NAV-TIMEUTC
-    uint8_t *payload = new uint8_t[ 3 ];
+    //uint8_t *payload = new uint8_t[ 3 ];
+    uint8_t *payload = static_cast<uint8_t *>( heap_caps_malloc( 3, MALLOC_CAP_SPIRAM ) );
     payload[ 0 ] = ubx::message::nav::cls;
     payload[ 1 ] = ubx::message::nav::timeutc;
     payload[ 2 ] = 0x05;
@@ -833,7 +807,8 @@ init_ubx_normalboot() {
   }
 
   { // Poll periodic UBX-NAV-SAT
-    uint8_t *payload = new uint8_t[ 3 ];
+    //uint8_t *payload = new uint8_t[ 3 ];
+    uint8_t *payload = static_cast<uint8_t *>( heap_caps_malloc( 3, MALLOC_CAP_SPIRAM ) );
     payload[ 0 ] = ubx::message::nav::cls;
     payload[ 1 ] = ubx::message::nav::sat;
     payload[ 2 ] = 0x04;
@@ -842,7 +817,8 @@ init_ubx_normalboot() {
   }
 
   { // Poll periodic UBX-TIM-SVIN
-    uint8_t *payload = new uint8_t[ 3 ];
+    //uint8_t *payload = new uint8_t[ 3 ];
+    uint8_t *payload = static_cast<uint8_t *>( heap_caps_malloc( 3, MALLOC_CAP_SPIRAM ) );
     payload[ 0 ] = ubx::message::tim::cls;
     payload[ 1 ] = ubx::message::tim::svin;
     payload[ 2 ] = 0x04;
