@@ -32,12 +32,15 @@ namespace espena::broadcast_clock {
 
   private:
 
-    static const int m_time_pulse_offset_threshold = 50;
+    static const int m_time_pulse_offset_threshold_us = 50;
 
     static const char *m_component_name;
     static const size_t m_component_stack_size = 8192;
+    static const size_t m_timepulse_loop_stack_size = 4096;
 
     static const uint8_t m_i2c_address = 0x42; // u-blox DDC address
+
+    int32_t m_tp_offset_us = 0; // Timepulse offset from system clock, in microseconds
 
     static void event_handler( void *handler_arg,
                                esp_event_base_t event_base,
@@ -45,7 +48,8 @@ namespace espena::broadcast_clock {
                                void *event_params );
 
     esp_event_loop_handle_t m_event_loop_handle;
-    portMUX_TYPE m_spinlock;
+    portMUX_TYPE m_spinlock1;
+    portMUX_TYPE m_spinlock2;
 
     uint8_t m_ack = ubx::message::ack::ack;
 
@@ -56,9 +60,8 @@ namespace espena::broadcast_clock {
 
     esp_timer_handle_t m_poll_timer = nullptr;
     
-    static int64_t m_ns_timepulse;
-    static int64_t m_ns_mismatch;
-    static int64_t m_ns_since_timepulse;
+    volatile uint32_t m_timepulse_cc = 0;
+    uint32_t m_ns_since_timepulse = 0;
 
     ubx::mon_ver_t m_mon_ver;
     ubx::nav_sat_t m_nav_sat;
@@ -73,8 +76,8 @@ namespace espena::broadcast_clock {
     char m_hardware_version[ 10 ] = { 0x00 };
 
     QueueHandle_t m_task_queue;
-
     QueueHandle_t m_egress_queue;
+    QueueHandle_t m_timepulse_queue;
 
     typedef struct lea_m8t_task_params_struct {
       lea_m8t *instance;
@@ -83,6 +86,7 @@ namespace espena::broadcast_clock {
     } lea_m8t_task_params;
 
     lea_m8t_task_params m_task_params;
+    lea_m8t_task_params m_lea_m8t_tp_loop_params;
 
     enum class lea_m8t_task_message {
       init,
@@ -90,6 +94,10 @@ namespace espena::broadcast_clock {
       poll,
       start_time_mode,
       stop_time_mode,
+      timepulse
+    };
+
+    enum class lea_m8t_timepulse_message {
       timepulse
     };
 
@@ -105,7 +113,14 @@ namespace espena::broadcast_clock {
       void *arg;
     } lea_m8t_task_queue_item_t;
 
+    typedef struct lea_m8t_timepulse_queue_item_struct {
+      lea_m8t_timepulse_message message;
+      void *arg;
+    } lea_m8t_timepulse_queue_item_t;
+
     static void task_loop( void *arg );
+    static void timepulse_loop( void *arg );
+    
     static void on_poll_timer( void *arg );
 
     void set_time_mode( bool enable );
@@ -125,10 +140,11 @@ namespace espena::broadcast_clock {
 
     void reset();
 
-    static void timepulse_handler( void *arg );
+    static void isr_timepulse_handler( void *arg );
     void on_timepulse();
 
     void on_task_message( lea_m8t_task_message msg, void *arg );
+    void on_timepulse_loop_message( lea_m8t_timepulse_message msg, void *arg );
 
     void on_ubx_message( const uint8_t msg_class,
                          const uint8_t msg_id,

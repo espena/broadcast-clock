@@ -31,14 +31,14 @@ namespace ubx {
 
   [[maybe_unused]] const static char *utc_standard_timesource[ ] = {
     "Information not available",
-    "Communications Research Labratory (CRL), Tokyo, Japan",
-    "National Institute of Standards and Technology (NIST)",
-    "U.S. Naval Observatory (USNO)",
-    "International Bureau of Weights and Measures (BIPM)",
+    "Comm. Research Lab., Tokyo",
+    "Nat. Inst. of Standards and Techn.",
+    "U.S. Naval Observatory",
+    "Int. Bureau of Weights and Measures",
     "European laboratories",
-    "Former Soviet Union (SU)",
-    "National Time Service Center (NTSC), China",
-    "National Physics Laboratory India (NPLI)",
+    "Former Soviet Union",
+    "Nat. Time Service Center, China",
+    "National Physics Laboratory India",
     "Unknown"
   };
   

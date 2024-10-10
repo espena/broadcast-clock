@@ -35,6 +35,7 @@
             document.getElementById( 'hardware_version' ).innerText = data.hardware_version;
             document.getElementById( 'software_version' ).innerText = data.software_version;
             document.getElementById( 'satellites_found' ).innerText = data.satellites_found;
+            document.getElementById( 'offset_us' ).innerHTML = `<span>±<em>${data.time_accuracy}</em> µs</span>`;
             document.getElementById( 'system' ).innerText = data.system;
             document.getElementById( 'got_timepulse' ).innerText = data.got_timepulse;
             document.getElementById( 'utc_standard' ).innerText = data.utc_standard;
@@ -47,6 +48,15 @@
             document.getElementById( 'gnss_svin_active' ).innerText = data.survey_in.active;
             document.getElementById( 'gnss_svin_dur' ).innerText = secondsToHMS( data.survey_in.duration );
             document.getElementById( 'gnss_svin_obs' ).innerText = data.survey_in.observations;
+          }
+          const offsetUsElement = document.querySelector( '#offset_us span em' );
+          const value = parseInt( offsetUsElement.textContent, 10 );
+          offsetUsElement.className = '';
+          if ( value > 50 ) {
+            offsetUsElement.classList.add( 'low-accuracy' );
+          }
+          else {
+            offsetUsElement.classList.add( 'high-accuracy' );
           }
         } )
         .catch( ( error ) => console.error( error ) );
@@ -178,6 +188,7 @@
                 <tr><td>Software version</td><td id="software_version"></td></tr>
                 <tr><td>Time mode</td><td id="time_mode"></td></tr>
                 <tr><td>Satellites seen</td><td id="satellites_found"></td></tr>
+                <tr><td>Clock accuracy</td><td id="offset_us"></td></tr>
                 <tr><td>Satellite system</td><td id="system"></td></tr>
                 <tr><td>Got timepulse</td><td id="got_timepulse"></td></tr>
                 <tr><td>UTC standard</td><td id="utc_standard"></td></tr>

@@ -24,6 +24,9 @@ namespace espena::broadcast_clock {
     virtual uint8_t gnss_satellite_count() = 0;
     virtual std::string gnss_satellite_count_str() = 0;
 
+    virtual uint32_t gnss_mean_systime_offset_us() = 0;
+    virtual std::string gnss_mean_systime_offset_us_str() = 0;
+
     virtual uint8_t gnss_utc_standard() = 0;
     virtual std::string gnss_utc_standard_str() = 0;
 

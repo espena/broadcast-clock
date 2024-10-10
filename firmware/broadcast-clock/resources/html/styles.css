@@ -53,6 +53,16 @@ h2 {
 table {
   font-size: 13px;
 }
+table tr td {
+  white-space: nowrap;
+  overflow: ellipsis;
+}
+table tr td em {
+  font-style: normal;
+}
+table tr td em.low-accuracy {
+  color: #f00;
+}
 td.number {
   text-align: right;
 }

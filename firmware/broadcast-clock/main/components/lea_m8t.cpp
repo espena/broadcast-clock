@@ -16,6 +16,7 @@
 #include <driver/gpio.h>
 #include <driver/i2c.h>
 #include <esp_timer.h>
+#include <esp32/rom/ets_sys.h>
 #include <esp_log.h>
 #include <esp_heap_caps.h>
 
@@ -24,14 +25,11 @@ using namespace espena;
 const char *broadcast_clock::lea_m8t::m_component_name = "lea_m8t";
 const char *broadcast_clock::lea_m8t::m_event_base = "broadcast_clock_lea_m8t_event";
 
-int64_t broadcast_clock::lea_m8t::m_ns_timepulse = 0;
-int64_t broadcast_clock::lea_m8t::m_ns_mismatch = 0;
-int64_t broadcast_clock::lea_m8t::m_ns_since_timepulse = 0xffffffffffffffff;
-
 broadcast_clock::lea_m8t::
 lea_m8t() : m_event_loop_handle( nullptr ) {
 
-  spinlock_initialize( &m_spinlock );
+  spinlock_initialize( &m_spinlock1 );
+  spinlock_initialize( &m_spinlock2 );
 
   memset( &m_cfg_prt_ddc, 0x00, sizeof( ubx::cfg_prt_ddc_t ) );
   memset( &m_cfg_tmode2, 0x00, sizeof( ubx::cfg_tmode2_t ) );
@@ -45,8 +43,9 @@ lea_m8t() : m_event_loop_handle( nullptr ) {
 
   memset( &m_tim_svin, 0x00, sizeof( ubx::tim_svin_t ) );
 
-  m_task_queue = xQueueCreate( 8192, sizeof( lea_m8t_task_queue_item_t ) );
-  m_egress_queue = xQueueCreate( 4096, sizeof( lea_m8t_egress_queue_item_t ) );
+  m_task_queue = xQueueCreate( 1024, sizeof( lea_m8t_task_queue_item_t ) );
+  m_egress_queue = xQueueCreate( 1024, sizeof( lea_m8t_egress_queue_item_t ) );
+  m_timepulse_queue = xQueueCreate( 10, sizeof( lea_m8t_timepulse_queue_item_t ) );
 
   m_task_params.instance = this;
   m_task_params.stack_buffer = ( StackType_t * ) heap_caps_malloc( m_component_stack_size,
@@ -55,9 +54,20 @@ lea_m8t() : m_event_loop_handle( nullptr ) {
                      m_component_name,
                      m_component_stack_size,
                      &m_task_params,
-                     2,
+                     configMAX_PRIORITIES - 3,
                      m_task_params.stack_buffer,
                      &m_task_params.task_buffer );
+
+  m_lea_m8t_tp_loop_params.instance = this;
+  m_lea_m8t_tp_loop_params.stack_buffer = ( StackType_t * ) heap_caps_malloc( m_timepulse_loop_stack_size,
+                                                                              MALLOC_CAP_SPIRAM );
+  xTaskCreateStatic( &lea_m8t::timepulse_loop,
+                     m_component_name,
+                     m_timepulse_loop_stack_size,
+                     &m_lea_m8t_tp_loop_params,
+                     configMAX_PRIORITIES - 1,
+                     m_lea_m8t_tp_loop_params.stack_buffer,
+                     &m_lea_m8t_tp_loop_params.task_buffer );
 
   esp_timer_create_args_t timer_args;
   memset( &timer_args, 0x00, sizeof( esp_timer_create_args_t ) );
@@ -66,7 +76,7 @@ lea_m8t() : m_event_loop_handle( nullptr ) {
   timer_args.name = "poll_timer";
 
   ESP_ERROR_CHECK( esp_timer_create( &timer_args, &m_poll_timer ) );
-  ESP_ERROR_CHECK( esp_timer_start_periodic( m_poll_timer, 250000 ) );
+  ESP_ERROR_CHECK( esp_timer_start_periodic( m_poll_timer, 50000 ) );
 }
 
 broadcast_clock::lea_m8t::
@@ -113,7 +123,20 @@ task_loop( void *arg ) {
   memset( &item, 0x00, sizeof( lea_m8t_task_queue_item_t ) );
   while( 1 ) {
     if( xQueueReceive( inst->m_task_queue, &item, -1 ) ) {
-      inst->on_task_message( item.message, item.arg ); // DEBUG 1
+      inst->on_task_message( item.message, item.arg );
+    }
+  }
+}
+
+void broadcast_clock::lea_m8t::
+timepulse_loop( void *arg ) {
+  lea_m8t_task_params *params = static_cast<lea_m8t_task_params *>( arg );
+  lea_m8t *inst = params->instance;
+  lea_m8t_timepulse_queue_item_t item;
+  memset( &item, 0x00, sizeof( lea_m8t_timepulse_queue_item_t ) );
+  while( 1 ) {
+    if( xQueueReceive( inst->m_timepulse_queue, &item, -1 ) ) {
+      inst->on_timepulse_loop_message( item.message, item.arg );
     }
   }
 }
@@ -236,7 +259,7 @@ write() {
   while( m_ack != 0xff && xQueueReceive( m_egress_queue, &item, 0 ) ) {
     ESP_LOGI( m_component_name, "Writing message: class: 0x%02x, id: 0x%02x", item.message.cls, item.message.id );
     uint16_t buflen = 8 + item.len;
-    ESP_LOGI( m_component_name, "Read message length: %d", buflen );
+    ESP_LOGI( m_component_name, "Write message length: %d", buflen );
     //uint8_t *msg = new uint8_t[ buflen ];
     uint8_t *msg = static_cast<uint8_t *>( heap_caps_malloc( buflen, MALLOC_CAP_SPIRAM ) );
     int i = 0;
@@ -306,7 +329,7 @@ update_status() {
   if( m_event_loop_handle ) {
     struct timespec now;
     clock_gettime( CLOCK_REALTIME, &now );
-    if( m_ns_since_timepulse > 5000000000 ) {
+    if( m_ns_since_timepulse > 1000000000 ) {
       esp_event_post_to( m_event_loop_handle,
                         m_event_base,
                         TIMEPULSE_ABSENT,
@@ -315,6 +338,44 @@ update_status() {
                         portMAX_DELAY );
     }
   }
+}
+
+void broadcast_clock::lea_m8t::
+on_timepulse_loop_message( lea_m8t_timepulse_message msg, void *arg ) {
+
+  // High priority handling of timepulse
+  struct timespec now;
+  clock_gettime( CLOCK_REALTIME, &now );
+  now.tv_sec = ( now.tv_nsec > 500000000 ? now.tv_sec + 1 : now.tv_sec );
+  int32_t now_ns = now.tv_nsec;
+  uint32_t now_cc = xthal_get_ccount();
+  uint32_t tp_cc = now_cc - m_timepulse_cc;
+  uint32_t tp_ns = ( tp_cc * 1000000 ) / 240000000;
+  
+  now.tv_nsec = tp_ns + 52000; // Adjust for code execution time
+  clock_settime( CLOCK_REALTIME, &now );
+
+  // Forward timepulse message to regular task loop
+  lea_m8t_task_queue_item_t ts_item = { lea_m8t_task_message::timepulse, nullptr };
+  xQueueSendToFrontFromISR( m_task_queue, &ts_item, nullptr );
+
+  // Output timepulse offset
+  m_tp_offset_us = ( now_ns >= 500000000 ? now_ns -= 1000000000 : now_ns ) / 1000;
+  ESP_LOGI( m_component_name, "Timepulse offset: %li us", m_tp_offset_us );
+
+  // Fire time pulse offset reporting event
+  const uint32_t event_id = m_tp_offset_us >= -m_time_pulse_offset_threshold_us &&
+                            m_tp_offset_us <= m_time_pulse_offset_threshold_us
+                          ? HIGH_ACCURACY
+                          : LOWER_ACCURACY;  
+
+  esp_event_post_to( m_event_loop_handle,
+                    m_event_base,
+                    event_id,
+                    &m_tp_offset_us,
+                    sizeof( int32_t ),
+                    portMAX_DELAY );
+
 }
 
 void broadcast_clock::lea_m8t::
@@ -379,7 +440,7 @@ set_time_mode( bool enable ) {
     uint8_t *payload = static_cast<uint8_t *>( heap_caps_malloc( 3, MALLOC_CAP_SPIRAM ) );
     payload[ 0 ] = ubx::message::tim::cls;
     payload[ 1 ] = ubx::message::tim::svin;
-    payload[ 2 ] = 0x01;
+    payload[ 2 ] = 0x10;
     lea_m8t_egress_queue_item_t ubx_cfg_msg = { 3, { ubx::message::cfg::cls, ubx::message::cfg::msg }, payload, true };
     xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
   }
@@ -388,7 +449,7 @@ set_time_mode( bool enable ) {
     uint8_t *payload = static_cast<uint8_t *>( heap_caps_malloc( 3, MALLOC_CAP_SPIRAM ) );
     payload[ 0 ] = ubx::message::tim::cls;
     payload[ 1 ] = ubx::message::tim::svin;
-    payload[ 2 ] = 0x08;
+    payload[ 2 ] = 0x30;
     lea_m8t_egress_queue_item_t ubx_cfg_msg = { 3, { ubx::message::cfg::cls, ubx::message::cfg::msg }, payload, true };
     xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
   }
@@ -448,7 +509,7 @@ on_ubx_message( const uint8_t msg_class,
           on_ubx_nav_sat( static_cast<ubx::nav_sat_t *>( payload ) );
           break;
         case ubx::message::nav::timeutc:
-          on_ubx_nav_timeutc( static_cast<ubx::nav_timeutc_t *>( payload ) ); // DEBUG 4
+          on_ubx_nav_timeutc( static_cast<ubx::nav_timeutc_t *>( payload ) );
           break;
       }
       break;
@@ -492,7 +553,7 @@ on_ubx_cfg_tmode2( ubx::cfg_tmode2_t *tmode2 ) {
     uint8_t *payload = static_cast<uint8_t *>( heap_caps_malloc( 3, MALLOC_CAP_SPIRAM ) );
     payload[ 0 ] = ubx::message::tim::cls;
     payload[ 1 ] = ubx::message::tim::svin;
-    payload[ 2 ] = 0x01;
+    payload[ 2 ] = 0x10;
     lea_m8t_egress_queue_item_t ubx_cfg_msg = { 3, { ubx::message::cfg::cls, ubx::message::cfg::msg }, payload, true };
     xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
   }
@@ -565,132 +626,98 @@ on_ubx_nav_sat( ubx::nav_sat_t *sat ) {
 }
 
 void broadcast_clock::lea_m8t::
-on_ubx_nav_timeutc( ubx::nav_timeutc_t *timeutc ) {
-
-  if( m_ns_timepulse > 0 ) {
-
-    struct tm now_tm;
-    memset( &now_tm, 0x00, sizeof( struct tm ) );
-    
-    now_tm.tm_year = timeutc->year - 1900; // tm_year is years since 1900
-    now_tm.tm_mon = timeutc->month - 1;    // tm_mon is 0-based
-    now_tm.tm_mday = timeutc->day;
-    now_tm.tm_hour = timeutc->hour;
-    now_tm.tm_min = timeutc->min;
-    now_tm.tm_sec = timeutc->sec;
-    now_tm.tm_isdst = -1;
-
-    char *tz = getenv( "TZ" );
-    if( tz != nullptr ) {
-      tz = strdup( tz );
-    } 
-    setenv( "TZ", "UTC0", 1 );
-    tzset();
-    time_t now_time = mktime( &now_tm );
-    if( tz != nullptr ) {
-      setenv( "TZ", tz, 1 );
-      free( tz );
-    }
-
-    struct timespec now_spec;
-    clock_gettime( CLOCK_REALTIME, &now_spec ); // DEBUG 5
-
-    int64_t now_ns = now_spec.tv_sec * 1000000000 + now_spec.tv_nsec;
-    m_ns_since_timepulse = now_ns - m_ns_timepulse;
-    bool is_time_set = false;
-    if( m_ns_since_timepulse < 1000000000 ) {
-      if( now_time != -1 ) {
-        const int adj_ns = 48000;
-        now_spec.tv_sec = now_time;
-        now_spec.tv_nsec = m_ns_since_timepulse + adj_ns;
-        clock_settime( CLOCK_REALTIME, &now_spec );
-        is_time_set = true;
-      }
-    }
-
-    m_ns_timepulse = 0;
-    
-    if( is_time_set && m_event_loop_handle ) {
-      m_seconds_with_no_timesync_data = 0;
-      memcpy( &m_nav_timeutc, timeutc, sizeof( ubx::nav_timeutc_t ) );
-      esp_event_post_to( m_event_loop_handle,
-                         m_event_base,
-                         UBX_NAV_TIMEUTC,
-                         &m_nav_timeutc,
-                         sizeof( ubx::nav_timeutc_t ),
-                         portMAX_DELAY );
-    }
-  }
-}
-
-void broadcast_clock::lea_m8t::
 on_ubx_tim_svin( ubx::tim_svin_t *payload ) {
-  ESP_LOGI( m_component_name, "UBX_TIM_SVIN" );
+  ESP_LOGI( m_component_name, "UBX_TIM_SVIN enter event handler" );
   memcpy( &m_tim_svin, payload, sizeof( ubx::tim_svin_t ) );
+  ESP_LOGI( m_component_name, "UBX_TIM_SVIN memcpy OK" );
   if( m_event_loop_handle ) {
+    ESP_LOGI( m_component_name, "UBX_TIM_SVIN prepare event" );
     esp_event_post_to( m_event_loop_handle,
                         m_event_base,
                         UBX_TIM_SVIN,
                         &m_tim_svin,
                         sizeof( ubx::tim_svin_t ),
                         portMAX_DELAY );
+    ESP_LOGI( m_component_name, "UBX_TIM_SVIN event sent" );
   }
 }
 
 void broadcast_clock::lea_m8t::
-timepulse_handler( void *arg ) {
+on_ubx_nav_timeutc( ubx::nav_timeutc_t *timeutc ) {
 
-  struct timespec now;
-  clock_gettime( CLOCK_REALTIME, &now );
-  m_ns_timepulse = now.tv_sec * 1000000000 + now.tv_nsec;
-  m_ns_mismatch = now.tv_nsec; //< Should be as close to zero as possible
+  bool is_time_set = false;
+  struct timespec now_spec;
+  time_t now_time = -1;
+  uint32_t elapsed_cc = 0;
+  const uint32_t tmpulse_cc = m_timepulse_cc;
 
+  struct tm now_tm;
+  memset( &now_tm, 0x00, sizeof( struct tm ) );
+  
+  now_tm.tm_year = timeutc->year - 1900; // tm_year is years since 1900
+  now_tm.tm_mon = timeutc->month - 1;    // tm_mon is 0-based
+  now_tm.tm_mday = timeutc->day;
+  now_tm.tm_hour = timeutc->hour;
+  now_tm.tm_min = timeutc->min;
+  now_tm.tm_sec = timeutc->sec;
+  now_tm.tm_isdst = -1;
+
+  char *tz = getenv( "TZ" );
+  if( tz != nullptr ) {
+    tz = strdup( tz );
+  } 
+  setenv( "TZ", "UTC0", 1 );
+  tzset();
+  now_time = mktime( &now_tm );
+  if( tz != nullptr ) {
+    setenv( "TZ", tz, 1 );
+    free( tz );
+  }
+
+  if( now_time != -1 ) {
+    clock_gettime( CLOCK_REALTIME, &now_spec );
+    now_spec.tv_sec = now_time;
+    now_spec.tv_nsec = timeutc->nano;
+    clock_settime( CLOCK_REALTIME, &now_spec );
+    ESP_LOGI( m_component_name, "Time set to %s", ctime( &now_time ) );
+    is_time_set = true;
+  }
+
+  if( is_time_set && m_event_loop_handle ) {
+    m_seconds_with_no_timesync_data = 0;
+    memcpy( &m_nav_timeutc, timeutc, sizeof( ubx::nav_timeutc_t ) );
+    esp_event_post_to( m_event_loop_handle,
+                        m_event_base,
+                        UBX_NAV_TIMEUTC,
+                        &m_nav_timeutc,
+                        sizeof( ubx::nav_timeutc_t ),
+                        portMAX_DELAY );
+  }
+}
+
+void broadcast_clock::lea_m8t::
+isr_timepulse_handler( void *arg ) {
   lea_m8t *inst = static_cast<lea_m8t *>( arg );
-  lea_m8t::lea_m8t_task_queue_item_t item = { lea_m8t::lea_m8t_task_message::timepulse, nullptr };
-  xQueueSendFromISR( inst->m_task_queue, &item, nullptr );
-
+  inst->m_timepulse_cc = xthal_get_ccount();
+  lea_m8t_timepulse_queue_item_t tp_item = { lea_m8t_timepulse_message::timepulse, nullptr };
+  xQueueSendFromISR( inst->m_timepulse_queue, &tp_item, nullptr );
 }
 
 void broadcast_clock::lea_m8t::
 on_timepulse() {
+
+  struct timespec now;
   
-  const int offset = m_ns_mismatch > 500000000
-                   ? -( ( 1000000000 - m_ns_mismatch ) / 1000 )
-                   : m_ns_mismatch / 1000;
+  if( m_timepulse_cc > 0 ) {
 
-  if( m_ns_mismatch == 0 ) {
-    ESP_LOGI( m_component_name, "Timepulse offset from system clock:  0 us" );
-  }
-  else if( m_ns_mismatch > 500000000 ) {
-    ESP_LOGI( m_component_name, "Timepulse offset from system clock: -%lli us", ( 1000000000 - m_ns_mismatch ) / 1000 );
-  }
-  else {
-    ESP_LOGI( m_component_name, "Timepulse offset from system clock: +%lli us", m_ns_mismatch / 1000 );
-  }
-  if( m_event_loop_handle ) {
-    esp_event_post_to( m_event_loop_handle,
-                       m_event_base,
-                       TIMEPULSE_PRESENT,
-                       nullptr,
-                       0,
-                       portMAX_DELAY );
-  }
-
-  if( offset >= -m_time_pulse_offset_threshold && offset <= m_time_pulse_offset_threshold ) {
-    esp_event_post_to( m_event_loop_handle,
-                       m_event_base,
-                       HIGH_ACCURACY,
-                       nullptr,
-                       0,
-                       portMAX_DELAY );
-  }
-  else {
-    esp_event_post_to( m_event_loop_handle,
-                       m_event_base,
-                       LOWER_ACCURACY,
-                       nullptr,
-                       0,
-                       portMAX_DELAY );
+    if( m_event_loop_handle ) {
+      esp_event_post_to( m_event_loop_handle,
+                        m_event_base,
+                        TIMEPULSE_PRESENT,
+                        nullptr,
+                        0,
+                        portMAX_DELAY );
+    }
   }
 
   if( ++m_seconds_with_no_timesync_data > 60 ) {
@@ -700,8 +727,8 @@ on_timepulse() {
                        nullptr,
                        0,
                        portMAX_DELAY );
-  }
-
+    
+  }    
 }
 
 bool broadcast_clock::lea_m8t::
@@ -726,11 +753,11 @@ is_present() {
 
 void broadcast_clock::lea_m8t::
 init_isr_timepulse() {
-  ESP_LOGI( m_component_name, "Configure timpulse interrupt" );
+  ESP_LOGI( m_component_name, "Configure timepulse interrupt" );
   ESP_ERROR_CHECK( gpio_install_isr_service( 0 ) );
   ESP_ERROR_CHECK( gpio_set_direction( LEA_M8T_TIMEPULSE, GPIO_MODE_INPUT ) );
   ESP_ERROR_CHECK( gpio_set_intr_type( LEA_M8T_TIMEPULSE, GPIO_INTR_POSEDGE ) );
-  ESP_ERROR_CHECK( gpio_isr_handler_add( LEA_M8T_TIMEPULSE, &timepulse_handler, this ) );
+  ESP_ERROR_CHECK( gpio_isr_handler_add( LEA_M8T_TIMEPULSE, &isr_timepulse_handler, this ) );
 }
 
 void broadcast_clock::lea_m8t::
@@ -790,7 +817,7 @@ init_ubx_normalboot() {
     //ubx::cfg_rate_t *payload = reinterpret_cast<ubx::cfg_rate_t *>( new uint8_t[ sizeof( ubx::cfg_rate_t ) ] );
     ubx::cfg_rate_t *payload = static_cast<ubx::cfg_rate_t *>( heap_caps_malloc( sizeof( ubx::cfg_rate_t ), MALLOC_CAP_SPIRAM ) );
     payload->meas_rate = 100;
-    payload->nav_rate = 16;
+    payload->nav_rate = 8;
     payload->time_ref = 1;
     lea_m8t_egress_queue_item_t ubx_cfg_rate = { sizeof( ubx::cfg_rate_t ), { ubx::message::cfg::cls, ubx::message::cfg::rate }, reinterpret_cast<uint8_t *>( payload ), true };
     xQueueSend( m_egress_queue, &ubx_cfg_rate, 0 );
@@ -801,7 +828,7 @@ init_ubx_normalboot() {
     uint8_t *payload = static_cast<uint8_t *>( heap_caps_malloc( 3, MALLOC_CAP_SPIRAM ) );
     payload[ 0 ] = ubx::message::nav::cls;
     payload[ 1 ] = ubx::message::nav::timeutc;
-    payload[ 2 ] = 0x05;
+    payload[ 2 ] = 0x4c; // Update every minute
     lea_m8t_egress_queue_item_t ubx_cfg_msg = { 3, { ubx::message::cfg::cls, ubx::message::cfg::msg }, payload, true };
     xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
   }
@@ -811,7 +838,7 @@ init_ubx_normalboot() {
     uint8_t *payload = static_cast<uint8_t *>( heap_caps_malloc( 3, MALLOC_CAP_SPIRAM ) );
     payload[ 0 ] = ubx::message::nav::cls;
     payload[ 1 ] = ubx::message::nav::sat;
-    payload[ 2 ] = 0x04;
+    payload[ 2 ] = 0x20;
     lea_m8t_egress_queue_item_t ubx_cfg_msg = { 3, { ubx::message::cfg::cls, ubx::message::cfg::msg }, payload, true };
     xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
   }
@@ -821,7 +848,7 @@ init_ubx_normalboot() {
     uint8_t *payload = static_cast<uint8_t *>( heap_caps_malloc( 3, MALLOC_CAP_SPIRAM ) );
     payload[ 0 ] = ubx::message::tim::cls;
     payload[ 1 ] = ubx::message::tim::svin;
-    payload[ 2 ] = 0x04;
+    payload[ 2 ] = 0x10;
     lea_m8t_egress_queue_item_t ubx_cfg_msg = { 3, { ubx::message::cfg::cls, ubx::message::cfg::msg }, payload, true };
     xQueueSend( m_egress_queue, &ubx_cfg_msg, 0 );
   }
@@ -831,7 +858,7 @@ init_ubx_normalboot() {
     xQueueSend( m_egress_queue, &ubx_cfg_tmode2, 0 );
   }
 
-  { // Poll UBX-MON-VER twice to populate JSON feed to web interface
+  { // Poll UBX-MON-VER to populate JSON feed to web interface
     lea_m8t_egress_queue_item_t ubx_mon_ver = { 0, { ubx::message::mon::cls, ubx::message::mon::ver }, nullptr, false };
     xQueueSend( m_egress_queue, &ubx_mon_ver, 0 );
   }

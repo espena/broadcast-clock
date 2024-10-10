@@ -4,6 +4,7 @@
 #include "lea_m8t.hpp"
 
 #include <map>
+#include <stdlib.h>
 #include <memory.h>
 #include <string.h>
 #include <freertos/FreeRTOS.h>
@@ -137,8 +138,13 @@ gnss_installed() {
 }
 
 void clock_status::
-high_accuracy( bool ok ) {
+high_accuracy( bool ok, int32_t *offset_us ) {
   m_high_accuracy = ok;
+  const uint32_t abs_offset_us = abs( *offset_us );
+  if( abs_offset_us < 1000 ) { // Ignore peaks
+    m_offset_us_cumulative += abs_offset_us;
+    m_offset_us_sample_count++;
+  }
 }
 
 void clock_status::

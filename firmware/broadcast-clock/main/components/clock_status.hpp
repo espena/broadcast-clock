@@ -40,6 +40,9 @@ namespace espena::broadcast_clock {
     bool m_sntp_sync = false;
     bool m_configurator_enabled = false;
 
+    uint32_t m_offset_us_cumulative = 0;
+    uint32_t m_offset_us_sample_count = 0;
+
     uint8_t m_gnss_svin_active = 0;
     uint8_t m_gnss_svin_valid = 0;
     uint32_t m_gnss_svin_dur = 0;
@@ -89,7 +92,7 @@ namespace espena::broadcast_clock {
     void gnss_installed();
     void gnss_satellite_count( uint8_t count ) { m_gnss_satellite_count = count; };
 
-    void high_accuracy( bool ok );
+    void high_accuracy( bool ok, int32_t *offset_us );
     void sntp_sync( bool ok );
     void configurator_enabled( bool ok );
 
@@ -113,6 +116,14 @@ namespace espena::broadcast_clock {
 
     uint8_t gnss_satellite_count() override { return m_gnss_satellite_count; };
     std::string gnss_satellite_count_str() override { return std::to_string( static_cast<int>( m_gnss_satellite_count ) ); };
+
+    uint32_t gnss_mean_systime_offset_us() override {
+      uint32_t mean = m_offset_us_sample_count == 0 ? 0 : m_offset_us_cumulative / m_offset_us_sample_count;
+      m_offset_us_cumulative = 0;
+      m_offset_us_sample_count = 0;
+      return mean;
+    };
+    std::string gnss_mean_systime_offset_us_str() override { return std::to_string( static_cast<int>( gnss_mean_systime_offset_us() ) ); };
 
     uint8_t gnss_utc_standard() override { return m_gnss_utc_standard; };
     std::string gnss_utc_standard_str() override { return ubx::utc_standard_timesource[ m_gnss_utc_standard > 8 ? 9 : m_gnss_utc_standard ]; };

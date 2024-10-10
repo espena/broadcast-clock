@@ -60,6 +60,7 @@ void broadcast_clock::captive_portal_http::update_json_gnss_status() {
                             \"utc_standard\": \"__gnss_utc_standard__\", \
                             \"time_mode_started\": \"__gnss_time_mode_started__\", \
                             \"time_mode_status\": \"__gnss_time_mode__\", \
+                            \"time_accuracy\": \"__gnss_offset_us__\", \
                             \"survey_in\": {\
                               \"active\": \"__gnss_svin_active__\", \
                               \"valid\": \"__gnss_svin_valid__\", \
@@ -81,6 +82,7 @@ void broadcast_clock::captive_portal_http::update_json_gnss_status() {
     utils::replace_substring( m_json_gnss_status, "__gnss_utc_standard__", m_gnss_state->gnss_utc_standard_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_time_mode_started__", m_gnss_state->gnss_time_mode_started_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_time_mode__", m_gnss_state->gnss_time_mode_str() );
+    utils::replace_substring( m_json_gnss_status, "__gnss_offset_us__", m_gnss_state->gnss_mean_systime_offset_us_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_svin_active__", m_gnss_state->gnss_svin_active_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_svin_valid__", m_gnss_state->gnss_svin_valid_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_svin_dur__", m_gnss_state->gnss_svin_dur_str() );
@@ -240,35 +242,35 @@ on_request( httpd_req_t *req ) {
 
   if( uri == "/save" && req->content_len > 0 && m_event_loop_handle ) {
     httpd_resp_set_status( req, "302 Found" ); 
-    httpd_resp_set_type( req, "text/html; charset=is08859-1;" );
+    httpd_resp_set_type( req, "text/html; charset=utf-8;" );
     save_handler( req );
   }
   else if( uri == "/survey_in" && req->content_len > 0 && m_event_loop_handle ) {
     httpd_resp_set_status( req, "302 Found" ); 
-    httpd_resp_set_type( req, "text/html; charset=is08859-1;" );
+    httpd_resp_set_type( req, "text/html; charset=utf-8;" );
     survey_in_handler( req );
   }
   else if( uri == "/timers" && m_event_loop_handle ) {
     httpd_resp_set_status( req, "302 Found" ); 
-    httpd_resp_set_type( req, "text/html; charset=is08859-1;" );
+    httpd_resp_set_type( req, "text/html; charset=utf-8;" );
     timers_handler( req );
   }
   else if( uri.starts_with( "/stopwatch/start" ) ||
            uri.starts_with( "/stopwatch/stop" ) ||
            uri.starts_with( "/stopwatch/reset" ) ) {
     httpd_resp_set_status( req, "302 Found" ); 
-    httpd_resp_set_type( req, "text/html; charset=iso8859-1;" );
+    httpd_resp_set_type( req, "text/html; charset=utf-8;" );
     stopwatch_handler( req );
   }
   else if( uri.starts_with( "/countdown/start" ) ||
            uri.starts_with( "/countdown/reset" ) ) {
     httpd_resp_set_status( req, "302 Found" ); 
-    httpd_resp_set_type( req, "text/html; charset=iso8859-1;" );
+    httpd_resp_set_type( req, "text/html; charset=utf-8;" );
     countdown_handler( req );
   }
   else if( uri == "/styles.css" ) {
     httpd_resp_set_status( req, "302 Found" ); 
-    httpd_resp_set_type( req, "text/css; charset=iso8859-1;" );
+    httpd_resp_set_type( req, "text/css; charset=utf-8;" );
     const char *buf_st = ( char * ) broadcast_clock::resources::html::styles_css_start;
     const size_t buf_st_len = broadcast_clock::resources::html::styles_css_end - broadcast_clock::resources::html::styles_css_start;
     httpd_resp_send( req, buf_st, buf_st_len );
@@ -276,7 +278,7 @@ on_request( httpd_req_t *req ) {
   else if( uri == "/gnss-status" ) {
     update_json_gnss_status();
     httpd_resp_set_status( req, "302 Found" ); 
-    httpd_resp_set_type( req, "application/json; charset=iso8859-1" );
+    httpd_resp_set_type( req, "application/json; charset=utf-8" );
     httpd_resp_send( req, m_json_gnss_status.c_str(), m_json_gnss_status.length() );
   }
   else if( uri == "/favicon.ico" ) {

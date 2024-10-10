@@ -247,10 +247,10 @@ wifi_event_handler( void *handler_arg,
         instance->m_clock_status.gnss_installed();
         break;
       case broadcast_clock::lea_m8t::HIGH_ACCURACY:
-        instance->m_clock_status.high_accuracy( true );
+        instance->m_clock_status.high_accuracy( true, static_cast<int32_t *>( event_params ) );
         break;
       case broadcast_clock::lea_m8t::LOWER_ACCURACY:
-        instance->m_clock_status.high_accuracy( false );
+        instance->m_clock_status.high_accuracy( false, static_cast<int32_t *>( event_params ) );
         break;
     }
   }
