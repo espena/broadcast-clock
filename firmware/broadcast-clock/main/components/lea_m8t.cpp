@@ -327,15 +327,21 @@ update_status() {
     }
   }
   if( m_event_loop_handle ) {
-    struct timespec now;
-    clock_gettime( CLOCK_REALTIME, &now );
-    if( m_ns_since_timepulse > 1000000000 ) {
-      esp_event_post_to( m_event_loop_handle,
-                        m_event_base,
-                        TIMEPULSE_ABSENT,
-                        "",
-                        0,
-                        portMAX_DELAY );
+    if( m_timepulse_cc > 0 ) {
+      uint32_t cc_tp = m_timepulse_cc;
+      uint32_t cc_now = xthal_get_ccount();
+      uint32_t cc_diff = cc_now - cc_tp;
+      uint32_t diff_sec = cc_diff / 240000000;
+      if( diff_sec > 2 ) {
+        m_timepulse_cc = 0;
+        ESP_LOGE( m_component_name, "Timepulse ABSENT" );
+        esp_event_post_to( m_event_loop_handle,
+                          m_event_base,
+                          TIMEPULSE_ABSENT,
+                          "",
+                          0,
+                          portMAX_DELAY );
+      }
     }
   }
 }
@@ -360,6 +366,7 @@ on_timepulse_loop_message( lea_m8t_timepulse_message msg, void *arg ) {
   xQueueSendToFrontFromISR( m_task_queue, &ts_item, nullptr );
 
   // Output timepulse offset
+  now_ns -= ( tp_ns );
   m_tp_offset_us = ( now_ns >= 500000000 ? now_ns -= 1000000000 : now_ns ) / 1000;
   ESP_LOGI( m_component_name, "Timepulse offset: %li us", m_tp_offset_us );
 
