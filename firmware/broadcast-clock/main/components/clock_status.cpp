@@ -1,6 +1,7 @@
 #include "clock_status.hpp"
 #include "ubx_types.hpp"
 #include "captive_portal_http.hpp"
+#include "wifi.hpp"
 #include "lea_m8t.hpp"
 
 #include <map>
@@ -67,6 +68,12 @@ set_event_loop_handle( esp_event_loop_handle_t event_loop_handle ) {
                                    this );
 
   esp_event_handler_register_with( m_event_loop_handle,
+                                   wifi::m_event_base,
+                                   wifi::WIFI_EVENT_NTP_SYNC,
+                                   event_handler,
+                                   this );
+
+  esp_event_handler_register_with( m_event_loop_handle,
                                    captive_portal_http::m_event_base,
                                    captive_portal_http::EVENT_START_TIME_MODE,
                                    event_handler,
@@ -110,6 +117,16 @@ event_handler( void *handler_arg,
         break;
     }
   }
+  else if( wifi::m_event_base == event_base ) {
+    switch( event_id ) {
+      case wifi::WIFI_EVENT_NTP_SYNC:
+        inst->sntp_sync( true );
+        break;
+      case wifi::WIFI_EVENT_NTP_SYNC_FAILED:
+        inst->sntp_sync( false );
+        break;
+    }
+  }
   else if( captive_portal_http::m_event_base == event_base ) {
     switch( event_id ) {
       case captive_portal_http::EVENT_START_TIME_MODE:
@@ -150,6 +167,7 @@ high_accuracy( bool ok, int32_t *offset_us ) {
 void clock_status::
 sntp_sync( bool ok ) {
   m_sntp_sync = ok;
+  m_sntp_aquiring = ok ? 20 : 0;
 }
 
 void clock_status::

@@ -220,12 +220,6 @@ wifi_event_handler( void *handler_arg,
       case broadcast_clock::wifi::LEAVE_CONFIG_MODE:
         instance->on_leave_config_mode();
         break;
-      case broadcast_clock::wifi::WIFI_EVENT_NTP_SYNC:
-        instance->m_clock_status.sntp_sync( true );
-        break;
-      case broadcast_clock::wifi::WIFI_EVENT_NTP_SYNC_FAILED:
-        instance->m_clock_status.sntp_sync( false );
-        break;
     }
   }
   else if( source == broadcast_clock::lea_m8t::m_event_base ) {
