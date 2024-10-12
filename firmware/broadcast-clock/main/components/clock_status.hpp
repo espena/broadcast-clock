@@ -40,6 +40,8 @@ namespace espena::broadcast_clock {
     bool m_sntp_sync = false;
     bool m_configurator_enabled = false;
 
+    int32_t m_sntp_aquiring = 0;
+
     uint32_t m_offset_us_cumulative = 0;
     uint32_t m_offset_us_sample_count = 0;
 
@@ -69,14 +71,14 @@ namespace espena::broadcast_clock {
     int8_t m_gnss_time_mode_started = -1;
 
     bool blue_blinker() { return m_gnss_svin_active ? m_blink : true; };
-    bool green_blinker() { return true; };
+    bool green_blinker() { return ( m_sntp_aquiring > 0 && --m_sntp_aquiring > 0 ) ? m_blink : true; };
     bool yellow_blinker() { return true; };
-    bool red_blinker() { return true; };
+    bool red_blinker() { return m_high_accuracy ? true : m_blink; };
 
     bool is_blue() { return m_gnss_installed && m_got_time_sync && m_got_timepulse && blue_blinker(); };
     bool is_green() { return m_sntp_sync && green_blinker(); };
     bool is_yellow() { return m_configurator_enabled && yellow_blinker(); };
-    bool is_red() { return m_high_accuracy && red_blinker(); };
+    bool is_red() { return m_got_timepulse && red_blinker(); };
 
   public:
 
