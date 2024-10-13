@@ -6,7 +6,7 @@
 #include <sys/time.h>
 
 namespace espena::utils {
-  void span_to_timespec( std::string timespan, struct timespec *ts ) {
+  inline void span_to_timespec( std::string timespan, struct timespec *ts ) {
     const char *p = timespan.c_str();
     memset( ts, 0x00, sizeof( struct timespec ) );
     int h = 0, m = 0, s = 0;

@@ -21,7 +21,7 @@ namespace espena::broadcast_clock {
   private:
 
     static const char *m_component_name;
-    static const size_t m_component_stack_size = 8192;
+    static const size_t m_component_stack_size = 4096;
 
     static void event_handler( void *handler_arg,
                                esp_event_base_t event_base,
@@ -56,7 +56,8 @@ namespace espena::broadcast_clock {
     void on_task_message( ntp_server_task_message msg, void *arg );
 
     void sock_read();
-
+    void timespec_to_ntp( const struct timespec *ts, uint8_t *ntp_time );
+    void get_ntp_time( uint8_t *ntp_time );
     void on_init();
 
   public:

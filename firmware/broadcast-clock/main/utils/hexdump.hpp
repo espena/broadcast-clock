@@ -7,7 +7,7 @@
 namespace espena::utils {
   // Debug utility function to print a hexdump of a
   // buffer with two-byte length field
-  void hexdump( uint8_t *buf, uint16_t len ) {
+  inline void hexdump( uint8_t *buf, uint16_t len ) {
     uint16_t i;
     for( i = 0; i < len; i+= 16 ) {
       printf(

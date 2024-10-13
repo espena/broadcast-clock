@@ -5,7 +5,7 @@
 
 namespace espena::utils {
 
-  std::string
+  inline std::string
   get_query_field( const std::string query, const std::string field ) {
 
     std::string key;

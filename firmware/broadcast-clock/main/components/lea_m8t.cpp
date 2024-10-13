@@ -78,7 +78,7 @@ lea_m8t() : m_event_loop_handle( nullptr ) {
   timer_args.name = "poll_timer";
 
   ESP_ERROR_CHECK( esp_timer_create( &timer_args, &m_poll_timer ) );
-  ESP_ERROR_CHECK( esp_timer_start_periodic( m_poll_timer, 50000 ) );
+  ESP_ERROR_CHECK( esp_timer_start_periodic( m_poll_timer, 5000 ) );
 }
 
 broadcast_clock::lea_m8t::
@@ -697,8 +697,13 @@ on_ubx_nav_timeutc( ubx::nav_timeutc_t *timeutc ) {
 
       clock_gettime( CLOCK_REALTIME, &now_spec );
 
+      //const uint32_t cc_now = xthal_get_ccount();
+      //const uint32_t cc_diff = cc_now - m_timepulse_cc;
+      //const int32_t ns_diff = ( ( cc_diff * 1000000000 ) / 240000000 ) + 20000; // Adjust for code execution time
+
       now_spec.tv_sec = now_time;
       now_spec.tv_nsec = timeutc->nano;
+
       clock_settime( CLOCK_REALTIME, &now_spec );
 
       ESP_LOGI( m_component_name, "Time set to %s", ctime( &now_time ) );
