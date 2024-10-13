@@ -702,17 +702,18 @@ on_ubx_nav_timeutc( ubx::nav_timeutc_t *timeutc ) {
       is_time_set = true;
     }
 
-    if( is_time_set && m_event_loop_handle ) {
-      m_seconds_with_no_timesync_data = 0;
-      memcpy( &m_nav_timeutc, timeutc, sizeof( ubx::nav_timeutc_t ) );
-      esp_event_post_to( m_event_loop_handle,
-                          m_event_base,
-                          UBX_NAV_TIMEUTC,
-                          &m_nav_timeutc,
-                          sizeof( ubx::nav_timeutc_t ),
-                          portMAX_DELAY );
-    }
     xSemaphoreGive( semaphores::mutex::system_clock );
+  }
+
+  if( is_time_set && m_event_loop_handle ) {
+    m_seconds_with_no_timesync_data = 0;
+    memcpy( &m_nav_timeutc, timeutc, sizeof( ubx::nav_timeutc_t ) );
+    esp_event_post_to( m_event_loop_handle,
+                        m_event_base,
+                        UBX_NAV_TIMEUTC,
+                        &m_nav_timeutc,
+                        sizeof( ubx::nav_timeutc_t ),
+                        portMAX_DELAY );
   }
 }
 
