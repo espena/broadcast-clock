@@ -1,6 +1,7 @@
 #include "lea_m8t.hpp"
 #include "configuration.hpp"
 #include "ubx_types.hpp"
+#include "../semaphores/mutex.hpp"
 #include "../utils/fletcher8.hpp"
 #include "../utils/hexdump.hpp"
 #include <string>
@@ -10,6 +11,7 @@
 #include <sys/time.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include <freertos/semphr.h>
 #include <freertos/portmacro.h>
 #include <freertos/timers.h>
 #include <freertos/queue.h>
@@ -331,8 +333,8 @@ update_status() {
       uint32_t cc_tp = m_timepulse_cc;
       uint32_t cc_now = xthal_get_ccount();
       uint32_t cc_diff = cc_now - cc_tp;
-      uint32_t diff_sec = cc_diff / 240000000;
-      if( diff_sec > 2 ) {
+      uint32_t diff_msec = ( cc_diff * 1000 ) / 240000000;
+      if( diff_msec > 2000 ) {
         m_timepulse_cc = 0;
         ESP_LOGE( m_component_name, "Timepulse ABSENT" );
         esp_event_post_to( m_event_loop_handle,
@@ -351,7 +353,11 @@ on_timepulse_loop_message( lea_m8t_timepulse_message msg, void *arg ) {
 
   // High priority handling of timepulse
   struct timespec now;
-  clock_gettime( CLOCK_REALTIME, &now );
+  if( xSemaphoreTake( semaphores::mutex::system_clock, portMAX_DELAY ) ) {
+    clock_gettime( CLOCK_REALTIME, &now );
+    xSemaphoreGive( semaphores::mutex::system_clock );
+  }
+
   now.tv_sec = ( now.tv_nsec > 500000000 ? now.tv_sec + 1 : now.tv_sec );
   int32_t now_ns = now.tv_nsec;
   uint32_t now_cc = xthal_get_ccount();
@@ -359,11 +365,14 @@ on_timepulse_loop_message( lea_m8t_timepulse_message msg, void *arg ) {
   uint32_t tp_ns = ( tp_cc * 1000000 ) / 240000000;
   
   now.tv_nsec = tp_ns + 52000; // Adjust for code execution time
-  clock_settime( CLOCK_REALTIME, &now );
+  if( xSemaphoreTake( semaphores::mutex::system_clock, portMAX_DELAY ) ) {
+    clock_settime( CLOCK_REALTIME, &now );
+    xSemaphoreGive( semaphores::mutex::system_clock );
+  }
 
   // Forward timepulse message to regular task loop
   lea_m8t_task_queue_item_t ts_item = { lea_m8t_task_message::timepulse, nullptr };
-  xQueueSendToFrontFromISR( m_task_queue, &ts_item, nullptr );
+  xQueueSendToFront( m_task_queue, &ts_item, -1 );
 
   // Output timepulse offset
   now_ns -= ( tp_ns );
@@ -655,8 +664,6 @@ on_ubx_nav_timeutc( ubx::nav_timeutc_t *timeutc ) {
   bool is_time_set = false;
   struct timespec now_spec;
   time_t now_time = -1;
-  uint32_t elapsed_cc = 0;
-  const uint32_t tmpulse_cc = m_timepulse_cc;
 
   struct tm now_tm;
   memset( &now_tm, 0x00, sizeof( struct tm ) );
@@ -669,36 +676,43 @@ on_ubx_nav_timeutc( ubx::nav_timeutc_t *timeutc ) {
   now_tm.tm_sec = timeutc->sec;
   now_tm.tm_isdst = -1;
 
-  char *tz = getenv( "TZ" );
-  if( tz != nullptr ) {
-    tz = strdup( tz );
-  } 
-  setenv( "TZ", "UTC0", 1 );
-  tzset();
-  now_time = mktime( &now_tm );
-  if( tz != nullptr ) {
-    setenv( "TZ", tz, 1 );
-    free( tz );
-  }
+  if( xSemaphoreTake( semaphores::mutex::system_clock, portMAX_DELAY ) ) {
 
-  if( now_time != -1 ) {
-    clock_gettime( CLOCK_REALTIME, &now_spec );
-    now_spec.tv_sec = now_time;
-    now_spec.tv_nsec = timeutc->nano;
-    clock_settime( CLOCK_REALTIME, &now_spec );
-    ESP_LOGI( m_component_name, "Time set to %s", ctime( &now_time ) );
-    is_time_set = true;
-  }
+    char *tz = getenv( "TZ" );
+    if( tz != nullptr ) {
+      tz = strdup( tz );
+    } 
+    setenv( "TZ", "UTC0", 1 );
+    tzset();
+    now_time = mktime( &now_tm );
+    if( tz != nullptr ) {
+      setenv( "TZ", tz, 1 );
+      free( tz );
+    }
 
-  if( is_time_set && m_event_loop_handle ) {
-    m_seconds_with_no_timesync_data = 0;
-    memcpy( &m_nav_timeutc, timeutc, sizeof( ubx::nav_timeutc_t ) );
-    esp_event_post_to( m_event_loop_handle,
-                        m_event_base,
-                        UBX_NAV_TIMEUTC,
-                        &m_nav_timeutc,
-                        sizeof( ubx::nav_timeutc_t ),
-                        portMAX_DELAY );
+    if( now_time != -1 ) {
+
+      clock_gettime( CLOCK_REALTIME, &now_spec );
+
+      now_spec.tv_sec = now_time;
+      now_spec.tv_nsec = timeutc->nano;
+      clock_settime( CLOCK_REALTIME, &now_spec );
+
+      ESP_LOGI( m_component_name, "Time set to %s", ctime( &now_time ) );
+      is_time_set = true;
+    }
+
+    if( is_time_set && m_event_loop_handle ) {
+      m_seconds_with_no_timesync_data = 0;
+      memcpy( &m_nav_timeutc, timeutc, sizeof( ubx::nav_timeutc_t ) );
+      esp_event_post_to( m_event_loop_handle,
+                          m_event_base,
+                          UBX_NAV_TIMEUTC,
+                          &m_nav_timeutc,
+                          sizeof( ubx::nav_timeutc_t ),
+                          portMAX_DELAY );
+    }
+    xSemaphoreGive( semaphores::mutex::system_clock );
   }
 }
 
@@ -713,8 +727,6 @@ isr_timepulse_handler( void *arg ) {
 void broadcast_clock::lea_m8t::
 on_timepulse() {
 
-  struct timespec now;
-  
   if( m_timepulse_cc > 0 ) {
 
     if( m_event_loop_handle ) {

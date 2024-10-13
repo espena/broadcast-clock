@@ -182,6 +182,8 @@ init() {
 
     m_lea_m8t.init();
 
+    m_ntp_server.set_event_loop_handle( m_event_loop_handle );
+
     if( m_configuration->get_bool( "configurator" ) ) {
       m_captive_portal_http.init();
       m_captive_portal_http.start();
@@ -309,6 +311,7 @@ switch_to_station_mode() {
 void application::
 on_got_ip( esp_netif_ip_info_t *ip_info ) {
   m_clock_face.display_ip( ip_info );
+  m_ntp_server.init();
 }
 
 void application::

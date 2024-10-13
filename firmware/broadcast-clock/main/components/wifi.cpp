@@ -1,6 +1,9 @@
 #include "wifi.hpp"
 #include "configuration.hpp"
 #include "../secrets.hpp"
+#include "../semaphores/mutex.hpp"
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
 #include <memory.h>
 #include <esp_wifi.h>
 #include <time.h>
@@ -341,7 +344,10 @@ on_ntp_sync( struct timeval *now ) {
     uint32_t e = 0;
     if( sntp_get_sync_status() == SNTP_SYNC_STATUS_COMPLETED ) {
       e = broadcast_clock::wifi::WIFI_EVENT_NTP_SYNC;
-      clock_gettime( CLOCK_MONOTONIC, &m_app_instance->m_last_ntp_sync_time );
+      if( xSemaphoreTake( semaphores::mutex::system_clock, portMAX_DELAY ) ) {
+        clock_gettime( CLOCK_MONOTONIC, &m_app_instance->m_last_ntp_sync_time );
+        xSemaphoreGive( semaphores::mutex::system_clock );
+      }
     }
     else {
       e = wifi::WIFI_EVENT_NTP_SYNC_FAILED;

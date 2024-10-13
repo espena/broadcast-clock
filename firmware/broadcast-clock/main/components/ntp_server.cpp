@@ -1,5 +1,11 @@
 #include "ntp_server.hpp"
 #include "configuration.hpp"
+#include "wifi.hpp"
+#include <sys/socket.h>
+#include <netdb.h>
+#include <lwip/sockets.h>
+#include <lwip/netdb.h>
+#include <lwip/err.h>
 #include <memory.h>
 #include <time.h>
 #include <sys/time.h>
@@ -17,6 +23,9 @@ const char *broadcast_clock::ntp_server::m_event_base = "broadcast_clock_ntp_ser
 
 broadcast_clock::ntp_server::
 ntp_server() : m_event_loop_handle( nullptr ) {
+
+  memset( &m_server_addr, 0x00, sizeof( struct sockaddr_in ) );
+  m_sock = -1;
 
   m_task_queue = xQueueCreate( 1024, sizeof( ntp_server_task_queue_item_t ) );
 
@@ -79,6 +88,30 @@ task_loop( void *arg ) {
     if( xQueueReceive( inst->m_task_queue, &item, -1 ) ) {
       inst->on_task_message( item.message, item.arg );
     }
+    if( inst->m_sock > -1 ) {
+      inst->sock_read();
+    }
+  }
+}
+
+void broadcast_clock::ntp_server::
+sock_read() {
+  struct sockaddr_in client_addr;
+  socklen_t client_addr_len = sizeof( client_addr );
+  char recv_buf[ 48 ];
+  int len = recvfrom( m_sock,
+                      recv_buf,
+                      sizeof( recv_buf ),
+                      0,
+                      ( struct sockaddr * ) &client_addr,
+                      &client_addr_len );
+  if( len > 0 ) {
+    ESP_LOGI( m_component_name,
+              "Received %d bytes from %s:%d",
+              len,
+              inet_ntoa( client_addr.sin_addr ),
+              ntohs( client_addr.sin_port ) );
+
   }
 }
 
@@ -93,7 +126,27 @@ on_task_message( ntp_server_task_message msg, void *arg ) {
 
 void broadcast_clock::ntp_server::
 on_init() {
-
+  configuration *cnf = configuration::get_instance();
+  if( cnf ) {
+    if( cnf->get_str( "ntp_server_enable" ) == "on" ) {
+      ESP_LOGI( m_component_name, "Initializing" );
+      m_server_addr.sin_family = AF_INET;
+      m_server_addr.sin_addr.s_addr = INADDR_ANY;
+      m_server_addr.sin_port = htons( m_ntp_server_port );
+      m_sock = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
+      if( m_sock < 0 ) {
+        ESP_LOGE( m_component_name, "Failed to create socket" );
+        return;
+      }
+      const int err = bind( m_sock, ( struct sockaddr * ) &m_server_addr, sizeof( m_server_addr ) );
+      if( err < 0 ) {
+        ESP_LOGE( m_component_name, "Failed to bind socket" );
+        close( m_sock );
+        m_sock = -1;
+        return;
+      }
+    }
+  }
 }
 
 void broadcast_clock::ntp_server::

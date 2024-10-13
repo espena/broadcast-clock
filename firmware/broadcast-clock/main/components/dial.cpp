@@ -1,5 +1,6 @@
 #include "dial.hpp"
 #include "configuration.hpp"
+#include "../semaphores/mutex.hpp"
 #include "../utils/micro_delay.hpp"
 #include "../gpio_mapping.hpp"
 #include <memory.h>
@@ -8,6 +9,7 @@
 #include <sys/time.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include <freertos/semphr.h>
 #include <freertos/queue.h>
 #include <driver/gpio.h>
 #include <driver/ledc.h>
@@ -203,7 +205,10 @@ update() {
   bool stopwatch_stopped = !stopwatch_running && ( m_stopwatch_end.tv_nsec > 0 || m_stopwatch_end.tv_sec > 0 );
   static int16_t stopwatch_led_runner = 0;
   if( stopwatch_running ) {
-      clock_gettime( CLOCK_MONOTONIC, &m_stopwatch_end );
+      if( xSemaphoreTake( semaphores::mutex::system_clock, portMAX_DELAY ) ) {
+        clock_gettime( CLOCK_MONOTONIC, &m_stopwatch_end );
+        xSemaphoreGive( semaphores::mutex::system_clock );
+      }
       uint32_t stopwatch_begin_ms = ( m_stopwatch_begin.tv_sec * 1000 ) + ( m_stopwatch_begin.tv_nsec / 1000000 );
       uint32_t stopwatch_end_ms = ( m_stopwatch_end.tv_sec * 1000 ) + ( m_stopwatch_end.tv_nsec / 1000000 );
       uint32_t ms_delta = ( stopwatch_end_ms - stopwatch_begin_ms ) % 1000;
@@ -297,7 +302,10 @@ init_gpio() {
 void broadcast_clock::dial::
 countdown_start( struct timespec *period ) {
   memcpy( &m_countdown_period, period, sizeof( timespec ) );
-  clock_gettime( CLOCK_MONOTONIC, &m_stopwatch_begin );
+  if( xSemaphoreTake( semaphores::mutex::system_clock, portMAX_DELAY ) ) {
+    clock_gettime( CLOCK_MONOTONIC, &m_stopwatch_begin );
+    xSemaphoreGive( semaphores::mutex::system_clock );
+  }
 }
 
 void broadcast_clock::dial::
@@ -309,7 +317,10 @@ countdown_reset() {
 
 void broadcast_clock::dial::
 stopwatch_start() {
-  clock_gettime( CLOCK_MONOTONIC, &m_stopwatch_begin );
+  if( xSemaphoreTake( semaphores::mutex::system_clock, portMAX_DELAY ) ) {
+    clock_gettime( CLOCK_MONOTONIC, &m_stopwatch_begin );
+    xSemaphoreGive( semaphores::mutex::system_clock );
+  }
 }
 
 void broadcast_clock::dial::

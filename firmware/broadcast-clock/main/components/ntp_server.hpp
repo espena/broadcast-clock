@@ -2,6 +2,7 @@
 #define __NTP_SERVER__
 
 #include <time.h>
+#include <lwip/sockets.h>
 #include <esp_event.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
@@ -14,6 +15,8 @@ namespace espena::broadcast_clock {
 
     static const char *m_event_base;
     static const uint32_t NTP_SERVER_RESPONDED = 0x01u;
+
+    static const uint16_t m_ntp_server_port = 123;
 
   private:
 
@@ -46,8 +49,13 @@ namespace espena::broadcast_clock {
       void *arg;
     } ntp_server_task_queue_item_t;
 
+    struct sockaddr_in m_server_addr; // NTP server address
+    int m_sock; // Socket file descriptor
+
     static void task_loop( void *arg );
     void on_task_message( ntp_server_task_message msg, void *arg );
+
+    void sock_read();
 
     void on_init();
 

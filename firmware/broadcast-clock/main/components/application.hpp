@@ -7,6 +7,7 @@
 #include "clock_status.hpp"
 #include "beeper.hpp"
 #include "lea_m8t.hpp"
+#include "ntp_server.hpp"
 #include "captive_portal_dns.hpp"
 #include "captive_portal_http.hpp"
 #include <string>
@@ -27,6 +28,7 @@ namespace espena::broadcast_clock {
     captive_portal_dns m_captive_portal_dns;
     captive_portal_http m_captive_portal_http;
     lea_m8t m_lea_m8t;
+    ntp_server m_ntp_server;
     clock_face m_clock_face;
     clock_status m_clock_status;
     beeper m_beeper;

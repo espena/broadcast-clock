@@ -1,11 +1,13 @@
 #include "dotmatrix.hpp"
 #include "../gpio_mapping.hpp"
+#include "../semaphores/mutex.hpp"
 #include <memory.h>
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include <freertos/semphr.h>
 #include <freertos/queue.h>
 #include <driver/spi_master.h>
 #include <driver/gpio.h>
@@ -149,7 +151,12 @@ task_loop( void *arg ) {
     
     if( inst->m_stopwatch_begin.tv_nsec != 0 || inst->m_stopwatch_end.tv_nsec != 0 ) {
       if( inst->m_stopwatch_begin.tv_nsec != 0 ) {
-        clock_gettime( CLOCK_MONOTONIC, &inst->m_stopwatch_end );
+
+        if( xSemaphoreTake( semaphores::mutex::system_clock, portMAX_DELAY ) ) {
+          clock_gettime( CLOCK_MONOTONIC, &inst->m_stopwatch_end );
+          xSemaphoreGive( semaphores::mutex::system_clock );
+        }
+
         const uint32_t mstart = inst->m_stopwatch_begin.tv_sec * 1000 + inst->m_stopwatch_begin.tv_nsec / 1000000;
         const uint32_t mend = inst->m_stopwatch_end.tv_sec * 1000 + inst->m_stopwatch_end.tv_nsec / 1000000;
         const uint32_t mdiff = mend - mstart;
@@ -319,7 +326,10 @@ on_display( display_message *msg ) {
 
 void broadcast_clock::dotmatrix::
 on_stopwatch_start() {
-  clock_gettime( CLOCK_MONOTONIC, &m_stopwatch_begin );
+  if( xSemaphoreTake( semaphores::mutex::system_clock, portMAX_DELAY ) ) {
+    clock_gettime( CLOCK_MONOTONIC, &m_stopwatch_begin );
+    xSemaphoreGive( semaphores::mutex::system_clock );
+  }
 }
 
 void broadcast_clock::dotmatrix::
@@ -336,7 +346,10 @@ on_stopwatch_reset() {
 void broadcast_clock::dotmatrix::
 on_countdown_start( struct timespec *period ) {
   memcpy( &m_countdown_period, period, sizeof( struct timespec ) );
-  clock_gettime( CLOCK_MONOTONIC, &m_stopwatch_begin );
+  if( xSemaphoreTake( semaphores::mutex::system_clock, portMAX_DELAY ) ) {
+    clock_gettime( CLOCK_MONOTONIC, &m_stopwatch_begin );
+    xSemaphoreGive( semaphores::mutex::system_clock );
+  }
 }
 
 void broadcast_clock::dotmatrix::

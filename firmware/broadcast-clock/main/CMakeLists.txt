@@ -1,4 +1,5 @@
 idf_component_register( SRCS "app_main.cpp"
+                             "semaphores/mutex.cpp"
                              "components/application.cpp"
                              "components/configuration.cpp"
                              "components/clock_face.cpp"
