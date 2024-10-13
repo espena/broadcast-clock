@@ -718,8 +718,10 @@ on_ubx_nav_timeutc( ubx::nav_timeutc_t *timeutc ) {
 
 void broadcast_clock::lea_m8t::
 isr_timepulse_handler( void *arg ) {
+  UBaseType_t intstat = taskENTER_CRITICAL_FROM_ISR();
   lea_m8t *inst = static_cast<lea_m8t *>( arg );
   inst->m_timepulse_cc = xthal_get_ccount();
+  taskEXIT_CRITICAL_FROM_ISR( intstat );
   lea_m8t_timepulse_queue_item_t tp_item = { lea_m8t_timepulse_message::timepulse, nullptr };
   xQueueSendFromISR( inst->m_timepulse_queue, &tp_item, nullptr );
 }
