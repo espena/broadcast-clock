@@ -353,20 +353,24 @@ on_timepulse_loop_message( lea_m8t_timepulse_message msg, void *arg ) {
 
   // High priority handling of timepulse
   struct timespec now;
+  int32_t now_ns = 0;
+  uint32_t now_cc = 0;
+  uint32_t tp_cc = 0;
+  uint32_t tp_ns = 0;
+
   if( xSemaphoreTake( semaphores::mutex::system_clock, portMAX_DELAY ) ) {
+    taskENTER_CRITICAL( &m_spinlock1 );
     clock_gettime( CLOCK_REALTIME, &now );
     xSemaphoreGive( semaphores::mutex::system_clock );
-  }
-
-  now.tv_sec = ( now.tv_nsec > 500000000 ? now.tv_sec + 1 : now.tv_sec );
-  int32_t now_ns = now.tv_nsec;
-  uint32_t now_cc = xthal_get_ccount();
-  uint32_t tp_cc = now_cc - m_timepulse_cc;
-  uint32_t tp_ns = ( tp_cc * 1000000 ) / 240000000;
-  
-  now.tv_nsec = tp_ns + 52000; // Adjust for code execution time
-  if( xSemaphoreTake( semaphores::mutex::system_clock, portMAX_DELAY ) ) {
+    now.tv_sec = ( now.tv_nsec > 500000000 ? now.tv_sec + 1 : now.tv_sec );
+    now_ns = now.tv_nsec;
+    now_cc = xthal_get_ccount();
+    tp_cc = now_cc - m_timepulse_cc;
+    tp_ns = ( tp_cc * 1000000 ) / 240000000;
+    now.tv_nsec = tp_ns + 52000; // Adjust for code execution time
     clock_settime( CLOCK_REALTIME, &now );
+    now_ns -= ( tp_ns );
+    taskEXIT_CRITICAL( &m_spinlock1 );
     xSemaphoreGive( semaphores::mutex::system_clock );
   }
 
@@ -375,7 +379,6 @@ on_timepulse_loop_message( lea_m8t_timepulse_message msg, void *arg ) {
   xQueueSendToFront( m_task_queue, &ts_item, -1 );
 
   // Output timepulse offset
-  now_ns -= ( tp_ns );
   m_tp_offset_us = ( now_ns >= 500000000 ? now_ns -= 1000000000 : now_ns ) / 1000;
   ESP_LOGI( m_component_name, "Timepulse offset: %li us", m_tp_offset_us );
 

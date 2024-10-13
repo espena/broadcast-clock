@@ -32,7 +32,7 @@ clock_face() : m_is_initialized( false ),
                       m_component_name,
                       m_component_stack_size,
                       &m_task_params,
-                      15,
+                      8,
                       m_task_params.stack_buffer,
                       &m_task_params.task_buffer );
 }

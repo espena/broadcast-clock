@@ -45,7 +45,8 @@ dial() : m_initialized( false ),
                  m_component_name,
                  m_component_stack_size,
                  &m_task_params,
-                 configMAX_PRIORITIES - 2,
+                 //configMAX_PRIORITIES - 2,
+                 5,
                  &m_task_params.task_handle );
 }
 

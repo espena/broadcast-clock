@@ -41,7 +41,7 @@ broadcast_clock::captive_portal_http::captive_portal_http() : m_message_queue( n
                      m_component_name,
                      m_component_stack_size,
                      &m_task_params,
-                     22,
+                     8,
                      m_task_params.stack_buffer,
                      &m_task_params.task_buffer );
 }

@@ -36,7 +36,7 @@ ntp_server() : m_event_loop_handle( nullptr ) {
                      m_component_name,
                      m_component_stack_size,
                      &m_task_params,
-                     configMAX_PRIORITIES - 3,
+                     10,
                      m_task_params.stack_buffer,
                      &m_task_params.task_buffer );
 
