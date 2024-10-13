@@ -2,6 +2,7 @@
 #include "ubx_types.hpp"
 #include "captive_portal_http.hpp"
 #include "wifi.hpp"
+#include "ntp_server.hpp"
 #include "lea_m8t.hpp"
 
 #include <map>
@@ -90,6 +91,18 @@ set_event_loop_handle( esp_event_loop_handle_t event_loop_handle ) {
                                    lea_m8t::UBX_TIM_SVIN,
                                    event_handler,
                                    this );
+
+  esp_event_handler_register_with( m_event_loop_handle,
+                                   ntp_server::m_event_base,
+                                   ntp_server::READY,
+                                   event_handler,
+                                   this );
+
+  esp_event_handler_register_with( m_event_loop_handle,
+                                   ntp_server::m_event_base,
+                                   ntp_server::RESPONDED,
+                                   event_handler,
+                                   this );
 }
 
 void clock_status::
@@ -124,6 +137,16 @@ event_handler( void *handler_arg,
         break;
       case wifi::WIFI_EVENT_NTP_SYNC_FAILED:
         inst->sntp_sync( false );
+        break;
+    }
+  }
+  else if( ntp_server::m_event_base == event_base ) {
+    switch( event_id ) {
+      case ntp_server::READY:
+        inst->ntp_server_ready( true );
+        break;
+      case ntp_server::RESPONDED:
+        inst->ntp_server_responded( true );
         break;
     }
   }

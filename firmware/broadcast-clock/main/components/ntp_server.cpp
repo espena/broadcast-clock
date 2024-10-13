@@ -180,6 +180,16 @@ sock_read() {
             ( struct sockaddr * ) &client_addr,
             client_addr_len );
 
+    // Send notification
+    if( m_event_loop_handle ) {
+      esp_event_post_to( m_event_loop_handle,
+                          m_event_base,
+                          RESPONDED,
+                          nullptr,
+                          0,
+                          10 );
+    }
+
   }
 }
 
@@ -196,7 +206,7 @@ void broadcast_clock::ntp_server::
 on_init() {
   configuration *cnf = configuration::get_instance();
   if( cnf ) {
-    if( cnf->get_str( "ntp_server_enable" ) != "off" ) {
+    if( cnf->get_str( "ntp_server_enable" ) == "on" ) {
       ESP_LOGI( m_component_name, "Initializing" );
       m_server_addr.sin_family = AF_INET;
       m_server_addr.sin_addr.s_addr = INADDR_ANY;
@@ -212,6 +222,14 @@ on_init() {
         close( m_sock );
         m_sock = -1;
         return;
+      }
+      if( m_event_loop_handle ) {
+        esp_event_post_to( m_event_loop_handle,
+                           m_event_base,
+                           READY,
+                           nullptr,
+                           0,
+                           10 );
       }
     }
   }

@@ -14,7 +14,8 @@ namespace espena::broadcast_clock {
   public:
 
     static const char *m_event_base;
-    static const uint32_t NTP_SERVER_RESPONDED = 0x01u;
+    static const uint32_t READY = 0x01u;
+    static const uint32_t RESPONDED = 0x02u;
 
     static const uint16_t m_ntp_server_port = 123;
 

@@ -41,6 +41,7 @@
             document.getElementById( 'utc_standard' ).innerText = data.utc_standard;
             document.getElementById( 'time_mode' ).innerText = time_mode_status;
             document.getElementById( 'time_mode_enable' ).disabled = false;
+            document.getElementById( 'ntp_server_enable' ).disabled = false;
             document.getElementById( 'gnss_svin_mean_x' ).innerText = data.survey_in.mean_x;
             document.getElementById( 'gnss_svin_mean_y' ).innerText = data.survey_in.mean_y;
             document.getElementById( 'gnss_svin_mean_z' ).innerText = data.survey_in.mean_z;
@@ -207,8 +208,15 @@
                 <tr><td>ECEF mean Z</td><td class="number" id="gnss_svin_mean_z"></td></tr>
               </table>
             </div>
+            <div class="page ntp-server">
+              <label>NTP server</label>
+              <div><input |ntp_server_enable:on| type="checkbox" disabled name="ntp_server_enable" id="ntp_server_enable"><label for="ntp_server_enable">Enable NTP server</label></div>
+              <table class="ntp-server-status |ntp_server_enable:on|">
+                <tr><td>Number of clients</td><td class="number" id="ntp_server_clients"></td></tr>
+              </table>
+            </div>
             <div class="gnss pages">
-              <button class="status">Status</button> <button class="setup">Setup</button>
+              <button class="status">Status</button> <button class="setup">Setup</button> <button class="ntp-server">NTP server</button>
             </div>
           </fieldset>
           <fieldset class="tab misc">
@@ -306,6 +314,12 @@
       time_mode_enable.addEventListener( 'change', ( event ) => {
         document.querySelector( '.sys-status' ).classList.remove( event.target.checked ? 'disabled' : 'enabled' );
         document.querySelector( '.sys-status' ).classList.add( event.target.checked ? 'enabled' : 'disabled' );
+      } );
+
+      var ntp_server_enable = document.getElementById( 'ntp_server_enable' );
+      ntp_server_enable.addEventListener( 'change', ( event ) => {
+        document.querySelector( '.ntp-server-status' ).classList.remove( event.target.checked ? 'disabled' : 'enabled' );
+        document.querySelector( '.ntp-server-status' ).classList.add( event.target.checked ? 'enabled' : 'disabled' );
       } );
 
       var coundown_input = document.getElementById( 'period' );
