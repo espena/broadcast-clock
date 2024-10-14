@@ -161,9 +161,7 @@ on_init() {
 
   m_dotmatrix.set_event_loop_handle( m_event_loop_handle );
   m_dotmatrix.init();
-
-  //m_ambient_sensor.init( m_i2c_bus );
-
+  m_ambient_sensor.init();
   init_interval_timer();
 }
 
@@ -363,7 +361,7 @@ lux2threshold( uint16_t lux ) {
       hysteresis = 1.0;
     }
     else {
-      hysteresis = m_threshold < threshold ? 0.9 : 1.1;
+      hysteresis = m_threshold < threshold ? 0.8 : 1.2;
     }
   }
   m_threshold = threshold;
@@ -371,13 +369,10 @@ lux2threshold( uint16_t lux ) {
 
 void broadcast_clock::clock_face::
 check_ambient_light() {
-  /*
   uint16_t lux = m_ambient_sensor.read();
   lux2threshold( lux );
   m_dial.set_ambient_light_level( m_threshold );
   m_dotmatrix.set_ambient_light_level( m_threshold );
-  */
-  m_dotmatrix.set_ambient_light_level( 4 );
 }
 
 void broadcast_clock::clock_face::

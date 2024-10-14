@@ -383,4 +383,16 @@ init_timezone() {
 
 void application::
 init_i2c() {
+  i2c_config_t conf;
+  memset( &conf, 0x00, sizeof( i2c_config_t ) );
+  conf.mode = I2C_MODE_MASTER;
+  conf.sda_io_num = I2C_SDA;
+  conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
+  conf.scl_io_num = I2C_SCL;
+  conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
+  conf.master.clk_speed = 400000;
+
+  ESP_ERROR_CHECK( i2c_param_config( I2C_NUM_0, &conf ) );
+  ESP_ERROR_CHECK( i2c_driver_install( I2C_NUM_0, I2C_MODE_MASTER, 0, 0, 0 ) );
+  i2c_set_timeout( I2C_NUM_0, 1000000 );
 }

@@ -3,8 +3,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <memory.h>
-//#include <driver/i2c.h>
-#include <driver/i2c_master.h>
+#include <driver/i2c.h>
 #include <esp_log.h>
 
 #define I2C_MASTER_WRITE 0
@@ -27,34 +26,40 @@ broadcast_clock::ambient_sensor::
 void broadcast_clock::ambient_sensor::
 init() {
   ESP_LOGI( m_component_name, "Initializing" );
-  //m_i2c_bus = i2c_bus;
   init_sensor();
 }
 
 void broadcast_clock::ambient_sensor::
 init_sensor() {
-  //i2c_master_probe( m_i2c_bus, m_i2c_address, -1 );
-  //i2c_device_config_t dev_cfg;
-  //memset( &dev_cfg, 0x00, sizeof( i2c_device_config_t ) );
-  //dev_cfg.dev_addr_length = I2C_ADDR_BIT_LEN_7;
-  //dev_cfg.device_address = m_i2c_address;
-  //dev_cfg.scl_speed_hz = 10000;
-  //ESP_ERROR_CHECK( i2c_master_bus_add_device( m_i2c_bus, &dev_cfg, &m_i2c_dev ) );
-  //uint8_t cmd_config[ ] = { 0x00, 0b00001000, 0b11000000 };
-  //ESP_ERROR_CHECK( i2c_master_transmit( m_i2c_dev, cmd_config, sizeof( cmd_config ), -1 ) );
+
+  uint8_t cmd_config[ ] = { 0x00, 0b00001000, 0b11000000 };
+  i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+  i2c_master_start( cmd );
+  i2c_master_write_byte( cmd, ( m_i2c_address << 1 ) | I2C_MASTER_WRITE, true );
+  i2c_master_write( cmd, cmd_config, sizeof( cmd_config ), true );
+  i2c_master_stop( cmd );
+  esp_err_t res = i2c_master_cmd_begin( I2C_NUM_0, cmd, 1000 );
+  i2c_cmd_link_delete( cmd );
+
 }
 
 uint16_t broadcast_clock::ambient_sensor::
 read() {
   uint8_t cmd_read_als[ ] = { 0x04 };
   uint8_t buf_lux_val[ ] = { 0x00, 0x00 };
+  uint16_t lux = 0;
 
-  //ESP_ERROR_CHECK( i2c_master_transmit_receive( m_i2c_dev,
-  //                                              cmd_read_als,
-  //                                              sizeof( cmd_read_als ),
-  //                                              buf_lux_val,
-  //                                              sizeof( buf_lux_val ),
-  //                                              -1 ) );
+  esp_err_t res = i2c_master_write_read_device( I2C_NUM_0,
+                                                m_i2c_address,
+                                                cmd_read_als,
+                                                sizeof( cmd_read_als ),
+                                                buf_lux_val,
+                                                sizeof( buf_lux_val ),
+                                                -1 );
 
-  return ( buf_lux_val[ 0 ] << 8 ) | buf_lux_val[ 1 ];
+  if( res == ESP_OK ) {
+    lux = ( buf_lux_val[ 0 ] << 8 ) | buf_lux_val[ 1 ];
+  }
+
+  return lux;
 }
