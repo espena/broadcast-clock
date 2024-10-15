@@ -1,6 +1,6 @@
 # Broadcast clock
 
-**Digital precision studio/broadcast clock with WiFi configuration, NTP and GPS time sync.**
+**Digital precision studio/broadcast master clock with WiFi configuration, NTP client/server and GPS time sync.**
 
 ![Home made broadcast clock](/hardware/gfx/prototype_programming.jpg "Broadcast studio clock")
 
@@ -12,7 +12,7 @@ The enclosure is an 25x25 cm [IKEA "Sannahed"](https://www.ikea.com/us/en/p/sann
 
 There are no traditional buttons to control the clock. Instead, it has a browser based web configurator. When powered on, the clock will expose a dedicated wifi network for 30 seconds. Connect to the network in order to access the clock's control panel.
 
-The clock supports time synchronization over the web (NTP) or via a range of GNSS satellite systems (GPS/QZSS, GLONASS, BeiDou, Galileo).
+The clock supports time synchronization over the web (NTP) or via a range of GNSS satellite systems (GPS/QZSS, GLONASS, BeiDou, Galileo). It acts as a highly accurate NTP time server for other clocks on your LAN.
 
 LED brightness is auto-adjusted to ambient light conditions. This feature can be overridden in the control panel.
 
