@@ -49,6 +49,7 @@
             document.getElementById( 'gnss_svin_active' ).innerText = data.survey_in.active;
             document.getElementById( 'gnss_svin_dur' ).innerText = secondsToHMS( data.survey_in.duration );
             document.getElementById( 'gnss_svin_obs' ).innerText = data.survey_in.observations;
+            document.getElementById( 'ntp_server_clients' ).innerText = data.ntp_server_client_count;
           }
           const offsetUsElement = document.querySelector( '#offset_us span em' );
           const value = parseInt( offsetUsElement.textContent, 10 );

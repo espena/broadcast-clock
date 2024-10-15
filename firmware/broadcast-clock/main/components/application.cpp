@@ -1,7 +1,7 @@
 #include "application.hpp"
 #include "clock_face.hpp"
 #include "captive_portal_dns.hpp"
-#include "captive_portal_http.hpp"
+#include "http_server.hpp"
 #include "../gpio_mapping.hpp"
 #include <rtc_wdt.h>
 #include <string>
@@ -50,42 +50,42 @@ init() {
     esp_netif_init();
     esp_event_loop_create_default();
 
-    m_captive_portal_http.set_event_loop_handle( m_event_loop_handle );
-    m_captive_portal_http.set_gnss_state( &m_clock_status );
+    m_http_server.set_event_loop_handle( m_event_loop_handle );
+    m_http_server.set_gnss_state( &m_clock_status );
 
     esp_event_handler_register_with( m_event_loop_handle,
-                                     broadcast_clock::captive_portal_http::m_event_base,
-                                     broadcast_clock::captive_portal_http::EVENT_SAVE,
+                                     broadcast_clock::http_server::m_event_base,
+                                     broadcast_clock::http_server::EVENT_SAVE,
                                      wifi_event_handler,
                                      this );
 
     esp_event_handler_register_with( m_event_loop_handle,
-                                     broadcast_clock::captive_portal_http::m_event_base,
-                                     broadcast_clock::captive_portal_http::EVENT_CANCEL,
+                                     broadcast_clock::http_server::m_event_base,
+                                     broadcast_clock::http_server::EVENT_CANCEL,
                                      wifi_event_handler,
                                      this );
 
     esp_event_handler_register_with( m_event_loop_handle,
-                                     broadcast_clock::captive_portal_http::m_event_base,
-                                     broadcast_clock::captive_portal_http::EVENT_START_TIME_MODE,
+                                     broadcast_clock::http_server::m_event_base,
+                                     broadcast_clock::http_server::EVENT_START_TIME_MODE,
                                      wifi_event_handler,
                                      this );
 
     esp_event_handler_register_with( m_event_loop_handle,
-                                     broadcast_clock::captive_portal_http::m_event_base,
-                                     broadcast_clock::captive_portal_http::EVENT_STOP_TIME_MODE,
+                                     broadcast_clock::http_server::m_event_base,
+                                     broadcast_clock::http_server::EVENT_STOP_TIME_MODE,
                                      wifi_event_handler,
                                      this );
 
     esp_event_handler_register_with( m_event_loop_handle,
-                                     broadcast_clock::captive_portal_http::m_event_base,
-                                     broadcast_clock::captive_portal_http::EVENT_CONFIGURATOR_START,
+                                     broadcast_clock::http_server::m_event_base,
+                                     broadcast_clock::http_server::EVENT_CONFIGURATOR_START,
                                      wifi_event_handler,
                                      this );
 
     esp_event_handler_register_with( m_event_loop_handle,
-                                     broadcast_clock::captive_portal_http::m_event_base,
-                                     broadcast_clock::captive_portal_http::EVENT_CONFIGURATOR_STOP,
+                                     broadcast_clock::http_server::m_event_base,
+                                     broadcast_clock::http_server::EVENT_CONFIGURATOR_STOP,
                                      wifi_event_handler,
                                      this );
 
@@ -185,8 +185,8 @@ init() {
     m_ntp_server.set_event_loop_handle( m_event_loop_handle );
 
     if( m_configuration->get_bool( "configurator" ) ) {
-      m_captive_portal_http.init();
-      m_captive_portal_http.start();
+      m_http_server.init();
+      m_http_server.start();
     }
 }
 
@@ -250,25 +250,25 @@ wifi_event_handler( void *handler_arg,
         break;
     }
   }
-  else if( source == broadcast_clock::captive_portal_http::m_event_base ) {
+  else if( source == broadcast_clock::http_server::m_event_base ) {
     broadcast_clock::application *instance = static_cast<broadcast_clock::application *>( handler_arg );
     switch( event_id ) {
-      case broadcast_clock::captive_portal_http::EVENT_SAVE:
+      case broadcast_clock::http_server::EVENT_SAVE:
         instance->on_save_config( std::string( ( char * ) event_params ) );
         break;
-      case broadcast_clock::captive_portal_http::EVENT_CANCEL:
+      case broadcast_clock::http_server::EVENT_CANCEL:
         instance->on_cancel_config( std::string( ( char * ) event_params ) );
         break;
-      case broadcast_clock::captive_portal_http::EVENT_START_TIME_MODE:
+      case broadcast_clock::http_server::EVENT_START_TIME_MODE:
         instance->m_lea_m8t.start_time_mode();
         break;
-      case broadcast_clock::captive_portal_http::EVENT_STOP_TIME_MODE:
+      case broadcast_clock::http_server::EVENT_STOP_TIME_MODE:
         instance->m_lea_m8t.stop_time_mode();
         break;
-      case broadcast_clock::captive_portal_http::EVENT_CONFIGURATOR_START:
+      case broadcast_clock::http_server::EVENT_CONFIGURATOR_START:
         instance->m_clock_status.configurator_enabled( true );
         break;
-      case broadcast_clock::captive_portal_http::EVENT_CONFIGURATOR_STOP:
+      case broadcast_clock::http_server::EVENT_CONFIGURATOR_STOP:
         instance->m_clock_status.configurator_enabled( false );
         break;
     }
@@ -303,7 +303,7 @@ switch_to_station_mode() {
   }
   m_captive_portal_dns.stop();
   if( !m_configuration->get_bool( "configurator" ) ) {
-    m_captive_portal_http.stop();
+    m_http_server.stop();
   }
   m_wifi.init( wifi::mode::station );
 }
@@ -323,8 +323,8 @@ on_enter_config_mode() {
     m_captive_portal_dns.init();
     m_captive_portal_dns.start();
     if( !m_configuration->get_bool( "configurator" ) ) {
-      m_captive_portal_http.init();
-      m_captive_portal_http.start();
+      m_http_server.init();
+      m_http_server.start();
     }
   }
 }

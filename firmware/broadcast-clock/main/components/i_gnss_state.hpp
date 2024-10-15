@@ -63,6 +63,9 @@ namespace espena::broadcast_clock {
     virtual uint32_t gnss_svin_mean_v() = 0;
     virtual std::string gnss_svin_mean_v_str() = 0;
 
+    virtual uint32_t gnss_ntp_server_client_count() = 0;
+    virtual std::string gnss_ntp_server_client_count_str() = 0;
+
   };
 
 }

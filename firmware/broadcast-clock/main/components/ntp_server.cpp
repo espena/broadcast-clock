@@ -1,17 +1,22 @@
 #include "ntp_server.hpp"
 #include "configuration.hpp"
+#include "../semaphores/mutex.hpp"
 #include "../utils/hexdump.hpp"
 #include "wifi.hpp"
+#include "lea_m8t.hpp"
 #include <sys/socket.h>
 #include <netdb.h>
 #include <lwip/sockets.h>
 #include <lwip/netdb.h>
 #include <lwip/err.h>
+#include <string>
+#include <set>
 #include <memory.h>
 #include <time.h>
 #include <sys/time.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include <freertos/semphr.h>
 #include <freertos/portmacro.h>
 #include <freertos/queue.h>
 #include <esp_log.h>
@@ -25,6 +30,7 @@ const char *broadcast_clock::ntp_server::m_event_base = "broadcast_clock_ntp_ser
 broadcast_clock::ntp_server::
 ntp_server() : m_event_loop_handle( nullptr ) {
 
+  memset( &m_last_sync_time, 0x00, sizeof( struct timespec ) );
   memset( &m_server_addr, 0x00, sizeof( struct sockaddr_in ) );
   m_sock = -1;
 
@@ -37,7 +43,7 @@ ntp_server() : m_event_loop_handle( nullptr ) {
                      m_component_name,
                      m_component_stack_size,
                      &m_task_params,
-                     configMAX_PRIORITIES - 4,
+                     configMAX_PRIORITIES - 7,
                      m_task_params.stack_buffer,
                      &m_task_params.task_buffer );
 }
@@ -54,6 +60,12 @@ set_event_loop_handle( esp_event_loop_handle_t h ) {
     esp_event_handler_register_with( m_event_loop_handle,
                                      configuration::m_event_base,
                                      configuration::CONFIGURATION_UPDATED,
+                                     event_handler,
+                                     this );
+
+    esp_event_handler_register_with( m_event_loop_handle,
+                                     lea_m8t::m_event_base,
+                                     lea_m8t::TIME_ADJUSTED,
                                      event_handler,
                                      this );
   }
@@ -76,6 +88,21 @@ event_handler( void *handler_arg,
       }
     }
   }
+  else if( source == lea_m8t::m_event_base ) {
+    ntp_server *instance = static_cast<ntp_server *>( handler_arg );
+    if( instance ) {
+      switch( event_id ) {
+        case lea_m8t::TIME_ADJUSTED:
+          instance->on_time_adjusted( static_cast<struct timespec *>( event_params ) );
+          break;
+      }
+    }
+  }
+}
+
+void broadcast_clock::ntp_server::
+on_time_adjusted( struct timespec *ts ) {
+  memcpy( &m_last_sync_time, ts, sizeof( struct timespec ) );
 }
 
 void broadcast_clock::ntp_server::
@@ -85,7 +112,7 @@ task_loop( void *arg ) {
   ntp_server_task_queue_item_t item;
   memset( &item, 0x00, sizeof( ntp_server_task_queue_item_t ) );
   while( 1 ) {
-    if( xQueueReceive( inst->m_task_queue, &item, 10 ) ) {
+    if( xQueueReceive( inst->m_task_queue, &item, 1 ) ) {
       inst->on_task_message( item.message, item.arg );
     }
     if( inst->m_sock > -1 ) {
@@ -136,60 +163,70 @@ sock_read() {
                       &client_addr_len );
   if( len > 0 ) {
 
-    uint8_t ntp_receive_time[ 8 ];
-    uint8_t ntp_reference_time[ 8 ];
-    uint8_t ntp_transmit_time[ 8 ];
+    // We don't want any time ajustments while building the NTP response
+    if( xSemaphoreTake( semaphores::mutex::system_clock, portMAX_DELAY ) ) {
 
-    get_ntp_time( ntp_receive_time );
+      uint8_t ntp_receive_time[ 8 ];
+      get_ntp_time( ntp_receive_time );
 
-    ESP_LOGI( m_component_name,
-              "Received %d bytes from %s:%d",
-              len,
-              inet_ntoa( client_addr.sin_addr ),
-              ntohs( client_addr.sin_port ) );
+      // Prepare response, initialize with fixed header values
+      uint8_t tx_buf[ 48 ] = { 0x1c, 0x01, 0x04, 0xf7, 0x00, 0x00, 0x00, 0x00,
+                              0x00, 0x00, 0x00, 0x50,  'G',  'P',  'S', 0x00,
+                              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+                              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+      
+      // Set reference timestamp
+      uint8_t ntp_reference_time[ 8 ];
+      timespec_to_ntp( &m_last_sync_time, ntp_reference_time );
+      memcpy( &tx_buf[ 16 ], ntp_reference_time, 8 );
 
-    ::espena::utils::hexdump( recv_buf, len );
+      // Set original timestamp from request
+      memcpy( &tx_buf[ 24 ], &recv_buf[ 40 ], 8 );
 
-    // Prepare response, initialize with fixed header values
-    uint8_t tx_buf[ 48 ] = { 0x1c, 0x01, 0x04, 0xf7, 0x00, 0x00, 0x00, 0x00,
-                             0x00, 0x00, 0x00, 0x50,  'G',  'P',  'S', 0x00,
-                             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-                             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-    
-    // Set reference timestamp from request
-    get_ntp_time( ntp_reference_time );
-    memcpy( &tx_buf[ 16 ], ntp_reference_time, 8 );
+      // Set receive timestamp
+      memcpy( &tx_buf[ 32 ], ntp_receive_time, 8 );
 
-    // Set original timestamp from request
-    memcpy( &tx_buf[ 24 ], &recv_buf[ 40 ], 8 );
+      // Set transmit timestamp
+      get_ntp_time( &tx_buf[ 40 ] );
 
-    // Set receive timestamp
-    memcpy( &tx_buf[ 32 ], ntp_receive_time, 8 );
+      // Send response
+      sendto( m_sock,
+              tx_buf,
+              sizeof( tx_buf ),
+              0,
+              ( struct sockaddr * ) &client_addr,
+              client_addr_len );
 
-    // Set transmit timestamp
-    get_ntp_time( ntp_transmit_time );
-    memcpy( &tx_buf[ 40 ], ntp_transmit_time, 8 );
+      // Send notification
+      if( m_event_loop_handle ) {
+        esp_event_post_to( m_event_loop_handle,
+                            m_event_base,
+                            RESPONDED,
+                            nullptr,
+                            0,
+                            10 );
+      }
 
-    // Send response
-    sendto( m_sock,
-            tx_buf,
-            sizeof( tx_buf ),
-            0,
-            ( struct sockaddr * ) &client_addr,
-            client_addr_len );
+      xSemaphoreGive( semaphores::mutex::system_clock );
+    }
+    char client_ip[ INET_ADDRSTRLEN ];
+    inet_ntop( AF_INET, &client_addr.sin_addr, client_ip, INET_ADDRSTRLEN );
+    std::string client_address = std::string( client_ip );
+    m_clients.insert( client_address );
 
-    // Send notification
+    // Trig client count event
+    static size_t client_count = 0;
+    client_count = m_clients.size();
     if( m_event_loop_handle ) {
       esp_event_post_to( m_event_loop_handle,
                           m_event_base,
-                          RESPONDED,
-                          nullptr,
-                          0,
+                          CLIENTS,
+                          &client_count,
+                          sizeof( size_t ),
                           10 );
     }
-
   }
 }
 

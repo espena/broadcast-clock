@@ -45,7 +45,6 @@ dial() : m_initialized( false ),
                  m_component_name,
                  m_component_stack_size,
                  &m_task_params,
-                 //configMAX_PRIORITIES - 2,
                  5,
                  &m_task_params.task_handle );
 }
@@ -128,24 +127,6 @@ on_test() {
 void broadcast_clock::dial::
 on_ambient_light_level( int threshold ) {
   switch( threshold ) {
-    /*
-    case 0:
-      m_brightness_bit = 6;
-      break;
-    case 1:
-      m_brightness_bit = 5;
-      break;
-    case 2:
-      m_brightness_bit = 4;
-      break;
-    case 3:
-      m_brightness_bit = 2;
-      break;
-    case 4:
-      m_brightness_bit = 1;
-      break;
-    */
-
     case 0:
       m_brightness_bit = 5;
       break;

@@ -43,6 +43,7 @@ namespace espena::broadcast_clock {
     int32_t m_sntp_aquiring = 0;
 
     bool m_ntp_server_ready = false;
+    uint32_t m_ntp_server_client_count = 0;
     uint8_t m_ntp_server_responded = 0;
 
     uint32_t m_offset_us_cumulative = 0;
@@ -102,6 +103,7 @@ namespace espena::broadcast_clock {
     void configurator_enabled( bool ok );
 
     void ntp_server_ready( bool ok ) { m_ntp_server_ready = ok; };
+    void ntp_server_client_count( uint32_t count ) { m_ntp_server_client_count = count; };
     void ntp_server_responded( bool ok ) { m_ntp_server_responded = ok ? 10 : 0; };
 
     // i_gnss_ubx interface (u-blox messages)
@@ -168,6 +170,9 @@ namespace espena::broadcast_clock {
 
     uint32_t gnss_svin_mean_v() override { return m_gnss_svin_mean_v; };
     std::string gnss_svin_mean_v_str() override { return std::to_string( static_cast<int>( m_gnss_svin_mean_v ) ); };
+
+    uint32_t gnss_ntp_server_client_count() override { return m_ntp_server_client_count; };
+    std::string gnss_ntp_server_client_count_str() override { return std::to_string( static_cast<int>( m_ntp_server_client_count ) ); };
 
   };
 

@@ -1,6 +1,6 @@
 #include "clock_status.hpp"
 #include "ubx_types.hpp"
-#include "captive_portal_http.hpp"
+#include "http_server.hpp"
 #include "wifi.hpp"
 #include "ntp_server.hpp"
 #include "lea_m8t.hpp"
@@ -75,14 +75,14 @@ set_event_loop_handle( esp_event_loop_handle_t event_loop_handle ) {
                                    this );
 
   esp_event_handler_register_with( m_event_loop_handle,
-                                   captive_portal_http::m_event_base,
-                                   captive_portal_http::EVENT_START_TIME_MODE,
+                                   http_server::m_event_base,
+                                   http_server::EVENT_START_TIME_MODE,
                                    event_handler,
                                    this );
 
   esp_event_handler_register_with( m_event_loop_handle,
-                                   captive_portal_http::m_event_base,
-                                   captive_portal_http::EVENT_STOP_TIME_MODE,
+                                   http_server::m_event_base,
+                                   http_server::EVENT_STOP_TIME_MODE,
                                    event_handler,
                                    this );
 
@@ -101,6 +101,12 @@ set_event_loop_handle( esp_event_loop_handle_t event_loop_handle ) {
   esp_event_handler_register_with( m_event_loop_handle,
                                    ntp_server::m_event_base,
                                    ntp_server::RESPONDED,
+                                   event_handler,
+                                   this );
+
+  esp_event_handler_register_with( m_event_loop_handle,
+                                   ntp_server::m_event_base,
+                                   ntp_server::CLIENTS,
                                    event_handler,
                                    this );
 }
@@ -145,17 +151,20 @@ event_handler( void *handler_arg,
       case ntp_server::READY:
         inst->ntp_server_ready( true );
         break;
+      case ntp_server::CLIENTS:
+        inst->ntp_server_client_count( *( static_cast<uint32_t *>( event_params ) ) );
+        break;
       case ntp_server::RESPONDED:
         inst->ntp_server_responded( true );
         break;
     }
   }
-  else if( captive_portal_http::m_event_base == event_base ) {
+  else if( http_server::m_event_base == event_base ) {
     switch( event_id ) {
-      case captive_portal_http::EVENT_START_TIME_MODE:
+      case http_server::EVENT_START_TIME_MODE:
         inst->m_gnss_time_mode_started = 1;
         break;
-      case captive_portal_http::EVENT_STOP_TIME_MODE:
+      case http_server::EVENT_STOP_TIME_MODE:
         inst->m_gnss_time_mode_started = 0;
         break;
     }

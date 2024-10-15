@@ -10,7 +10,7 @@
 #include "esp_wifi.h"
 #include "esp_http_server.h"
 
-#include "captive_portal_http.hpp"
+#include "http_server.hpp"
 #include "configuration.hpp"
 
 #include "../utils/get_query_field.hpp"
@@ -19,10 +19,10 @@
 
 using namespace espena;
 
-const char *broadcast_clock::captive_portal_http::m_component_name = "captive_portal_http";
-const esp_event_base_t broadcast_clock::captive_portal_http::m_event_base = "CAPTIVE_PORTAL_HTTP_EVENT";
+const char *broadcast_clock::http_server::m_component_name = "http_server";
+const esp_event_base_t broadcast_clock::http_server::m_event_base = "http_server_EVENT";
 
-broadcast_clock::captive_portal_http::captive_portal_http() : m_message_queue( nullptr ),
+broadcast_clock::http_server::http_server() : m_message_queue( nullptr ),
                                                               m_server( nullptr ),
                                                               m_event_loop_handle( nullptr ),
                                                               m_gnss_state( nullptr )
@@ -30,14 +30,14 @@ broadcast_clock::captive_portal_http::captive_portal_http() : m_message_queue( n
   m_cfg.uri_match_fn = httpd_uri_match_wildcard;
   m_cfg.lru_purge_enable = true;
   m_cfg.enable_so_linger = false;
-  m_message_queue = xQueueCreate( 50, sizeof( captive_portal_http_task_queue_item ) );
+  m_message_queue = xQueueCreate( 50, sizeof( http_server_task_queue_item ) );
   m_task_params.instance = this;
 
   m_task_params.stack_buffer = ( StackType_t * ) heap_caps_malloc( m_component_stack_size,
                                                                    MALLOC_CAP_SPIRAM );
   update_json_gnss_status();
 
-  xTaskCreateStatic( &broadcast_clock::captive_portal_http::task_loop,
+  xTaskCreateStatic( &broadcast_clock::http_server::task_loop,
                      m_component_name,
                      m_component_stack_size,
                      &m_task_params,
@@ -46,7 +46,7 @@ broadcast_clock::captive_portal_http::captive_portal_http() : m_message_queue( n
                      &m_task_params.task_buffer );
 }
 
-void broadcast_clock::captive_portal_http::update_json_gnss_status() {
+void broadcast_clock::http_server::update_json_gnss_status() {
   if( m_gnss_state ) {
 
     m_json_gnss_status = "{ \
@@ -61,6 +61,7 @@ void broadcast_clock::captive_portal_http::update_json_gnss_status() {
                             \"time_mode_started\": \"__gnss_time_mode_started__\", \
                             \"time_mode_status\": \"__gnss_time_mode__\", \
                             \"time_accuracy\": \"__gnss_offset_us__\", \
+                            \"ntp_server_client_count\": \"__ntp_server_client_count__\", \
                             \"survey_in\": {\
                               \"active\": \"__gnss_svin_active__\", \
                               \"valid\": \"__gnss_svin_valid__\", \
@@ -83,6 +84,7 @@ void broadcast_clock::captive_portal_http::update_json_gnss_status() {
     utils::replace_substring( m_json_gnss_status, "__gnss_time_mode_started__", m_gnss_state->gnss_time_mode_started_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_time_mode__", m_gnss_state->gnss_time_mode_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_offset_us__", m_gnss_state->gnss_mean_systime_offset_us_str() );
+    utils::replace_substring( m_json_gnss_status, "__ntp_server_client_count__", m_gnss_state->gnss_ntp_server_client_count_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_svin_active__", m_gnss_state->gnss_svin_active_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_svin_valid__", m_gnss_state->gnss_svin_valid_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_svin_dur__", m_gnss_state->gnss_svin_dur_str() );
@@ -98,16 +100,16 @@ void broadcast_clock::captive_portal_http::update_json_gnss_status() {
   }
 }
 
-void broadcast_clock::captive_portal_http::enqueue_simple_message( captive_portal_http_task_message msg ) {
-  captive_portal_http_task_queue_item item = { msg, nullptr };
+void broadcast_clock::http_server::enqueue_simple_message( http_server_task_message msg ) {
+  http_server_task_queue_item item = { msg, nullptr };
   xQueueSend( m_message_queue, &item, 10 );
 }
 
-void broadcast_clock::captive_portal_http::task_loop( void *arg ) {
-  captive_portal_http_task_params *params = static_cast<captive_portal_http_task_params *>( arg );
-  captive_portal_http *inst = params->instance;
-  captive_portal_http_task_queue_item item;
-  memset( &item, 0x00, sizeof( captive_portal_http_task_queue_item ) );
+void broadcast_clock::http_server::task_loop( void *arg ) {
+  http_server_task_params *params = static_cast<http_server_task_params *>( arg );
+  http_server *inst = params->instance;
+  http_server_task_queue_item item;
+  memset( &item, 0x00, sizeof( http_server_task_queue_item ) );
   while( 1 ) {
     if( xQueueReceive( inst->m_message_queue, &item, 10 ) ) {
       inst->on_message( item.message, item.arg );
@@ -115,13 +117,13 @@ void broadcast_clock::captive_portal_http::task_loop( void *arg ) {
   }
 }
 
-esp_err_t broadcast_clock::captive_portal_http::
+esp_err_t broadcast_clock::http_server::
 request_handler( httpd_req_t *req ) {
-  captive_portal_http *inst = static_cast<captive_portal_http *>( req->user_ctx );
+  http_server *inst = static_cast<http_server *>( req->user_ctx );
   return inst->on_request( req );
 }
 
-void broadcast_clock::captive_portal_http::
+void broadcast_clock::http_server::
 save_handler( httpd_req_t *req ) {
 
     static std::string post_data;
@@ -152,7 +154,7 @@ save_handler( httpd_req_t *req ) {
 }
 
 
-void broadcast_clock::captive_portal_http::
+void broadcast_clock::http_server::
 survey_in_handler( httpd_req_t *req ) {
 
     static std::string post_data;
@@ -169,7 +171,7 @@ survey_in_handler( httpd_req_t *req ) {
     httpd_resp_send( req, "OK", 3 );
 }
 
-void broadcast_clock::captive_portal_http::
+void broadcast_clock::http_server::
 timers_handler( httpd_req_t *req ) {
 
   esp_event_post_to( m_event_loop_handle,
@@ -184,7 +186,7 @@ timers_handler( httpd_req_t *req ) {
   httpd_resp_send( req, buf_sw, buf_sw_len );
 }
 
-void broadcast_clock::captive_portal_http::
+void broadcast_clock::http_server::
 stopwatch_handler( httpd_req_t *req ) {
 
   httpd_resp_send( req, "OK", 3 );
@@ -202,7 +204,7 @@ stopwatch_handler( httpd_req_t *req ) {
                      portMAX_DELAY );
 }
 
-void broadcast_clock::captive_portal_http::
+void broadcast_clock::http_server::
 countdown_handler( httpd_req_t *req ) {
   httpd_resp_send( req, "OK", 3 );
   std::string uri( req->uri );
@@ -227,7 +229,7 @@ countdown_handler( httpd_req_t *req ) {
                      portMAX_DELAY );
 }
 
-esp_err_t broadcast_clock::captive_portal_http::
+esp_err_t broadcast_clock::http_server::
 on_request( httpd_req_t *req ) {
 
   const size_t req_hdr_host_len = httpd_req_get_hdr_value_len( req, "Host" );
@@ -295,29 +297,29 @@ on_request( httpd_req_t *req ) {
   return ESP_OK;
 }
 
-void broadcast_clock::captive_portal_http::on_message( captive_portal_http_task_message msg, void *arg ) {
+void broadcast_clock::http_server::on_message( http_server_task_message msg, void *arg ) {
   switch( msg ) {
-    case captive_portal_http_task_message::set_network_list:
+    case http_server_task_message::set_network_list:
       m_json_network_list = static_cast<char *>( arg );
       free( arg );
       break;
-    case captive_portal_http_task_message::init:
+    case http_server_task_message::init:
       init_sync();
       break;
-    case captive_portal_http_task_message::start:
+    case http_server_task_message::start:
       start_sync();
       break;
-    case captive_portal_http_task_message::stop:
+    case http_server_task_message::stop:
       stop_sync();
       break;
   }
 }
 
-void broadcast_clock::captive_portal_http::init_sync() {
+void broadcast_clock::http_server::init_sync() {
 
 }
 
-void broadcast_clock::captive_portal_http::start_sync() {
+void broadcast_clock::http_server::start_sync() {
 
   stop_sync(); // Assert server is not running
 
@@ -369,7 +371,7 @@ void broadcast_clock::captive_portal_http::start_sync() {
   
 }
 
-std::string broadcast_clock::captive_portal_http::create_html_response() {
+std::string broadcast_clock::http_server::create_html_response() {
 
   const char *buf_cp = ( char * ) broadcast_clock::resources::html::control_panel_html_start;
   const size_t buf_cp_len = broadcast_clock::resources::html::control_panel_html_end - broadcast_clock::resources::html::control_panel_html_start;
@@ -458,7 +460,7 @@ std::string broadcast_clock::captive_portal_http::create_html_response() {
   return htm;
 }
 
-void broadcast_clock::captive_portal_http::stop_sync() {
+void broadcast_clock::http_server::stop_sync() {
   if( m_server ) {
     httpd_stop( m_server );
     m_server = nullptr;
@@ -474,21 +476,21 @@ void broadcast_clock::captive_portal_http::stop_sync() {
   }
 }
 
-void broadcast_clock::captive_portal_http::set_network_list( char *json ) {
-  captive_portal_http_task_queue_item item;
-  item.message = captive_portal_http_task_message::set_network_list;
+void broadcast_clock::http_server::set_network_list( char *json ) {
+  http_server_task_queue_item item;
+  item.message = http_server_task_message::set_network_list;
   item.arg = strdup( json );
   xQueueSend( m_message_queue, &item, 10 );  
 }
 
-void broadcast_clock::captive_portal_http::init() {
-  enqueue_simple_message( captive_portal_http_task_message::init );
+void broadcast_clock::http_server::init() {
+  enqueue_simple_message( http_server_task_message::init );
 }
 
-void broadcast_clock::captive_portal_http::start() {
-  enqueue_simple_message( captive_portal_http_task_message::start );
+void broadcast_clock::http_server::start() {
+  enqueue_simple_message( http_server_task_message::start );
 }
 
-void broadcast_clock::captive_portal_http::stop() {
-  enqueue_simple_message( captive_portal_http_task_message::stop );
+void broadcast_clock::http_server::stop() {
+  enqueue_simple_message( http_server_task_message::stop );
 }

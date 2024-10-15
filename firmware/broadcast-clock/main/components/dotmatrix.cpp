@@ -49,7 +49,7 @@ dotmatrix() : m_config( nullptr ),
                       m_component_name,
                       m_component_stack_size,
                       &m_task_params,
-                      8,
+                      5,
                       m_task_params.stack_buffer,
                       &m_task_params.task_buffer );
 }

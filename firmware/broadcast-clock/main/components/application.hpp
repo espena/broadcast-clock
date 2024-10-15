@@ -9,7 +9,7 @@
 #include "lea_m8t.hpp"
 #include "ntp_server.hpp"
 #include "captive_portal_dns.hpp"
-#include "captive_portal_http.hpp"
+#include "http_server.hpp"
 #include <string>
 #include <esp_timer.h>
 //#include <driver/i2c_master.h>
@@ -26,7 +26,7 @@ namespace espena::broadcast_clock {
 
     wifi m_wifi;
     captive_portal_dns m_captive_portal_dns;
-    captive_portal_http m_captive_portal_http;
+    http_server m_http_server;
     lea_m8t m_lea_m8t;
     ntp_server m_ntp_server;
     clock_face m_clock_face;

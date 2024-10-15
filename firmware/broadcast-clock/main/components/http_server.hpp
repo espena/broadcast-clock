@@ -1,5 +1,5 @@
-#ifndef __CAPTIVE_PORTAL_HTTP_HPP__
-#define __CAPTIVE_PORTAL_HTTP_HPP__
+#ifndef __http_server_HPP__
+#define __http_server_HPP__
 
 #include <string>
 #include <freertos/FreeRTOS.h>
@@ -28,7 +28,7 @@ namespace espena::broadcast_clock {
     }
   }
 
-  class captive_portal_http {
+  class http_server {
 
   public:
 
@@ -85,29 +85,29 @@ namespace espena::broadcast_clock {
     void stopwatch_handler( httpd_req_t *req );
     void countdown_handler( httpd_req_t *req );
 
-    typedef struct captive_portal_http_task_params_struct {
-        captive_portal_http *instance;
+    typedef struct http_server_task_params_struct {
+        http_server *instance;
       StackType_t *stack_buffer;
       StaticTask_t task_buffer;
-    } captive_portal_http_task_params;
+    } http_server_task_params;
 
-    captive_portal_http_task_params m_task_params;
+    http_server_task_params m_task_params;
 
-    enum class captive_portal_http_task_message {
+    enum class http_server_task_message {
         set_network_list,
         init,
         start,
         stop
     };
 
-    typedef struct captive_portal_http_task_queue_item_struct {
-        captive_portal_http_task_message message;
+    typedef struct http_server_task_queue_item_struct {
+        http_server_task_message message;
         void *arg;
-    } captive_portal_http_task_queue_item;
+    } http_server_task_queue_item;
 
-    void on_message( captive_portal_http_task_message msg, void *arg );
+    void on_message( http_server_task_message msg, void *arg );
 
-    void enqueue_simple_message( captive_portal_http_task_message msg );
+    void enqueue_simple_message( http_server_task_message msg );
 
     std::string create_html_response();
 
@@ -120,7 +120,7 @@ namespace espena::broadcast_clock {
       void set_event_loop_handle( esp_event_loop_handle_t h ) { m_event_loop_handle = h; };
       void set_gnss_state( i_gnss_state *gnss_state ) { m_gnss_state = gnss_state; };
 
-      captive_portal_http();
+      http_server();
 
       void set_network_list( char *json );
 
@@ -128,8 +128,8 @@ namespace espena::broadcast_clock {
       void start();
       void stop();
 
-  }; // class captive_portal_http
+  }; // class http_server
 
 }; // namespace espena::broadcast_clock
 
-#endif // __CAPTIVE_PORTAL_HTTP_HPP__
+#endif // __http_server_HPP__

@@ -2,7 +2,7 @@
 #include "configuration.hpp"
 #include "lea_m8t.hpp"
 #include "wifi.hpp"
-#include "captive_portal_http.hpp"
+#include "http_server.hpp"
 #include <string>
 #include <memory.h>
 #include <esp_timer.h>
@@ -111,44 +111,44 @@ on_init() {
                                      this );
 
     esp_event_handler_register_with( m_event_loop_handle,
-                                     broadcast_clock::captive_portal_http::m_event_base,
-                                     broadcast_clock::captive_portal_http::EVENT_SAVE,
+                                     broadcast_clock::http_server::m_event_base,
+                                     broadcast_clock::http_server::EVENT_SAVE,
                                      event_handler,
                                      this );
 
     esp_event_handler_register_with( m_event_loop_handle,
-                                     broadcast_clock::captive_portal_http::m_event_base,
-                                     broadcast_clock::captive_portal_http::EVENT_CANCEL,
+                                     broadcast_clock::http_server::m_event_base,
+                                     broadcast_clock::http_server::EVENT_CANCEL,
                                      event_handler,
                                      this );
 
     esp_event_handler_register_with( m_event_loop_handle,
-                                     broadcast_clock::captive_portal_http::m_event_base,
-                                     broadcast_clock::captive_portal_http::EVENT_STOPWATCH_START,
+                                     broadcast_clock::http_server::m_event_base,
+                                     broadcast_clock::http_server::EVENT_STOPWATCH_START,
                                      event_handler,
                                      this );
 
     esp_event_handler_register_with( m_event_loop_handle,
-                                     broadcast_clock::captive_portal_http::m_event_base,
-                                     broadcast_clock::captive_portal_http::EVENT_STOPWATCH_STOP,
+                                     broadcast_clock::http_server::m_event_base,
+                                     broadcast_clock::http_server::EVENT_STOPWATCH_STOP,
                                      event_handler,
                                      this );
 
     esp_event_handler_register_with( m_event_loop_handle,
-                                     broadcast_clock::captive_portal_http::m_event_base,
-                                     broadcast_clock::captive_portal_http::EVENT_STOPWATCH_RESET,
+                                     broadcast_clock::http_server::m_event_base,
+                                     broadcast_clock::http_server::EVENT_STOPWATCH_RESET,
                                      event_handler,
                                      this );
 
     esp_event_handler_register_with( m_event_loop_handle,
-                                     broadcast_clock::captive_portal_http::m_event_base,
-                                     broadcast_clock::captive_portal_http::EVENT_COUNTDOWN_START,
+                                     broadcast_clock::http_server::m_event_base,
+                                     broadcast_clock::http_server::EVENT_COUNTDOWN_START,
                                      event_handler,
                                      this );
 
     esp_event_handler_register_with( m_event_loop_handle,
-                                     broadcast_clock::captive_portal_http::m_event_base,
-                                     broadcast_clock::captive_portal_http::EVENT_COUNTDOWN_RESET,
+                                     broadcast_clock::http_server::m_event_base,
+                                     broadcast_clock::http_server::EVENT_COUNTDOWN_RESET,
                                      event_handler,
                                      this );
 
@@ -187,27 +187,27 @@ event_handler( void *handler_arg,
         break;
     }
   }
-  else if( source == broadcast_clock::captive_portal_http::m_event_base ) {
+  else if( source == broadcast_clock::http_server::m_event_base ) {
     switch( event_id ) {
-      case broadcast_clock::captive_portal_http::EVENT_SAVE:
+      case broadcast_clock::http_server::EVENT_SAVE:
         instance->on_leave_config_mode();
         break;
-      case broadcast_clock::captive_portal_http::EVENT_CANCEL:
+      case broadcast_clock::http_server::EVENT_CANCEL:
         instance->on_leave_config_mode();
         break;
-      case broadcast_clock::captive_portal_http::EVENT_STOPWATCH_START:
+      case broadcast_clock::http_server::EVENT_STOPWATCH_START:
         instance->on_stopwatch_start();
         break;
-      case broadcast_clock::captive_portal_http::EVENT_STOPWATCH_STOP:
+      case broadcast_clock::http_server::EVENT_STOPWATCH_STOP:
         instance->on_stopwatch_stop();
         break;
-      case broadcast_clock::captive_portal_http::EVENT_STOPWATCH_RESET:
+      case broadcast_clock::http_server::EVENT_STOPWATCH_RESET:
         instance->on_stopwatch_reset();
         break;
-      case broadcast_clock::captive_portal_http::EVENT_COUNTDOWN_START:
+      case broadcast_clock::http_server::EVENT_COUNTDOWN_START:
         instance->on_countdown_start( static_cast<struct timespec *>( event_params ) );
         break;
-      case broadcast_clock::captive_portal_http::EVENT_COUNTDOWN_RESET:
+      case broadcast_clock::http_server::EVENT_COUNTDOWN_RESET:
         instance->on_countdown_reset();
         break;
     }

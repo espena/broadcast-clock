@@ -1,6 +1,8 @@
 #ifndef __NTP_SERVER__
 #define __NTP_SERVER__
 
+#include <string>
+#include <set>
 #include <time.h>
 #include <lwip/sockets.h>
 #include <esp_event.h>
@@ -15,7 +17,8 @@ namespace espena::broadcast_clock {
 
     static const char *m_event_base;
     static const uint32_t READY = 0x01u;
-    static const uint32_t RESPONDED = 0x02u;
+    static const uint32_t CLIENTS = 0x02u;
+    static const uint32_t RESPONDED = 0x03u;
 
     static const uint16_t m_ntp_server_port = 123;
 
@@ -53,8 +56,14 @@ namespace espena::broadcast_clock {
     struct sockaddr_in m_server_addr; // NTP server address
     int m_sock; // Socket file descriptor
 
+    struct timespec m_last_sync_time;
+
+    std::set<std::string> m_clients;
+
     static void task_loop( void *arg );
     void on_task_message( ntp_server_task_message msg, void *arg );
+
+    void on_time_adjusted( struct timespec *ts );
 
     void sock_read();
     void timespec_to_ntp( const struct timespec *ts, uint8_t *ntp_time );

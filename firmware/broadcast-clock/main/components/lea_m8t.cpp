@@ -37,6 +37,7 @@ lea_m8t() : m_event_loop_handle( nullptr ) {
   memset( &m_cfg_tmode2, 0x00, sizeof( ubx::cfg_tmode2_t ) );
   memset( &m_cfg_gnss, 0x00, sizeof( ubx::cfg_gnss_t ) );
   memset( &m_cfg_ant, 0x00, sizeof( ubx::cfg_ant_t ) );
+  memset( &m_last_sync_time, 0x00, sizeof( struct timespec ) );
   
   memset( &m_mon_ver, 0x00, sizeof( ubx::mon_ver_t ) );
   
@@ -359,9 +360,8 @@ on_timepulse_loop_message( lea_m8t_timepulse_message msg, void *arg ) {
   uint32_t tp_ns = 0;
 
   if( xSemaphoreTake( semaphores::mutex::system_clock, portMAX_DELAY ) ) {
-    taskENTER_CRITICAL( &m_spinlock1 );
+    //taskENTER_CRITICAL( &m_spinlock1 );
     clock_gettime( CLOCK_REALTIME, &now );
-    xSemaphoreGive( semaphores::mutex::system_clock );
     now.tv_sec = ( now.tv_nsec > 500000000 ? now.tv_sec + 1 : now.tv_sec );
     now_ns = now.tv_nsec;
     now_cc = xthal_get_ccount();
@@ -370,9 +370,20 @@ on_timepulse_loop_message( lea_m8t_timepulse_message msg, void *arg ) {
     now.tv_nsec = tp_ns + 52000; // Adjust for code execution time
     clock_settime( CLOCK_REALTIME, &now );
     now_ns -= ( tp_ns );
-    taskEXIT_CRITICAL( &m_spinlock1 );
+    //taskEXIT_CRITICAL( &m_spinlock1 );
     xSemaphoreGive( semaphores::mutex::system_clock );
   }
+
+  // Save reference timstampe for NTP sync
+  memcpy( &m_last_sync_time, &now, sizeof( struct timespec ) );
+
+  // Fire time adjusted event
+  esp_event_post_to( m_event_loop_handle,
+                    m_event_base,
+                    lea_m8t::TIME_ADJUSTED,
+                    &m_last_sync_time,
+                    sizeof( struct timespec ),
+                    portMAX_DELAY );
 
   // Forward timepulse message to regular task loop
   lea_m8t_task_queue_item_t ts_item = { lea_m8t_task_message::timepulse, nullptr };

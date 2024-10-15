@@ -22,13 +22,14 @@ namespace espena::broadcast_clock {
     static const uint32_t TIMEPULSE_PRESENT = 0x02u;
     static const uint32_t TIMEPULSE_ABSENT = 0x03u;
     static const uint32_t NO_TIME_SYNC = 0x04u;
-    static const uint32_t HIGH_ACCURACY = 0x05u;
-    static const uint32_t LOWER_ACCURACY = 0x06u;
-    static const uint32_t UBX_NAV_TIMEUTC = 0x07u;
-    static const uint32_t UBX_NAV_SAT = 0x08u;
-    static const uint32_t UBX_MON_VER = 0x09u;
-    static const uint32_t UBX_CFG_TMODE2 = 0x0au;
-    static const uint32_t UBX_TIM_SVIN = 0x0bu;
+    static const uint32_t TIME_ADJUSTED = 0x05u;
+    static const uint32_t HIGH_ACCURACY = 0x06u;
+    static const uint32_t LOWER_ACCURACY = 0x76u;
+    static const uint32_t UBX_NAV_TIMEUTC = 0x08u;
+    static const uint32_t UBX_NAV_SAT = 0x09u;
+    static const uint32_t UBX_MON_VER = 0x0au;
+    static const uint32_t UBX_CFG_TMODE2 = 0x0bu;
+    static const uint32_t UBX_TIM_SVIN = 0x0cu;
 
   private:
 
@@ -117,6 +118,8 @@ namespace espena::broadcast_clock {
       lea_m8t_timepulse_message message;
       void *arg;
     } lea_m8t_timepulse_queue_item_t;
+
+    struct timespec m_last_sync_time;
 
     static void task_loop( void *arg );
     static void timepulse_loop( void *arg );
