@@ -32,7 +32,8 @@
                                    : data.time_mode_status;
 
             if( data.status == 'running' ) {
-              document.querySelectorAll( 'button.reboot.active' ).forEach( ( button ) => {
+              const selector = 'button.reboot.cpu.active, button.reboot.gnss.active';
+              document.querySelectorAll( selector ).forEach( ( button ) => {
                 button.classList.remove( 'active' );
               } );
             }
@@ -363,14 +364,13 @@
         } );
       } );
 
-      var buttons_rb = document.querySelectorAll( '.reboot button' );
+      var buttons_rb = document.querySelectorAll( '.reboot button.cpu, .reboot button.gnss' );
       buttons_rb.forEach( ( button ) => {
         button.addEventListener( 'click', ( e ) => {
           var action = button.classList[ 1 ];
           e.target.classList.add( 'active' );
           fetch( `/reboot/${action}`, { cache: 'no-store' } )
             .then( response => response.text() )
-            .then( data => console.log( data ) );
           e.preventDefault();
         } );
       } );
