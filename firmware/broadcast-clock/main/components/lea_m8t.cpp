@@ -1,5 +1,6 @@
 #include "lea_m8t.hpp"
 #include "configuration.hpp"
+#include "http_server.hpp"
 #include "ubx_types.hpp"
 #include "../semaphores/mutex.hpp"
 #include "../utils/fletcher8.hpp"
@@ -46,8 +47,8 @@ lea_m8t() : m_event_loop_handle( nullptr ) {
 
   memset( &m_tim_svin, 0x00, sizeof( ubx::tim_svin_t ) );
 
-  m_task_queue = xQueueCreate( 1024, sizeof( lea_m8t_task_queue_item_t ) );
-  m_egress_queue = xQueueCreate( 1024, sizeof( lea_m8t_egress_queue_item_t ) );
+  m_task_queue = xQueueCreate( 100, sizeof( lea_m8t_task_queue_item_t ) );
+  m_egress_queue = xQueueCreate( 100, sizeof( lea_m8t_egress_queue_item_t ) );
   m_timepulse_queue = xQueueCreate( 10, sizeof( lea_m8t_timepulse_queue_item_t ) );
 
   m_task_params.instance = this;
@@ -329,6 +330,11 @@ update_status() {
       xQueueSend( m_egress_queue, &ubx_cfg_tmode2, 0 );
     }
   }
+  if( m_mon_ver.sw_version[ 0 ] == 0x00 ) {
+    // Poll UBX-MON-VER
+    lea_m8t_egress_queue_item_t ubx_mon_ver = { 0, { ubx::message::mon::cls, ubx::message::mon::ver }, nullptr, true };
+    xQueueSend( m_egress_queue, &ubx_mon_ver, 0 );
+  }
   if( m_event_loop_handle ) {
     if( m_timepulse_cc > 0 ) {
       uint32_t cc_tp = m_timepulse_cc;
@@ -417,6 +423,9 @@ on_task_message( lea_m8t_task_message msg, void *arg ) {
     case lea_m8t_task_message::soft_init:
       init_ubx_normalboot();
       break;
+    case lea_m8t_task_message::reset:
+      on_reset();
+      break;
     case lea_m8t_task_message::poll:
       if( m_i2c_installed ) {
         read();
@@ -437,10 +446,9 @@ on_task_message( lea_m8t_task_message msg, void *arg ) {
 }
 
 void broadcast_clock::lea_m8t::
-reset() {
+on_reset() {
   ESP_LOGI( m_component_name, "Resetting device..." );
   { // Reset device
-    //uint8_t *payload = new uint8_t[ 4 ];
     uint8_t *payload = static_cast<uint8_t *>( heap_caps_malloc( 4, MALLOC_CAP_SPIRAM ) );
     memset( payload, 0x00, 4 );
     lea_m8t_egress_queue_item_t ubx_cfg_rst = { 4, { ubx::message::cfg::cls, ubx::message::cfg::rst }, payload, false };
@@ -770,6 +778,7 @@ on_timepulse() {
                        portMAX_DELAY );
     
   }    
+
 }
 
 bool broadcast_clock::lea_m8t::
@@ -899,11 +908,6 @@ init_ubx_normalboot() {
     xQueueSend( m_egress_queue, &ubx_cfg_tmode2, 0 );
   }
 
-  { // Poll UBX-MON-VER to populate JSON feed to web interface
-    lea_m8t_egress_queue_item_t ubx_mon_ver = { 0, { ubx::message::mon::cls, ubx::message::mon::ver }, nullptr, false };
-    xQueueSend( m_egress_queue, &ubx_mon_ver, 0 );
-  }
-
 }
 
 void broadcast_clock::lea_m8t::
@@ -955,5 +959,11 @@ start_time_mode() {
 void broadcast_clock::lea_m8t::
 stop_time_mode() {
   lea_m8t_task_queue_item_t item = { lea_m8t_task_message::stop_time_mode, nullptr };
+  xQueueSend( m_task_queue, &item, 0 );
+}
+
+void broadcast_clock::lea_m8t::
+reset() {
+  lea_m8t_task_queue_item_t item = { lea_m8t_task_message::reset, nullptr };
   xQueueSend( m_task_queue, &item, 0 );
 }

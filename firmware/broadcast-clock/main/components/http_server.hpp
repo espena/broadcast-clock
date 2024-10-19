@@ -2,11 +2,14 @@
 #define __http_server_HPP__
 
 #include <string>
+#include <set>
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
+#include <esp_wifi.h>
 #include <esp_http_server.h>
 #include <esp_event.h>
 
+#include "wifi.hpp"
 #include "i_gnss_state.hpp"
 
 namespace espena::broadcast_clock {
@@ -53,6 +56,11 @@ namespace espena::broadcast_clock {
     static const uint32_t EVENT_START_TIME_MODE     = 0x0cu;
     static const uint32_t EVENT_STOP_TIME_MODE      = 0x0du;
 
+    static const uint32_t EVENT_REBOOT_CPU          = 0x0eu;
+    static const uint32_t EVENT_REBOOT_GNSS         = 0x0fu;
+
+    static const uint32_t EVENT_SSID_REQUEST        = 0x10u;
+
   private:
 
     static const char *m_component_name;
@@ -61,19 +69,30 @@ namespace espena::broadcast_clock {
     QueueHandle_t m_message_queue;
     httpd_handle_t m_server;
 
+    std::set<std::string> m_ssid_list;
+    std::string m_json_ssid_list;
+    bool volatile m_ssids_received = false;
+
+    void on_ssid_scan_result( wifi::ssid_scan_result_t * );
+
     esp_event_loop_handle_t m_event_loop_handle;
     i_gnss_state *m_gnss_state;
 
     httpd_config_t m_cfg = HTTPD_DEFAULT_CONFIG();
 
-    std::string m_json_network_list;
     std::string m_json_gnss_status;
 
     bool m_gnss_installed = false;
 
     void update_json_gnss_status();
+    void update_json_ssid_list();
 
     static void task_loop( void *arg );
+
+    static void event_handler( void *handler_arg,
+                               esp_event_base_t event_base,
+                               int32_t event_id,
+                               void *event_data );
 
     static esp_err_t request_handler( httpd_req_t *req );
 
@@ -84,6 +103,7 @@ namespace espena::broadcast_clock {
 
     void stopwatch_handler( httpd_req_t *req );
     void countdown_handler( httpd_req_t *req );
+    void reboot_handler( httpd_req_t *req );
 
     typedef struct http_server_task_params_struct {
         http_server *instance;
@@ -94,8 +114,8 @@ namespace espena::broadcast_clock {
     http_server_task_params m_task_params;
 
     enum class http_server_task_message {
-        set_network_list,
         init,
+        ssid_scan_result,
         start,
         stop
     };
@@ -117,12 +137,10 @@ namespace espena::broadcast_clock {
 
     public:
 
-      void set_event_loop_handle( esp_event_loop_handle_t h ) { m_event_loop_handle = h; };
+      void set_event_loop_handle( esp_event_loop_handle_t h );
       void set_gnss_state( i_gnss_state *gnss_state ) { m_gnss_state = gnss_state; };
 
       http_server();
-
-      void set_network_list( char *json );
 
       void init();
       void start();

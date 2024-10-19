@@ -66,6 +66,9 @@ namespace espena::broadcast_clock {
     virtual uint32_t gnss_ntp_server_client_count() = 0;
     virtual std::string gnss_ntp_server_client_count_str() = 0;
 
+    virtual bool rebooting() = 0;
+    virtual std::string rebooting_str() = 0;
+
   };
 
 }

@@ -166,6 +166,9 @@ fieldset>div>div>label {
   display: inline-block;
   min-width: 4em;
 }
+select {
+  width: 158px;
+}
 select,
 input[type="text"],
 input[type="password"] {
@@ -281,8 +284,16 @@ ul li,
   font-size: 1.5em;
   margin-right: 3px;
 }
-.reboot button:hover {
-  color: #f00;
+@keyframes toggleColor {
+  0% {
+    background-color: #eaa;
+  }
+  50% {
+    background-color: #f00;
+  }
+}
+button.reboot.active {
+  animation: toggleColor 2s infinite;
 }
 .timers {
   padding-top: 0;

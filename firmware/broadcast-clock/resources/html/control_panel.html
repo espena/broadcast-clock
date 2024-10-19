@@ -31,6 +31,13 @@
                                    ? 'Pending...'
                                    : data.time_mode_status;
 
+            if( data.status == 'running' ) {
+              document.querySelectorAll( 'button.reboot.active' ).forEach( ( button ) => {
+                button.classList.remove( 'active' );
+              } );
+            }
+
+            document.querySelector( 'body' ).className = data.status ?? '';
             document.querySelector( 'fieldset.tab.gnss' ).classList.remove( 'disabled' );
             document.getElementById( 'hardware_version' ).innerText = data.hardware_version;
             document.getElementById( 'software_version' ).innerText = data.software_version;
@@ -139,11 +146,11 @@
             <legend>Wifi</legend>
             <div>
               <label for="ssid">Network</label>
-              <input type="text" name="ssid" list="ssid_list" id="ssid" value="|ssid|">
-              <datalist id="ssid_list">
-                <option value="MyNetwork">
-                <option value="AnotherNetwork">
-              </datalist>
+              <select name="ssid" id="ssid" value="|ssid|"></select>
+            </div>
+            <div>
+              <input type="checkbox" onclick="ssidalt()" /><label>Other network:</label>
+              <input type="text" name="ssid_alt" id="ssid_alt" value="|ssid_alt|">
             </div>
             <div>
               <label for="password">Password</label>
@@ -275,7 +282,8 @@
           tabs.forEach( ( tab ) => {
             tab.classList.remove( 'active' );
           } );
-          window.localStorage.setItem( 'active_tab', tab.classList[ 1 ] );
+          active_tab = tab.classList[ 1 ];
+          window.localStorage.setItem( 'active_tab', active_tab );
           tab.classList.add( 'active' );
         } )
       } );
@@ -362,12 +370,31 @@
       buttons_rb.forEach( ( button ) => {
         button.addEventListener( 'click', ( e ) => {
           var action = button.classList[ 1 ];
+          e.target.classList.add( 'active' );
           fetch( `/reboot/${action}`, { cache: 'no-store' } )
             .then( response => response.text() )
             .then( data => console.log( data ) );
           e.preventDefault();
         } );
       } );
-    </script>
+
+      var ssid_list = document.getElementById( 'ssid' );
+      ssid_list.innerHTML = '<option value="" disabled selected>Select a network</option>';
+      fetch( '/ssid-list' )
+        .then( ( response ) => response.json() )
+        .then( ( access_points ) => {
+          if( access_points.ssids ) {
+            access_points.ssids.forEach( ( ssid ) => {
+              var option = document.createElement( 'option' );
+              option.selected = ( ssid == '|ssid|' );
+              option.value = ssid;
+              option.innerText = ssid;
+              ssid_list.appendChild( option );
+            } );
+          }
+        } )
+        .catch( ( error ) => console.error( error ) );
+
+      </script>
   </body>
 </html>

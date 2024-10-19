@@ -4,6 +4,7 @@
 #include "configuration.hpp"
 
 #include <time.h>
+#include <set>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <freertos/queue.h>
@@ -24,12 +25,20 @@ namespace espena::broadcast_clock {
     static const uint32_t WIFI_EVENT_GOT_IP = 0x03u;
     static const uint32_t ENTER_CONFIG_MODE = 0x04u;
     static const uint32_t LEAVE_CONFIG_MODE = 0x05u;
+    static const uint32_t SSID_SCAN_RESULT = 0x06u;
 
     enum class mode {
       none,
       station,
       access_point
     };
+
+    static const uint8_t max_ssid_scan_result = 50;
+
+    typedef struct ssid_scan_result_struct {
+      wifi_ap_record_t ap_records[ max_ssid_scan_result ];
+      uint16_t ap_count;
+    } ssid_scan_result_t;
 
   private:
 
@@ -55,6 +64,8 @@ namespace espena::broadcast_clock {
     enum class wifi_task_message {
       init,
       init_ntp,
+      ssid_request,
+      ssid_scan_done,
       enter_config_mode,
       leave_config_mode
     };
@@ -89,6 +100,9 @@ namespace espena::broadcast_clock {
 
     void init_wifi();
     void init_ntp();
+
+    void on_ssid_request();
+    void on_ssid_response();
 
     void got_ip( esp_netif_ip_info_t *ip_info );
 

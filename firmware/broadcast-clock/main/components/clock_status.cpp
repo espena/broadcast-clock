@@ -17,6 +17,8 @@
 
 using namespace espena::broadcast_clock;
 
+const time_t clock_status::m_startup_time = time( nullptr );
+
 clock_status::
 clock_status( i_indicators *indicators ) : m_indicators( indicators ),
                                            m_event_loop_handle( nullptr ),

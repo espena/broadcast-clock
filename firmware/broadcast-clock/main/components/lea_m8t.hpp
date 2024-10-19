@@ -92,6 +92,7 @@ namespace espena::broadcast_clock {
     enum class lea_m8t_task_message {
       init,
       soft_init,
+      reset,
       poll,
       start_time_mode,
       stop_time_mode,
@@ -141,7 +142,7 @@ namespace espena::broadcast_clock {
     void write();
     void update_status();
 
-    void reset();
+    void on_reset();
 
     static void isr_timepulse_handler( void *arg );
     void on_timepulse();
@@ -175,6 +176,7 @@ namespace espena::broadcast_clock {
     bool is_present();
     void init();
     void soft_init();
+    void reset();
     void start_time_mode();
     void stop_time_mode();
     void set_event_loop_handle( esp_event_loop_handle_t h );

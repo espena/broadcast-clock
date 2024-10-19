@@ -1,5 +1,7 @@
 #include "wifi.hpp"
 #include "configuration.hpp"
+#include "http_server.hpp"
+#include "../utils/hexdump.hpp"
 #include "../secrets.hpp"
 #include "../semaphores/mutex.hpp"
 #include <freertos/FreeRTOS.h>
@@ -30,7 +32,7 @@ wifi() : m_task_queue( nullptr ),
   m_task_queue = xQueueCreate( 10, sizeof( wifi_task_queue_item ) );
 
   memset( &m_last_ntp_sync_time, 0x00, sizeof( struct timespec ) );
-  
+
   m_task_params.instance = this;
 
   xTaskCreate( &wifi::task_loop,
@@ -49,12 +51,27 @@ broadcast_clock::wifi::
 
 void broadcast_clock::wifi::
 set_event_loop_handle( esp_event_loop_handle_t h ) {
+
   m_event_loop_handle = h;
+
   esp_event_handler_register_with( m_event_loop_handle,
                                    broadcast_clock::configuration::m_event_base,
                                    broadcast_clock::configuration::CONFIGURATION_UPDATED,
                                    on_event,
                                    this );
+
+  esp_event_handler_register_with( m_event_loop_handle,
+                                   broadcast_clock::http_server::m_event_base,
+                                   broadcast_clock::http_server::EVENT_SSID_REQUEST,
+                                   on_event,
+                                   this );
+
+  esp_event_handler_register_with( m_event_loop_handle,
+                                   WIFI_EVENT,
+                                   WIFI_EVENT_SCAN_DONE,
+                                   on_event,
+                                   this );
+
 }
 
 void broadcast_clock::wifi::
@@ -88,6 +105,7 @@ on_event( void *arg,
           esp_event_base_t event_base,
           int32_t event_id,
           void *event_data ) {
+
   wifi *instance = static_cast<wifi *>( arg );
   ESP_LOGI( instance->m_component_name, "Event received, base %s, id %lu", event_base, event_id );
   if( event_base == WIFI_EVENT ) {
@@ -107,6 +125,10 @@ on_event( void *arg,
         esp_wifi_connect();
         ESP_LOGI( m_component_name, "Retry connection to network" );
         break;
+      case WIFI_EVENT_SCAN_DONE:
+        wifi_task_queue_item item = { wifi_task_message::ssid_scan_done, nullptr };
+        xQueueSend( instance->m_task_queue, &item, 10 );
+        break;
     }
   }
   else if( event_base == IP_EVENT ) {
@@ -119,12 +141,55 @@ on_event( void *arg,
         break;
     }
   }
+  else if( event_base == broadcast_clock::http_server::m_event_base ) {
+    switch( event_id ) {
+      case broadcast_clock::http_server::EVENT_SSID_REQUEST:
+        {
+          wifi_task_queue_item item = { wifi_task_message::ssid_request, nullptr };
+          xQueueSend( instance->m_task_queue, &item, 10 );        
+        }
+        break;
+    }
+  }
   else if( event_base == broadcast_clock::configuration::m_event_base ) {
     switch( event_id ) {
       case broadcast_clock::configuration::CONFIGURATION_UPDATED:
         instance->on_configuration_changed();
         break;
     }
+  }
+}
+
+void broadcast_clock::wifi::
+on_ssid_request() {
+  esp_wifi_scan_start( nullptr, false );
+}
+
+void broadcast_clock::wifi::
+on_ssid_response() {
+  if( xSemaphoreTake( semaphores::mutex::ssid_list, portMAX_DELAY ) ) {
+    ESP_LOGI( m_component_name, "SSID response" );
+    //static ssid_scan_result_t *ssid_scan_result = ( ssid_scan_result_t * ) malloc( sizeof( ssid_scan_result_t ) );
+    static ssid_scan_result_t ssid_scan_result;
+    memset( &ssid_scan_result, 0x00, sizeof( ssid_scan_result_t ) );
+    wifi_ap_record_t buffer[ max_ssid_scan_result ];
+    uint16_t n = max_ssid_scan_result;
+    if( esp_wifi_scan_get_ap_records( &n, buffer ) == ESP_OK ) {
+      ssid_scan_result.ap_count = n;
+      for( int16_t i = 0; i < ssid_scan_result.ap_count; i++ ) {
+        memcpy( &ssid_scan_result.ap_records[ i ], &buffer[ i ], sizeof( wifi_ap_record_t ) );
+      }
+    }
+    ESP_LOGI( m_component_name, "Found %d SSIDs", ssid_scan_result.ap_count );
+    if( m_event_loop_handle ) {
+      esp_event_post_to( m_event_loop_handle,
+                        broadcast_clock::wifi::m_event_base,
+                        broadcast_clock::wifi::SSID_SCAN_RESULT,
+                        &ssid_scan_result,
+                        sizeof( ssid_scan_result_t ),
+                        10 );
+    }
+    xSemaphoreGive( semaphores::mutex::ssid_list );
   }
 }
 
@@ -164,6 +229,12 @@ on_message( wifi_task_message msg, void *arg ) {
       break;
     case wifi_task_message::init_ntp:
       on_init_ntp();
+      break;
+    case wifi_task_message::ssid_request:
+      on_ssid_request();
+      break;
+    case wifi_task_message::ssid_scan_done:
+      on_ssid_response();
       break;
     case wifi_task_message::enter_config_mode:
       on_enter_config_mode();
@@ -330,6 +401,8 @@ init_wifi() {
 
     esp_wifi_set_config( WIFI_IF_AP, &wifi_config );
     esp_wifi_start();
+    esp_wifi_scan_start( nullptr, false );
+
   }
 }
 

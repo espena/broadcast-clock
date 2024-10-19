@@ -89,6 +89,18 @@ init() {
                                      wifi_event_handler,
                                      this );
 
+    esp_event_handler_register_with( m_event_loop_handle,
+                                    http_server::m_event_base,
+                                    http_server::EVENT_REBOOT_CPU,
+                                    wifi_event_handler,
+                                    this );
+
+    esp_event_handler_register_with( m_event_loop_handle,
+                                    http_server::m_event_base,
+                                    http_server::EVENT_REBOOT_GNSS,
+                                    wifi_event_handler,
+                                    this );
+
     m_wifi.set_event_loop_handle( m_event_loop_handle );
     m_wifi.init( wifi::mode::access_point );
 
@@ -270,6 +282,14 @@ wifi_event_handler( void *handler_arg,
         break;
       case broadcast_clock::http_server::EVENT_CONFIGURATOR_STOP:
         instance->m_clock_status.configurator_enabled( false );
+        break;
+      case broadcast_clock::http_server::EVENT_REBOOT_GNSS:
+        instance->m_clock_status.reboot();
+        instance->m_lea_m8t.reset();
+        vTaskDelay( 7500 / portTICK_PERIOD_MS );
+        // fallthru
+      case broadcast_clock::http_server::EVENT_REBOOT_CPU:
+        esp_restart();
         break;
     }
   }

@@ -1,6 +1,8 @@
 #ifndef __I_CLOCK_STATUS_HPP__
 #define __I_CLOCK_STATUS_HPP__
 
+#include <time.h>
+
 #include <esp_event.h>
 #include <esp_timer.h>
 
@@ -15,6 +17,8 @@ namespace espena::broadcast_clock {
   class clock_status : public i_gnss_ubx,
                        public i_gnss_state {
 
+    const static time_t m_startup_time;
+
     i_indicators *m_indicators;
     esp_event_loop_handle_t m_event_loop_handle;
 
@@ -27,6 +31,8 @@ namespace espena::broadcast_clock {
 
     bool m_blink = false;
     esp_timer_handle_t m_blink_timer;
+
+    bool m_rebooting = false;
 
     bool m_status_gnss_sync_ok;
     bool m_status_ntp_sync_ok;
@@ -74,15 +80,15 @@ namespace espena::broadcast_clock {
 
     int8_t m_gnss_time_mode_started = -1;
 
-    bool blue_blinker() { return m_gnss_svin_active ? m_blink : true; };
-    bool green_blinker() { return ( m_sntp_aquiring > 0 && --m_sntp_aquiring > 0 ) ? m_blink : true; };
-    bool yellow_blinker() { return ( m_ntp_server_responded > 0 && --m_ntp_server_responded > 0 ) ? m_blink : true; };
-    bool red_blinker() { return m_high_accuracy ? true : m_blink; };
+    bool blue_blinker()   { return m_rebooting || (   m_gnss_svin_active                                                  ) ? m_blink : true;    };
+    bool green_blinker()  { return m_rebooting || ( ( m_sntp_aquiring > 0 ) && ( --m_sntp_aquiring > 0 )                  ) ? m_blink : true;    };
+    bool yellow_blinker() { return m_rebooting || ( ( m_ntp_server_responded > 0 ) && ( --m_ntp_server_responded > 0 )    ) ? m_blink : true;    };
+    bool red_blinker()    { return m_rebooting || (  !m_high_accuracy                                                     ) ? m_blink : true;    };
 
-    bool is_blue() { return m_gnss_installed && m_got_time_sync && m_got_timepulse && blue_blinker(); };
-    bool is_green() { return m_sntp_sync && green_blinker(); };
-    bool is_yellow() { return m_ntp_server_ready && yellow_blinker(); };
-    bool is_red() { return m_got_timepulse && red_blinker(); };
+    bool is_blue()        { return ( m_rebooting || ( m_gnss_installed && m_got_time_sync && m_got_timepulse            ) ) && blue_blinker();   };
+    bool is_green()       { return ( m_rebooting || ( m_sntp_sync                                                       ) ) && green_blinker();  };
+    bool is_yellow()      { return ( m_rebooting || ( m_ntp_server_ready                                                ) ) && yellow_blinker(); };
+    bool is_red()         { return ( m_rebooting || ( m_got_timepulse                                                   ) ) && red_blinker();    };
 
   public:
 
@@ -92,6 +98,8 @@ namespace espena::broadcast_clock {
     void set_event_loop_handle( esp_event_loop_handle_t h );
 
     // setters
+
+    void reboot() { m_rebooting = true; };
 
     void gnss_timepulse( bool ok );
     void gnss_time_sync( bool ok );
@@ -173,6 +181,9 @@ namespace espena::broadcast_clock {
 
     uint32_t gnss_ntp_server_client_count() override { return m_ntp_server_client_count; };
     std::string gnss_ntp_server_client_count_str() override { return std::to_string( static_cast<int>( m_ntp_server_client_count ) ); };
+
+    bool rebooting() override { return m_rebooting; };
+    std::string rebooting_str() override { return m_rebooting ? "Yes" : "No"; };
 
   };
 

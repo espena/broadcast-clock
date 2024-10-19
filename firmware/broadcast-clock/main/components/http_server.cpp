@@ -4,6 +4,7 @@
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include <freertos/semphr.h>
 #include <freertos/queue.h>
 
 #include "esp_log.h"
@@ -11,8 +12,11 @@
 #include "esp_http_server.h"
 
 #include "http_server.hpp"
+#include "wifi.hpp"
 #include "configuration.hpp"
 
+#include "../semaphores/mutex.hpp"
+#include "../utils/hexdump.hpp"
 #include "../utils/get_query_field.hpp"
 #include "../utils/span_to_timespec.hpp"
 #include "../utils/replace_substring.hpp"
@@ -36,7 +40,7 @@ broadcast_clock::http_server::http_server() : m_message_queue( nullptr ),
   m_task_params.stack_buffer = ( StackType_t * ) heap_caps_malloc( m_component_stack_size,
                                                                    MALLOC_CAP_SPIRAM );
   update_json_gnss_status();
-
+  
   xTaskCreateStatic( &broadcast_clock::http_server::task_loop,
                      m_component_name,
                      m_component_stack_size,
@@ -46,11 +50,60 @@ broadcast_clock::http_server::http_server() : m_message_queue( nullptr ),
                      &m_task_params.task_buffer );
 }
 
-void broadcast_clock::http_server::update_json_gnss_status() {
+void broadcast_clock::http_server::
+set_event_loop_handle( esp_event_loop_handle_t h ) {
+  m_event_loop_handle = h;
+  if( m_event_loop_handle ) {
+    ESP_ERROR_CHECK( esp_event_handler_register_with( m_event_loop_handle,
+                                                      wifi::m_event_base,
+                                                      wifi::SSID_SCAN_RESULT,
+                                                      &event_handler,
+                                                      this ) );
+  }
+}
+
+void broadcast_clock::http_server::
+event_handler( void *handler_arg,
+               esp_event_base_t event_base,
+               int32_t event_id,
+               void *event_data ) {
+
+  auto *instance = static_cast<broadcast_clock::http_server *>( handler_arg );
+  if( event_base == wifi::m_event_base ) {
+    if( event_id == wifi::SSID_SCAN_RESULT ) {
+      http_server_task_queue_item item;
+      static wifi::ssid_scan_result_t scan_result;
+      memcpy( &scan_result, event_data, sizeof( wifi::ssid_scan_result_t ) );
+      ESP_LOGI( instance->m_component_name, "SSID scan result form event_handler: %d found", scan_result.ap_count );
+      item.message = http_server_task_message::ssid_scan_result;
+      item.arg = &scan_result;
+      xQueueSend( instance->m_message_queue, &item, 10 );
+    }
+  }
+}
+
+void broadcast_clock::http_server::
+on_ssid_scan_result( wifi::ssid_scan_result_t * scan_result ) {
+  ESP_LOGI( m_component_name, "SSID scan result: %d found", scan_result->ap_count );
+  if( xSemaphoreTake( semaphores::mutex::ssid_list, portMAX_DELAY ) ) {
+    ESP_LOGI( m_component_name, "Got mutex!" );
+    ESP_LOGI( m_component_name, "Still %d SSIDs to go...", scan_result->ap_count );
+    for( uint16_t u = 0; u < scan_result->ap_count; u++ ) {
+      ESP_LOGI( m_component_name, "SSID: %s", scan_result->ap_records[ u ].ssid );
+      m_ssid_list.insert( std::string( reinterpret_cast<char *>( scan_result->ap_records[ u ].ssid ) ) );
+    }
+    xSemaphoreGive( semaphores::mutex::ssid_list );
+  }
+  m_ssids_received = true;
+}
+
+void broadcast_clock::http_server::
+update_json_gnss_status() {
+
   if( m_gnss_state ) {
 
     m_json_gnss_status = "{ \
-                            \"status\": \"updated\", \
+                            \"status\": \"__status__\", \
                             \"chip_installed\": \"__gnss_chip_installed__\", \
                             \"software_version\": \"__gnss_software_version__\", \
                             \"hardware_version\": \"__gnss_hardware_version__\", \
@@ -74,6 +127,7 @@ void broadcast_clock::http_server::update_json_gnss_status() {
                             }\
                           }";
 
+    utils::replace_substring( m_json_gnss_status, "__status__", m_gnss_state->rebooting() ? "rebooting" : "running" );
     utils::replace_substring( m_json_gnss_status, "__gnss_chip_installed__", m_gnss_state->gnss_chip_installed_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_software_version__", m_gnss_state->gnss_software_version_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_hardware_version__", m_gnss_state->gnss_hardware_version_str() );
@@ -100,15 +154,41 @@ void broadcast_clock::http_server::update_json_gnss_status() {
   }
 }
 
-void broadcast_clock::http_server::enqueue_simple_message( http_server_task_message msg ) {
+void broadcast_clock::http_server::
+update_json_ssid_list() {
+  if( m_event_loop_handle ) {
+    m_ssids_received = false;
+    esp_event_post_to( m_event_loop_handle,
+                      m_event_base,
+                      EVENT_SSID_REQUEST,
+                      nullptr,
+                      0,
+                      portMAX_DELAY );
+  }
+  int timeout = 0;
+  while( !m_ssids_received && timeout < 10000 ) {
+    vTaskDelay( 100 / portTICK_PERIOD_MS );
+    timeout += 100;
+  }
+  m_json_ssid_list = "{ \"ssids\": [";
+  int i = 0;
+  for( const auto &ssid : m_ssid_list ) {
+    m_json_ssid_list += ( i++ > 0 ? "," : "" ) + ( "\"" + ssid + "\"" );
+  }
+  m_json_ssid_list += "]}";
+}
+
+void broadcast_clock::http_server::
+enqueue_simple_message( http_server_task_message msg ) {
   http_server_task_queue_item item = { msg, nullptr };
   xQueueSend( m_message_queue, &item, 10 );
 }
 
-void broadcast_clock::http_server::task_loop( void *arg ) {
+void broadcast_clock::http_server::
+task_loop( void *arg ) {
   http_server_task_params *params = static_cast<http_server_task_params *>( arg );
   http_server *inst = params->instance;
-  http_server_task_queue_item item;
+  static http_server_task_queue_item item;
   memset( &item, 0x00, sizeof( http_server_task_queue_item ) );
   while( 1 ) {
     if( xQueueReceive( inst->m_message_queue, &item, 10 ) ) {
@@ -229,6 +309,19 @@ countdown_handler( httpd_req_t *req ) {
                      portMAX_DELAY );
 }
 
+void broadcast_clock::http_server::
+reboot_handler( httpd_req_t *req ) {
+  httpd_resp_send( req, "OK", 3 );
+  std::string uri( req->uri );
+  uint32_t e = uri.starts_with( "/reboot/gnss" ) ? EVENT_REBOOT_GNSS : EVENT_REBOOT_CPU;
+  esp_event_post_to( m_event_loop_handle,
+                     m_event_base,
+                     e,
+                     nullptr,
+                     0,
+                     portMAX_DELAY );
+}
+
 esp_err_t broadcast_clock::http_server::
 on_request( httpd_req_t *req ) {
 
@@ -270,6 +363,12 @@ on_request( httpd_req_t *req ) {
     httpd_resp_set_type( req, "text/html; charset=utf-8;" );
     countdown_handler( req );
   }
+  else if( uri.starts_with( "/reboot/cpu" ) ||
+           uri.starts_with( "/reboot/gnss" ) ) {
+    httpd_resp_set_status( req, "302 Found" ); 
+    httpd_resp_set_type( req, "text/html; charset=utf-8;" );
+    reboot_handler( req );
+  }
   else if( uri == "/styles.css" ) {
     httpd_resp_set_status( req, "302 Found" ); 
     httpd_resp_set_type( req, "text/css; charset=utf-8;" );
@@ -282,6 +381,12 @@ on_request( httpd_req_t *req ) {
     httpd_resp_set_status( req, "302 Found" ); 
     httpd_resp_set_type( req, "application/json; charset=utf-8" );
     httpd_resp_send( req, m_json_gnss_status.c_str(), m_json_gnss_status.length() );
+  }
+  else if( uri == "/ssid-list" ) {
+    update_json_ssid_list();
+    httpd_resp_set_status( req, "302 Found" ); 
+    httpd_resp_set_type( req, "application/json; charset=utf-8" );
+    httpd_resp_send( req, m_json_ssid_list.c_str(), m_json_ssid_list.length() );
   }
   else if( uri == "/favicon.ico" ) {
     httpd_resp_set_status( req, "302 Found" ); 
@@ -297,14 +402,14 @@ on_request( httpd_req_t *req ) {
   return ESP_OK;
 }
 
-void broadcast_clock::http_server::on_message( http_server_task_message msg, void *arg ) {
+void broadcast_clock::http_server::
+on_message( http_server_task_message msg, void *arg ) {
   switch( msg ) {
-    case http_server_task_message::set_network_list:
-      m_json_network_list = static_cast<char *>( arg );
-      free( arg );
-      break;
     case http_server_task_message::init:
       init_sync();
+      break;
+    case http_server_task_message::ssid_scan_result:
+      on_ssid_scan_result( static_cast<wifi::ssid_scan_result_t *>( arg ) );
       break;
     case http_server_task_message::start:
       start_sync();
@@ -315,11 +420,13 @@ void broadcast_clock::http_server::on_message( http_server_task_message msg, voi
   }
 }
 
-void broadcast_clock::http_server::init_sync() {
+void broadcast_clock::http_server::
+init_sync() {
 
 }
 
-void broadcast_clock::http_server::start_sync() {
+void broadcast_clock::http_server::
+start_sync() {
 
   stop_sync(); // Assert server is not running
 
@@ -371,7 +478,8 @@ void broadcast_clock::http_server::start_sync() {
   
 }
 
-std::string broadcast_clock::http_server::create_html_response() {
+std::string broadcast_clock::http_server::
+create_html_response() {
 
   const char *buf_cp = ( char * ) broadcast_clock::resources::html::control_panel_html_start;
   const size_t buf_cp_len = broadcast_clock::resources::html::control_panel_html_end - broadcast_clock::resources::html::control_panel_html_start;
@@ -476,21 +584,17 @@ void broadcast_clock::http_server::stop_sync() {
   }
 }
 
-void broadcast_clock::http_server::set_network_list( char *json ) {
-  http_server_task_queue_item item;
-  item.message = http_server_task_message::set_network_list;
-  item.arg = strdup( json );
-  xQueueSend( m_message_queue, &item, 10 );  
-}
-
-void broadcast_clock::http_server::init() {
+void broadcast_clock::http_server::
+init() {
   enqueue_simple_message( http_server_task_message::init );
 }
 
-void broadcast_clock::http_server::start() {
+void broadcast_clock::http_server::
+start() {
   enqueue_simple_message( http_server_task_message::start );
 }
 
-void broadcast_clock::http_server::stop() {
+void broadcast_clock::http_server::
+stop() {
   enqueue_simple_message( http_server_task_message::stop );
 }
