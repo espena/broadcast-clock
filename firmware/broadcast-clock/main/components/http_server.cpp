@@ -336,60 +336,60 @@ on_request( httpd_req_t *req ) {
   std::string uri( req->uri );
 
   if( uri == "/save" && req->content_len > 0 && m_event_loop_handle ) {
-    httpd_resp_set_status( req, "302 Found" ); 
+    httpd_resp_set_status( req, "200 OK" ); 
     httpd_resp_set_type( req, "text/html; charset=utf-8;" );
     save_handler( req );
   }
   else if( uri == "/survey_in" && req->content_len > 0 && m_event_loop_handle ) {
-    httpd_resp_set_status( req, "302 Found" ); 
+    httpd_resp_set_status( req, "200 OK" ); 
     httpd_resp_set_type( req, "text/html; charset=utf-8;" );
     survey_in_handler( req );
   }
   else if( uri == "/timers" && m_event_loop_handle ) {
-    httpd_resp_set_status( req, "302 Found" ); 
+    httpd_resp_set_status( req, "200 OK" ); 
     httpd_resp_set_type( req, "text/html; charset=utf-8;" );
     timers_handler( req );
   }
   else if( uri.starts_with( "/stopwatch/start" ) ||
            uri.starts_with( "/stopwatch/stop" ) ||
            uri.starts_with( "/stopwatch/reset" ) ) {
-    httpd_resp_set_status( req, "302 Found" ); 
+    httpd_resp_set_status( req, "200 OK" ); 
     httpd_resp_set_type( req, "text/html; charset=utf-8;" );
     stopwatch_handler( req );
   }
   else if( uri.starts_with( "/countdown/start" ) ||
            uri.starts_with( "/countdown/reset" ) ) {
-    httpd_resp_set_status( req, "302 Found" ); 
+    httpd_resp_set_status( req, "200 OK" ); 
     httpd_resp_set_type( req, "text/html; charset=utf-8;" );
     countdown_handler( req );
   }
   else if( uri.starts_with( "/reboot/cpu" ) ||
            uri.starts_with( "/reboot/gnss" ) ) {
-    httpd_resp_set_status( req, "302 Found" ); 
+    httpd_resp_set_status( req, "200 OK" ); 
     httpd_resp_set_type( req, "text/html; charset=utf-8;" );
     reboot_handler( req );
   }
   else if( uri == "/styles.css" ) {
-    httpd_resp_set_status( req, "302 Found" ); 
-    httpd_resp_set_type( req, "text/css; charset=utf-8;" );
+    httpd_resp_set_status( req, "200 OK" ); 
+    httpd_resp_set_type( req, "text/css; charset=utf-8" );
     const char *buf_st = ( char * ) broadcast_clock::resources::html::styles_css_start;
     const size_t buf_st_len = broadcast_clock::resources::html::styles_css_end - broadcast_clock::resources::html::styles_css_start;
     httpd_resp_send( req, buf_st, buf_st_len );
   }
   else if( uri == "/gnss-status" ) {
     update_json_gnss_status();
-    httpd_resp_set_status( req, "302 Found" ); 
+    httpd_resp_set_status( req, "200 OK" ); 
     httpd_resp_set_type( req, "application/json; charset=utf-8" );
     httpd_resp_send( req, m_json_gnss_status.c_str(), m_json_gnss_status.length() );
   }
   else if( uri == "/ssid-list" ) {
     update_json_ssid_list();
-    httpd_resp_set_status( req, "302 Found" ); 
+    httpd_resp_set_status( req, "200 OK" ); 
     httpd_resp_set_type( req, "application/json; charset=utf-8" );
     httpd_resp_send( req, m_json_ssid_list.c_str(), m_json_ssid_list.length() );
   }
   else if( uri == "/favicon.ico" ) {
-    httpd_resp_set_status( req, "302 Found" ); 
+    httpd_resp_set_status( req, "200 OK" ); 
     httpd_resp_set_type( req, "image/x-icon;" );
     const char *buf_ico = ( char * ) broadcast_clock::resources::gfx::favicon_ico_start;
     const size_t buf_ico_len = broadcast_clock::resources::gfx::favicon_ico_end - broadcast_clock::resources::gfx::favicon_ico_start;

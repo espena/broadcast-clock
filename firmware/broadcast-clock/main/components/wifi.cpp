@@ -146,7 +146,7 @@ on_event( void *arg,
       case broadcast_clock::http_server::EVENT_SSID_REQUEST:
         {
           wifi_task_queue_item item = { wifi_task_message::ssid_request, nullptr };
-          xQueueSend( instance->m_task_queue, &item, 10 );        
+          xQueueSend( instance->m_task_queue, &item, 10 );
         }
         break;
     }
@@ -169,7 +169,6 @@ void broadcast_clock::wifi::
 on_ssid_response() {
   if( xSemaphoreTake( semaphores::mutex::ssid_list, portMAX_DELAY ) ) {
     ESP_LOGI( m_component_name, "SSID response" );
-    //static ssid_scan_result_t *ssid_scan_result = ( ssid_scan_result_t * ) malloc( sizeof( ssid_scan_result_t ) );
     static ssid_scan_result_t ssid_scan_result;
     memset( &ssid_scan_result, 0x00, sizeof( ssid_scan_result_t ) );
     wifi_ap_record_t buffer[ max_ssid_scan_result ];
@@ -394,7 +393,7 @@ init_wifi() {
     wifi_config.ap.authmode = WIFI_AUTH_OPEN;
 
     ESP_LOGI( m_component_name, "Setting WiFi mode to AP" );
-    esp_wifi_set_mode( WIFI_MODE_AP );
+    esp_wifi_set_mode( WIFI_MODE_APSTA );
 
     ESP_LOGI( m_component_name, "Setting AP config" );
     ESP_ERROR_CHECK( esp_wifi_set_config( WIFI_IF_AP, &wifi_config ) );

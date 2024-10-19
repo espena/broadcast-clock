@@ -2,10 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Broadcast Clock - Configuration</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
+    <style>@import url('/styles.css');</style>
   </head>
   <body>
     <script>
@@ -146,11 +146,8 @@
             <legend>Wifi</legend>
             <div>
               <label for="ssid">Network</label>
-              <select name="ssid" id="ssid" value="|ssid|"></select>
-            </div>
-            <div>
-              <input type="checkbox" onclick="ssidalt()" /><label>Other network:</label>
-              <input type="text" name="ssid_alt" id="ssid_alt" value="|ssid_alt|">
+              <input type="text" list="ssid_list" spellcheck="false" name="ssid" id="ssid" value="|ssid|" />
+              <datalist id="ssid_list"></datalist>
             </div>
             <div>
               <label for="password">Password</label>
@@ -378,19 +375,20 @@
         } );
       } );
 
-      var ssid_list = document.getElementById( 'ssid' );
-      ssid_list.innerHTML = '<option value="" disabled selected>Select a network</option>';
+      var ssid_list = document.getElementById( 'ssid_list' );
+      ssid_list.innerHTML = '';
       fetch( '/ssid-list' )
         .then( ( response ) => response.json() )
         .then( ( access_points ) => {
           if( access_points.ssids ) {
             access_points.ssids.forEach( ( ssid ) => {
               var option = document.createElement( 'option' );
-              option.selected = ( ssid == '|ssid|' );
               option.value = ssid;
               option.innerText = ssid;
+              option.cursor = 'pointer';
               ssid_list.appendChild( option );
             } );
+            document.getElementById( 'ssid' ).list = 'ssid_list';
           }
         } )
         .catch( ( error ) => console.error( error ) );
