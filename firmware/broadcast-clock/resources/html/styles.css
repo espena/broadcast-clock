@@ -292,7 +292,8 @@ ul li,
     background-color: #f00;
   }
 }
-button.reboot.active {
+button.reboot.cpu.active,
+button.reboot.gnss.active {
   animation: toggleColor 2s infinite;
 }
 .timers {
