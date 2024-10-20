@@ -188,8 +188,7 @@ input[type="submit"] {
   border-radius: 5px;
   border: solid 1px #ccc; 
 }
-.wifi_sta input[type="submit"].cancel,
-.wifi_apsta input[type="submit"].cancel {
+.wifi_sta input[type="submit"].cancel {
   display: none;
 }
 .display.tab>div>div>span:first-of-type {
