@@ -11,6 +11,9 @@ namespace espena::broadcast_clock {
 
     virtual ~i_gnss_state() = default; // Virtual destructor for proper cleanup
 
+    virtual time_t system_uptime() = 0;
+    virtual std::string system_uptime_str() = 0;
+
     virtual bool gnss_chip_installed() = 0;
     virtual std::string gnss_chip_installed_str() = 0;
 

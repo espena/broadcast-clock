@@ -168,7 +168,6 @@ on_ssid_request() {
 void broadcast_clock::wifi::
 on_ssid_response() {
   if( xSemaphoreTake( semaphores::mutex::ssid_list, portMAX_DELAY ) ) {
-    ESP_LOGI( m_component_name, "SSID response" );
     static ssid_scan_result_t ssid_scan_result;
     memset( &ssid_scan_result, 0x00, sizeof( ssid_scan_result_t ) );
     wifi_ap_record_t buffer[ max_ssid_scan_result ];
@@ -179,7 +178,6 @@ on_ssid_response() {
         memcpy( &ssid_scan_result.ap_records[ i ], &buffer[ i ], sizeof( wifi_ap_record_t ) );
       }
     }
-    ESP_LOGI( m_component_name, "Found %d SSIDs", ssid_scan_result.ap_count );
     if( m_event_loop_handle ) {
       esp_event_post_to( m_event_loop_handle,
                         broadcast_clock::wifi::m_event_base,

@@ -17,7 +17,7 @@ namespace espena::broadcast_clock {
   class clock_status : public i_gnss_ubx,
                        public i_gnss_state {
 
-    const static time_t m_startup_time;
+    time_t m_startup_time = 0;
 
     i_indicators *m_indicators;
     esp_event_loop_handle_t m_event_loop_handle;
@@ -122,6 +122,9 @@ namespace espena::broadcast_clock {
     void ubx_tim_svin( ubx::tim_svin_t *tim_svin ) override;
 
     // i_gnss_state interface (getters)
+
+    time_t system_uptime() override;
+    std::string system_uptime_str() override;
 
     bool gnss_chip_installed() override { return m_gnss_installed; };
     std::string gnss_chip_installed_str() override { return m_gnss_installed ? "Yes" : "No"; };

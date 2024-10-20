@@ -74,7 +74,6 @@ event_handler( void *handler_arg,
       http_server_task_queue_item item;
       static wifi::ssid_scan_result_t scan_result;
       memcpy( &scan_result, event_data, sizeof( wifi::ssid_scan_result_t ) );
-      ESP_LOGI( instance->m_component_name, "SSID scan result form event_handler: %d found", scan_result.ap_count );
       item.message = http_server_task_message::ssid_scan_result;
       item.arg = &scan_result;
       xQueueSend( instance->m_message_queue, &item, 10 );
@@ -84,12 +83,8 @@ event_handler( void *handler_arg,
 
 void broadcast_clock::http_server::
 on_ssid_scan_result( wifi::ssid_scan_result_t * scan_result ) {
-  ESP_LOGI( m_component_name, "SSID scan result: %d found", scan_result->ap_count );
   if( xSemaphoreTake( semaphores::mutex::ssid_list, portMAX_DELAY ) ) {
-    ESP_LOGI( m_component_name, "Got mutex!" );
-    ESP_LOGI( m_component_name, "Still %d SSIDs to go...", scan_result->ap_count );
     for( uint16_t u = 0; u < scan_result->ap_count; u++ ) {
-      ESP_LOGI( m_component_name, "SSID: %s", scan_result->ap_records[ u ].ssid );
       m_ssid_list.insert( std::string( reinterpret_cast<char *>( scan_result->ap_records[ u ].ssid ) ) );
     }
     xSemaphoreGive( semaphores::mutex::ssid_list );
@@ -104,6 +99,7 @@ update_json_gnss_status() {
 
     m_json_gnss_status = "{ \
                             \"status\": \"__status__\", \
+                            \"system_uptime\": \"__system_uptime__\", \
                             \"chip_installed\": \"__gnss_chip_installed__\", \
                             \"software_version\": \"__gnss_software_version__\", \
                             \"hardware_version\": \"__gnss_hardware_version__\", \
@@ -128,6 +124,7 @@ update_json_gnss_status() {
                           }";
 
     utils::replace_substring( m_json_gnss_status, "__status__", m_gnss_state->rebooting() ? "rebooting" : "running" );
+    utils::replace_substring( m_json_gnss_status, "__system_uptime__", m_gnss_state->system_uptime_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_chip_installed__", m_gnss_state->gnss_chip_installed_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_software_version__", m_gnss_state->gnss_software_version_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_hardware_version__", m_gnss_state->gnss_hardware_version_str() );

@@ -148,7 +148,8 @@ fieldset span>label {
 fieldset>div>label {
   display: inline-block;
   min-width: 6.5em;
-  margin-bottom: 0.5em;
+  margin-top: 0.5em;
+  margin-bottom: 0.2em;
   font-weight: bold;
 }
 fieldset span {
@@ -167,7 +168,7 @@ fieldset>div>div>label {
   min-width: 4em;
 }
 select {
-  width: 158px;
+  width: 99%;
 }
 select,
 input[type="text"],

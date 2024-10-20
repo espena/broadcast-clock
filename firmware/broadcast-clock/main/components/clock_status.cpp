@@ -1,4 +1,5 @@
 #include "clock_status.hpp"
+#include "../semaphores/mutex.hpp"
 #include "ubx_types.hpp"
 #include "http_server.hpp"
 #include "wifi.hpp"
@@ -11,13 +12,12 @@
 #include <string.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
+#include <freertos/semphr.h>
 #include <freertos/task.h>
 #include <esp_timer.h>
 #include <esp_log.h>
 
 using namespace espena::broadcast_clock;
-
-const time_t clock_status::m_startup_time = time( nullptr );
 
 clock_status::
 clock_status( i_indicators *indicators ) : m_indicators( indicators ),
@@ -30,6 +30,37 @@ clock_status( i_indicators *indicators ) : m_indicators( indicators ),
   timer_args.name = "clock_status_blink_timer";
   ESP_ERROR_CHECK( esp_timer_create( &timer_args, &m_blink_timer ) );
   ESP_ERROR_CHECK( esp_timer_start_periodic( m_blink_timer, 250000 ) );
+}
+
+time_t clock_status::
+system_uptime() {
+  time_t ts = 0;
+  if( xSemaphoreTake( semaphores::mutex::system_clock, portMAX_DELAY ) == pdTRUE ) {
+    ts = ( m_startup_time > 0 ? time( nullptr ) - m_startup_time : 0 );
+    xSemaphoreGive( semaphores::mutex::system_clock );
+  }
+  return ts;
+}
+
+std::string clock_status::
+system_uptime_str() {
+  char buf[ 64 ];
+  memset( buf, 0x00, sizeof( buf ) );
+  if( m_startup_time > 0 ) {
+    time_t uptime = system_uptime();
+    int days = uptime / 86400;
+    int hours = ( uptime % 86400 ) / 3600;
+    int minutes = ( uptime % 3600 ) / 60;
+    int seconds = uptime % 60;
+    snprintf( buf,
+              sizeof( buf ),
+              "%03dd %02dh %02dm %02ds",
+              days,
+              hours,
+              minutes,
+              seconds );
+  }
+  return std::string( buf );
 }
 
 void clock_status::
@@ -202,6 +233,9 @@ void clock_status::
 sntp_sync( bool ok ) {
   m_sntp_sync = ok;
   m_sntp_aquiring = ok ? 20 : 0;
+  if( ok && m_startup_time == 0 ) {
+    m_startup_time = time( nullptr );
+  }
 }
 
 void clock_status::
@@ -262,4 +296,7 @@ ubx_nav_timeutc( ubx::nav_timeutc_t *nav_timeutc ) {
   m_gnss_utc_standard = ( nav_timeutc->valid & 0xf0 ) >> 4;
   const uint8_t id = m_gnss_utc_standard > 8 ? 9 : m_gnss_utc_standard;
   strncpy( m_gnss_utc_standard_str, ubx::utc_standard_timesource[ id ], sizeof( m_gnss_utc_standard_str ) );
+  if( m_startup_time == 0 ) {
+    m_startup_time = time( nullptr );
+  }
 }
