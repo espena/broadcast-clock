@@ -285,6 +285,10 @@ ul li,
   font-size: 1.5em;
   margin-right: 3px;
 }
+.reboot button.disabled {
+  opacity: 0.2;
+  background-color: #ddd;
+}
 @keyframes toggleColor {
   0% {
     background-color: #eaa;
@@ -352,4 +356,42 @@ a.back {
 .disabled {
   color: #bbb;
   pointer-events: none;
+}
+table.indicator-descriptions tr td {
+  font-size: 0.8em;
+}
+table.indicator-descriptions em {
+  display: inline-block;
+  width: 32px;
+  margin-right: 5px;
+  text-align: right;
+  font-style: normal;
+  font-weight: bold;
+}
+.led::before {
+  display: block;
+  float: left;
+  margin-right: 5px;
+  margin-left: 5px;
+  content: "";
+  width: 7px;
+  height: 9px;
+  background-color: #00f;
+  border-style: solid none;
+  border-color: #ccc;
+  border-width: 3px;
+}
+.led.blue::before { background-color: #00f; }
+.led.green::before { background-color: #0a0; }
+.led.amber::before { background-color: #fc0; }
+.led.red::before { background-color: #d22; }
+td.led {
+  vertical-align: top !important;
+}
+td.led span {
+  display: inline-block;
+  margin-top: 3px;
+}
+table tr td.led::after {
+  content: "";
 }
