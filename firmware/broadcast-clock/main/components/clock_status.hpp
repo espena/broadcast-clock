@@ -126,6 +126,9 @@ namespace espena::broadcast_clock {
     time_t system_uptime() override;
     std::string system_uptime_str() override;
 
+    wifi_mode_t system_wifi_mode() override;
+    std::string system_wifi_mode_str() override;
+
     bool gnss_chip_installed() override { return m_gnss_installed; };
     std::string gnss_chip_installed_str() override { return m_gnss_installed ? "Yes" : "No"; };
 

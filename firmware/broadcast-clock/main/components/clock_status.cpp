@@ -63,6 +63,37 @@ system_uptime_str() {
   return std::string( buf );
 }
 
+wifi_mode_t clock_status::
+system_wifi_mode() {
+  wifi_mode_t mode = WIFI_MODE_NULL;
+  wifi_mode_t current_mode;
+  if( esp_wifi_get_mode( &current_mode ) == ESP_OK ) {
+    mode = current_mode;
+  }
+  return mode;
+}
+
+std::string clock_status::
+system_wifi_mode_str() {
+  wifi_mode_t mode = system_wifi_mode();
+  std::string str;
+  switch( mode ) {
+    case WIFI_MODE_STA:
+      str = "sta";
+      break;
+    case WIFI_MODE_AP:
+      str = "ap";
+      break;
+    case WIFI_MODE_APSTA:
+      str = "apsta";
+      break;
+    default:
+      str = "none";
+      break;
+  }
+  return str;
+}
+
 void clock_status::
 on_blink_timer( void *arg ) {
   clock_status *inst = static_cast<clock_status *>( arg );

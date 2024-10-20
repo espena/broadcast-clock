@@ -360,7 +360,6 @@ on_save_config( std::string post_data ) {
 void application::
 on_cancel_config( std::string post_data ) {
   switch_to_station_mode();
-  m_configuration->update( post_data );
   init_timezone();
 }
 

@@ -2,6 +2,8 @@
 #define __I_GNSS_STATE_HPP__
 
 #include <string>
+#include <time.h>
+#include <esp_wifi.h>
 
 namespace espena::broadcast_clock {
 
@@ -13,6 +15,9 @@ namespace espena::broadcast_clock {
 
     virtual time_t system_uptime() = 0;
     virtual std::string system_uptime_str() = 0;
+
+    virtual wifi_mode_t system_wifi_mode() = 0;
+    virtual std::string system_wifi_mode_str() = 0;
 
     virtual bool gnss_chip_installed() = 0;
     virtual std::string gnss_chip_installed_str() = 0;

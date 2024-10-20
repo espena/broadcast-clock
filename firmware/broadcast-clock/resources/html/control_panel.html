@@ -7,7 +7,7 @@
     <title>Broadcast Clock - Configuration</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
+  <body class="wifi_ap">
     <script>
       function secondsToHMS( seconds ) {
         const date = new Date( seconds * 1000 );
@@ -40,6 +40,7 @@
             }
 
             document.querySelector( 'body' ).className = data.status ?? '';
+            document.querySelector( 'body' ).classList.add( `wifi_${data.system_wifi_mode}` );
             document.querySelector( 'fieldset.tab.gnss' ).classList.remove( 'disabled' );
             document.querySelector( 'button.reboot.gnss' ).classList.remove( 'disabled' );
             document.getElementById( 'hardware_version' ).innerText = data.hardware_version;
@@ -230,19 +231,18 @@
               </table>
             </div>
             <div class="gnss pages">
-              <button class="status">Status</button> <button class="setup">Setup</button> <button class="ntp-server">NTP server</button>
+              <button class="status">Status</button> <button class="setup">Setup</button> <button class="ntp-server">Server</button>
             </div>
           </fieldset>
           <fieldset class="tab misc">
             <legend>Misc</legend>
             <div class="page interface">
-              <label>User interface</label>
               <div><input |indicators:on| type="checkbox" name="indicators" id="indicators"><label for="indicators">Show status indicators</label></div>
               <table class="indicator-descriptions">
                 <tr><td class="blue led"><span>Blue</span></td><td><div><em>On</em> Satellite signal OK</div><div><em>Off</em> No satellite signal</div><div><em>Blink</em> Survey-in in progress</div></td></tr>
-                <tr><td class="green led"><span>Green</span></td><td><div><em>On</em> NTP time received</div><div><em>Off</em> NTP time not received</div></td></tr>
+                <tr><td class="green led"><span>Green</span></td><td><div><em>On</em> Receiving NTP time</div><div><em>Off</em> No NTP time received</div><div><em>Blink</em> Aquiring time from NTP</div></td></tr>
                 <tr><td class="amber led"><span>Amber</span></td><td><div><em>On</em> NTP server running</div><div><em>Off</em> NTP server disabled</div><div><em>Blink</em> NTP request processed</div></td></tr>
-                <tr><td class="red led"><span>Red</span></td><td><div><em>On</em> Accuracy is 50 &micro;s or better</div><div><em>Off</em> GNSS not installed or disabled</div><div><em>Blink</em> Accuracy less than 50 &micro;s</div></td></tr>
+                <tr><td class="red led"><span>Red</span></td><td><div><em>On</em> Time accuracy is 50 &micro;s or better</div><div><em>Off</em> GNSS not installed or disabled</div><div><em>Blink</em> Time accuracy less than 50 &micro;s</div></td></tr>
               </table>
             </div>
             <div class="page stopwatch">
@@ -275,12 +275,12 @@
               <div><button type="button" class="reboot gnss disabled">CPU and GNSS</button></div>
             </div>
             <div class="misc pages">
-              <button class="interface">Interface</button> <button class="stopwatch">Stopwatch</button> <button class="timer">Timer</button> <button class="reboot">Reboot</button>
+              <button class="interface">Interface</button> <button class="stopwatch">S.watch</button> <button class="timer">Timer</button> <button class="reboot">Reboot</button>
             </div>
           </fieldset>
           <fieldset class="actions">
-            <input type="submit" name="action" value="Save">
-            <input type="submit" name="action" value="Cancel">
+            <input type="submit" class="save" name="action" value="Save">
+            <input type="submit" class="cancel" name="action" value="Cancel">
           </fieldset>
         </form>
       </div>

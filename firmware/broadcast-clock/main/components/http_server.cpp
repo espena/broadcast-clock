@@ -100,6 +100,7 @@ update_json_gnss_status() {
     m_json_gnss_status = "{ \
                             \"status\": \"__status__\", \
                             \"system_uptime\": \"__system_uptime__\", \
+                            \"system_wifi_mode\": \"__system_wifi_mode__\", \
                             \"chip_installed\": \"__gnss_chip_installed__\", \
                             \"software_version\": \"__gnss_software_version__\", \
                             \"hardware_version\": \"__gnss_hardware_version__\", \
@@ -125,6 +126,7 @@ update_json_gnss_status() {
 
     utils::replace_substring( m_json_gnss_status, "__status__", m_gnss_state->rebooting() ? "rebooting" : "running" );
     utils::replace_substring( m_json_gnss_status, "__system_uptime__", m_gnss_state->system_uptime_str() );
+    utils::replace_substring( m_json_gnss_status, "__system_wifi_mode__", m_gnss_state->system_wifi_mode_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_chip_installed__", m_gnss_state->gnss_chip_installed_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_software_version__", m_gnss_state->gnss_software_version_str() );
     utils::replace_substring( m_json_gnss_status, "__gnss_hardware_version__", m_gnss_state->gnss_hardware_version_str() );
