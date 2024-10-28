@@ -331,7 +331,9 @@ switch_to_station_mode() {
 void application::
 on_got_ip( esp_netif_ip_info_t *ip_info ) {
   m_clock_face.display_ip( ip_info );
-  m_ntp_server.init();
+  if( m_lea_m8t.present() ) {
+    m_ntp_server.init();
+  }
 }
 
 void application::

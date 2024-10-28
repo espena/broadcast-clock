@@ -41,6 +41,8 @@ namespace espena::broadcast_clock {
 
     static const uint8_t m_i2c_address = 0x42; // u-blox DDC address
 
+    bool m_present;
+
     int32_t m_tp_offset_us = 0; // Timepulse offset from system clock, in microseconds
 
     static void event_handler( void *handler_arg,
@@ -96,11 +98,13 @@ namespace espena::broadcast_clock {
       poll,
       start_time_mode,
       stop_time_mode,
-      timepulse
+      timepulse,
+      exit
     };
 
     enum class lea_m8t_timepulse_message {
-      timepulse
+      timepulse,
+      exit
     };
 
     typedef struct lea_m8t_egress_queue_item_struct {
@@ -168,12 +172,14 @@ namespace espena::broadcast_clock {
 
     void on_ubx_tim_svin( ubx::tim_svin_t *payload );
 
+    bool is_present();
+
   public:
 
     lea_m8t();
     ~lea_m8t();
 
-    bool is_present();
+    bool present() { return m_present; };
     void init();
     void soft_init();
     void reset();

@@ -34,6 +34,8 @@ lea_m8t() : m_event_loop_handle( nullptr ) {
   spinlock_initialize( &m_spinlock1 );
   spinlock_initialize( &m_spinlock2 );
 
+  m_present = false;
+
   memset( &m_cfg_prt_ddc, 0x00, sizeof( ubx::cfg_prt_ddc_t ) );
   memset( &m_cfg_tmode2, 0x00, sizeof( ubx::cfg_tmode2_t ) );
   memset( &m_cfg_gnss, 0x00, sizeof( ubx::cfg_gnss_t ) );
@@ -109,7 +111,7 @@ event_handler( void *handler_arg,
   std::string source = ( char * ) event_base;
   if( source == configuration::m_event_base ) {
     lea_m8t *instance = static_cast<lea_m8t *>( handler_arg );
-    if( instance ) {
+    if( instance && instance->m_present ) {
       switch( event_id ) {
         case configuration::CONFIGURATION_UPDATED:
           instance->m_configuration_updated = true;
@@ -128,6 +130,14 @@ task_loop( void *arg ) {
   while( 1 ) {
     if( xQueueReceive( inst->m_task_queue, &item, -1 ) ) {
       inst->on_task_message( item.message, item.arg );
+    }
+    if( item.message == lea_m8t_task_message::exit ) {
+      if( inst->m_poll_timer ) {
+        ESP_LOGI( inst->m_component_name, "TERMINATING: Poll timer" );
+        esp_timer_stop( inst->m_poll_timer );
+        esp_timer_delete( inst->m_poll_timer );
+        inst->m_poll_timer = nullptr;
+      }
     }
   }
 }
@@ -148,7 +158,7 @@ timepulse_loop( void *arg ) {
 void broadcast_clock::lea_m8t::
 on_poll_timer( void *arg ) {
   lea_m8t *inst = static_cast<lea_m8t *>( arg );
-  if( inst ) {
+  if( inst && inst ) {
     lea_m8t_task_queue_item_t item = { lea_m8t_task_message::poll, nullptr };
     xQueueSend( inst->m_task_queue, &item, 0 );
   }
@@ -441,6 +451,9 @@ on_task_message( lea_m8t_task_message msg, void *arg ) {
       break;
     case lea_m8t_task_message::timepulse:
       on_timepulse();
+      break;
+    case lea_m8t_task_message::exit:
+      // Do nothing
       break;
   }
 }
@@ -929,12 +942,18 @@ on_init() {
 
   if( is_present() ) {
     ESP_LOGI( m_component_name, "LEA M8T found on i2c bus" );
+    m_present = true;
     init_isr_timepulse();
     vTaskDelay( 500 / portTICK_PERIOD_MS );
     init_ubx();
   }
   else {
     ESP_LOGE( m_component_name, "Not found on i2c bus" );
+    lea_m8t_timepulse_message tp_item = { lea_m8t_timepulse_message::exit };
+    xQueueSend( m_timepulse_queue, &tp_item, 0 );
+    lea_m8t_task_queue_item_t tq_item = { lea_m8t_task_message::exit, nullptr };
+    xQueueReset( m_task_queue );
+    xQueueSendToFront( m_task_queue, &tq_item, 0 );
   }
 }
 
@@ -952,18 +971,24 @@ soft_init() {
 
 void broadcast_clock::lea_m8t::
 start_time_mode() {
-  lea_m8t_task_queue_item_t item = { lea_m8t_task_message::start_time_mode, nullptr };
-  xQueueSend( m_task_queue, &item, 0 );
+  if( m_present ) {
+    lea_m8t_task_queue_item_t item = { lea_m8t_task_message::start_time_mode, nullptr };
+    xQueueSend( m_task_queue, &item, 0 );
+  }
 }
 
 void broadcast_clock::lea_m8t::
 stop_time_mode() {
-  lea_m8t_task_queue_item_t item = { lea_m8t_task_message::stop_time_mode, nullptr };
-  xQueueSend( m_task_queue, &item, 0 );
+  if( m_present ) {
+    lea_m8t_task_queue_item_t item = { lea_m8t_task_message::stop_time_mode, nullptr };
+    xQueueSend( m_task_queue, &item, 0 );
+  }
 }
 
 void broadcast_clock::lea_m8t::
 reset() {
-  lea_m8t_task_queue_item_t item = { lea_m8t_task_message::reset, nullptr };
-  xQueueSend( m_task_queue, &item, 0 );
+  if( m_present ) {
+    lea_m8t_task_queue_item_t item = { lea_m8t_task_message::reset, nullptr };
+    xQueueSend( m_task_queue, &item, 0 );
+  }
 }
