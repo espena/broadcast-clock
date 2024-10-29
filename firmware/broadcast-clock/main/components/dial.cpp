@@ -45,7 +45,7 @@ dial() : m_initialized( false ),
                  m_component_name,
                  m_component_stack_size,
                  &m_task_params,
-                 8,
+                 10,
                  &m_task_params.task_handle );
 }
 
