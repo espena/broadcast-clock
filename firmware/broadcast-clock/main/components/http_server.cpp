@@ -45,7 +45,7 @@ broadcast_clock::http_server::http_server() : m_message_queue( nullptr ),
                      m_component_name,
                      m_component_stack_size,
                      &m_task_params,
-                     8,
+                     12,
                      m_task_params.stack_buffer,
                      &m_task_params.task_buffer );
 }
@@ -202,6 +202,15 @@ request_handler( httpd_req_t *req ) {
   return inst->on_request( req );
 }
 
+esp_err_t broadcast_clock::http_server::
+respond( httpd_req_t *req, const char *buf, size_t buf_len ) {
+  if( xSemaphoreTake( semaphores::mutex::http_port, portMAX_DELAY ) ) {
+    httpd_resp_send( req, buf, buf_len );
+    xSemaphoreGive( semaphores::mutex::http_port );
+  }
+  return ESP_OK;
+}
+
 void broadcast_clock::http_server::
 save_handler( httpd_req_t *req ) {
 
@@ -225,10 +234,10 @@ save_handler( httpd_req_t *req ) {
       vTaskDelay( 100 / portTICK_PERIOD_MS ); // Wait for save completed
       std::string html = create_html_response();
       httpd_resp_set_hdr( req, "Connection", "Close"  );
-      httpd_resp_send( req, html.c_str(), html.length() );
+      ESP_ERROR_CHECK( respond( req, html.c_str(), html.length() ) );
     }
     else { // AP mode, exit from configuration
-      httpd_resp_send( req, buf_ex, buf_ex_len );
+      ESP_ERROR_CHECK( respond( req, buf_ex, buf_ex_len ) );
     }
 }
 
@@ -247,7 +256,7 @@ survey_in_handler( httpd_req_t *req ) {
                         post_data.length(),
                         portMAX_DELAY );
 
-    httpd_resp_send( req, "OK", 3 );
+    ESP_ERROR_CHECK( respond( req, "OK", 3 ) );
 }
 
 void broadcast_clock::http_server::
@@ -262,13 +271,13 @@ timers_handler( httpd_req_t *req ) {
 
   const char *buf_sw = ( char * ) broadcast_clock::resources::html::timers_page_html_start;
   const size_t buf_sw_len = broadcast_clock::resources::html::timers_page_html_end - broadcast_clock::resources::html::timers_page_html_start;
-  httpd_resp_send( req, buf_sw, buf_sw_len );
+  ESP_ERROR_CHECK( respond( req, buf_sw, buf_sw_len ) );
 }
 
 void broadcast_clock::http_server::
 stopwatch_handler( httpd_req_t *req ) {
 
-  httpd_resp_send( req, "OK", 3 );
+  ESP_ERROR_CHECK( respond( req, "OK", 3 ) );
   std::string uri( req->uri );
   uint32_t e = 0;
   if( uri.starts_with( "/stopwatch/start" ) ) e = EVENT_STOPWATCH_START;
@@ -285,7 +294,7 @@ stopwatch_handler( httpd_req_t *req ) {
 
 void broadcast_clock::http_server::
 countdown_handler( httpd_req_t *req ) {
-  httpd_resp_send( req, "OK", 3 );
+  ESP_ERROR_CHECK( respond( req, "OK", 3 ) );
   std::string uri( req->uri );
 
   static struct timespec countdown_period;
@@ -310,7 +319,7 @@ countdown_handler( httpd_req_t *req ) {
 
 void broadcast_clock::http_server::
 reboot_handler( httpd_req_t *req ) {
-  httpd_resp_send( req, "OK", 3 );
+  ESP_ERROR_CHECK( respond( req, "OK", 3 ) );
   std::string uri( req->uri );
   uint32_t e = uri.starts_with( "/reboot/gnss" ) ? EVENT_REBOOT_GNSS : EVENT_REBOOT_CPU;
   esp_event_post_to( m_event_loop_handle,
@@ -373,30 +382,30 @@ on_request( httpd_req_t *req ) {
     httpd_resp_set_type( req, "text/css; charset=utf-8" );
     const char *buf_st = ( char * ) broadcast_clock::resources::html::styles_css_start;
     const size_t buf_st_len = broadcast_clock::resources::html::styles_css_end - broadcast_clock::resources::html::styles_css_start;
-    httpd_resp_send( req, buf_st, buf_st_len );
+    ESP_ERROR_CHECK( respond( req, buf_st, buf_st_len ) );
   }
   else if( uri == "/gnss-status" ) {
     update_json_gnss_status();
     httpd_resp_set_status( req, "200 OK" ); 
     httpd_resp_set_type( req, "application/json; charset=utf-8" );
-    httpd_resp_send( req, m_json_gnss_status.c_str(), m_json_gnss_status.length() );
+    ESP_ERROR_CHECK( respond( req, m_json_gnss_status.c_str(), m_json_gnss_status.length() ) );
   }
   else if( uri == "/ssid-list" ) {
     update_json_ssid_list();
     httpd_resp_set_status( req, "200 OK" ); 
     httpd_resp_set_type( req, "application/json; charset=utf-8" );
-    httpd_resp_send( req, m_json_ssid_list.c_str(), m_json_ssid_list.length() );
+    ESP_ERROR_CHECK( respond( req, m_json_ssid_list.c_str(), m_json_ssid_list.length() ) );
   }
   else if( uri == "/favicon.ico" ) {
     httpd_resp_set_status( req, "200 OK" ); 
     httpd_resp_set_type( req, "image/x-icon;" );
     const char *buf_ico = ( char * ) broadcast_clock::resources::gfx::favicon_ico_start;
     const size_t buf_ico_len = broadcast_clock::resources::gfx::favicon_ico_end - broadcast_clock::resources::gfx::favicon_ico_start;
-    httpd_resp_send( req, buf_ico, buf_ico_len );
+    ESP_ERROR_CHECK( respond( req, buf_ico, buf_ico_len ) );
   }
   else {
     std::string html = create_html_response();
-    httpd_resp_send( req, html.c_str(), html.length() );
+    ESP_ERROR_CHECK( respond( req, html.c_str(), html.length() ) );
   }
   return ESP_OK;
 }

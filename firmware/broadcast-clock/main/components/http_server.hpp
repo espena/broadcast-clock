@@ -84,6 +84,8 @@ namespace espena::broadcast_clock {
 
     bool m_gnss_installed = false;
 
+    esp_err_t respond( httpd_req_t *req, const char *buf, size_t buf_len );
+
     void update_json_gnss_status();
     void update_json_ssid_list();
 

@@ -865,7 +865,6 @@ init_ubx_normalboot() {
     };
 
     for( size_t i = 0; i < sizeof( messages ) / sizeof( messages[ 0 ] ); ++i ) {
-        //uint8_t *payload = new uint8_t[3];
         uint8_t *payload = static_cast<uint8_t *>( heap_caps_malloc( 3, MALLOC_CAP_SPIRAM ) );
         payload[0] = messages[i][0]; // Message class
         payload[1] = messages[i][1]; // Message ID
@@ -877,7 +876,6 @@ init_ubx_normalboot() {
   }
 
   { // Set message rate
-    //ubx::cfg_rate_t *payload = reinterpret_cast<ubx::cfg_rate_t *>( new uint8_t[ sizeof( ubx::cfg_rate_t ) ] );
     ubx::cfg_rate_t *payload = static_cast<ubx::cfg_rate_t *>( heap_caps_malloc( sizeof( ubx::cfg_rate_t ), MALLOC_CAP_SPIRAM ) );
     payload->meas_rate = 100;
     payload->nav_rate = 8;
@@ -887,7 +885,6 @@ init_ubx_normalboot() {
   }
 
   { // Poll periodic UBX-NAV-TIMEUTC
-    //uint8_t *payload = new uint8_t[ 3 ];
     uint8_t *payload = static_cast<uint8_t *>( heap_caps_malloc( 3, MALLOC_CAP_SPIRAM ) );
     payload[ 0 ] = ubx::message::nav::cls;
     payload[ 1 ] = ubx::message::nav::timeutc;
@@ -897,7 +894,6 @@ init_ubx_normalboot() {
   }
 
   { // Poll periodic UBX-NAV-SAT
-    //uint8_t *payload = new uint8_t[ 3 ];
     uint8_t *payload = static_cast<uint8_t *>( heap_caps_malloc( 3, MALLOC_CAP_SPIRAM ) );
     payload[ 0 ] = ubx::message::nav::cls;
     payload[ 1 ] = ubx::message::nav::sat;
@@ -907,7 +903,6 @@ init_ubx_normalboot() {
   }
 
   { // Poll periodic UBX-TIM-SVIN
-    //uint8_t *payload = new uint8_t[ 3 ];
     uint8_t *payload = static_cast<uint8_t *>( heap_caps_malloc( 3, MALLOC_CAP_SPIRAM ) );
     payload[ 0 ] = ubx::message::tim::cls;
     payload[ 1 ] = ubx::message::tim::svin;

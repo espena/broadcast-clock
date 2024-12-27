@@ -8,6 +8,7 @@ namespace espena::semaphores::mutex {
 
   extern SemaphoreHandle_t system_clock;
   extern SemaphoreHandle_t ssid_list;
+  extern SemaphoreHandle_t http_port;
 
 } // namespace espena::semaphores::mutex
 
