@@ -147,5 +147,5 @@ get_bool( std::string key ) {
               s == "no" ||
               s == " " )
             ? false
-            : true);
+            : true );
 }

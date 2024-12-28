@@ -40,6 +40,7 @@ namespace espena::broadcast_clock {
     bool m_green_indicator;
     bool m_yellow_indicator;
     bool m_red_indicator;
+    bool m_time_valid;
 
     typedef struct dial_task_params_struct {
       dial *instance;
@@ -88,11 +89,12 @@ namespace espena::broadcast_clock {
     void countdown_start( struct timespec *period );
     void countdown_reset();
 
-    virtual void set_indicators( bool blue, bool green, bool yellow, bool red ) override;
-    virtual void set_blue_indicator( bool b ) override { set_indicators( b, m_green_indicator, m_yellow_indicator, m_red_indicator ); };
-    virtual void set_green_indicator( bool b ) override { set_indicators( m_blue_indicator, b, m_yellow_indicator, m_red_indicator ); };
-    virtual void set_yellow_indicator( bool b ) override { set_indicators( m_blue_indicator, m_green_indicator, b, m_red_indicator ); };
-    virtual void set_red_indicator( bool b ) override { set_indicators( m_blue_indicator, m_green_indicator, m_yellow_indicator, b ); };
+    virtual void set_indicators( bool blue, bool green, bool yellow, bool red, bool valid_time ) override;
+    virtual void set_blue_indicator( bool b ) override { set_indicators( b, m_green_indicator, m_yellow_indicator, m_red_indicator, m_time_valid ); };
+    virtual void set_green_indicator( bool b ) override { set_indicators( m_blue_indicator, b, m_yellow_indicator, m_red_indicator, m_time_valid ); };
+    virtual void set_yellow_indicator( bool b ) override { set_indicators( m_blue_indicator, m_green_indicator, b, m_red_indicator, m_time_valid ); };
+    virtual void set_red_indicator( bool b ) override { set_indicators( m_blue_indicator, m_green_indicator, m_yellow_indicator, b, m_time_valid ); };
+    virtual void set_time_valid( bool b ) override { m_time_valid = b; };
 
     void blink_green_indicator();
 

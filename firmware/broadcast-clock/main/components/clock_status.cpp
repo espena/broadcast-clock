@@ -101,7 +101,8 @@ on_blink_timer( void *arg ) {
   inst->m_indicators->set_indicators( inst->is_blue(),
                                       inst->is_green(),
                                       inst->is_yellow(),
-                                      inst->is_red() );
+                                      inst->is_red(),
+                                      inst->is_valid_time() );
 }
 
 void clock_status::

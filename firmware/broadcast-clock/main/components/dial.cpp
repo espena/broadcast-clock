@@ -31,7 +31,8 @@ dial() : m_initialized( false ),
          m_blue_indicator( false ),
          m_green_indicator( false ),
          m_yellow_indicator( false ),
-         m_red_indicator( false ) {
+         m_red_indicator( false ),
+         m_time_valid( false ) {
 
     memset( &m_stopwatch_begin, 0x00, sizeof( timespec ) );
     memset( &m_stopwatch_end, 0x00, sizeof( timespec ) );
@@ -178,6 +179,7 @@ update() {
 
   const char style = m_config->get_str( "dial_style" )[ 0 ];
   const bool indicators_enabled = m_config->get_bool( "indicators" );
+  const bool blank_invalid = m_config->get_bool( "blankinvalid" );
 
   gpio_set_level( DIAL_XLAT, 0 );
   gpio_set_level( DIAL_SCLK, 0 );
@@ -221,13 +223,13 @@ update() {
         else if( style == 'u' && // count up
                  k == m_brightness_bit &&
                  ( led_id <= m_current_seconds || led_id == 60 || led_id > 64 ) ) {
-          gpio_set_level( DIAL_SOUT, 1 );
+          gpio_set_level( DIAL_SOUT, !m_time_valid && blank_invalid ? 0 : 1 );
         }
         else if( style == 'd' && // count down
                  ( k == m_brightness_bit ) &&
                  ( led_id >= m_current_seconds && ( led_id < 61 || led_id > 64 ) ) &&
                  !( led_id < 60 && m_current_seconds == 0 ) ) {
-          gpio_set_level( DIAL_SOUT, 1 );
+          gpio_set_level( DIAL_SOUT, !m_time_valid && blank_invalid ? 0 : 1 );
         }
         else if( led_id >= 61 && led_id <= 64 ) { // Indicators
           gpio_set_level( DIAL_SOUT, 0 );
@@ -327,9 +329,10 @@ blink_green_indicator() {
 }
 
 void broadcast_clock::dial::
-set_indicators( bool blue, bool green, bool yellow, bool red ) {
+set_indicators( bool blue, bool green, bool yellow, bool red, bool time_valid ) {
   m_blue_indicator = blue;
   m_green_indicator = green;
   m_yellow_indicator = yellow;
   m_red_indicator = red;
+  m_time_valid = time_valid;
 }

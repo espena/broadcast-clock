@@ -22,6 +22,8 @@ const esp_event_base_t broadcast_clock::dotmatrix::m_event_base = "broadcast_clo
 broadcast_clock::dotmatrix::
 dotmatrix() : m_config( nullptr ),
               m_message_mode( false ),
+              m_init_mode( false ),
+              m_time_valid( false ),
               m_brightness_u1( 0x00 ),
               m_brightness_u2( 0x00 ),
               m_current_hour( 0 ),
@@ -250,8 +252,18 @@ transmit( uint8_t u1_command,
 
 void broadcast_clock::dotmatrix::
 update() {
+
   if( !m_message_mode && !m_init_mode ) {
-    if( m_stopwatch_begin.tv_nsec != 0 || m_stopwatch_end.tv_nsec != 0 ) {
+
+    if( m_time_valid == false && m_config && m_config->get_bool( "blankinvalid" ) ) {
+      transmit( 0x60u, '-', 0x60u, '-' );
+      transmit( 0x61u, '-', 0x61u, '-' );
+      transmit( 0x62u, '-', 0x62u, '-' );
+      transmit( 0x63u, '-', 0x63u, '-' );
+      transmit( 0x01u, m_brightness_u1, 0x01u, m_brightness_u2 );
+      transmit( 0x02u, m_brightness_u1, 0x02u, m_brightness_u2 );
+    }
+    else if( m_stopwatch_begin.tv_nsec != 0 || m_stopwatch_end.tv_nsec != 0 ) {
       transmit( 0x60u, 0x30u | ( ( m_stopwatch_minute / 10 ) & 0x0f ), 0x60u, 0x30u | ( ( m_stopwatch_fraction / 10 ) & 0x0f ) );
       transmit( 0x61u, 0x30u | ( ( m_stopwatch_minute % 10 ) & 0x0f ), 0x61u, 0x30u | ( ( m_stopwatch_fraction % 10 ) & 0x0f ) );
       transmit( 0x62u, 0x30u | ( ( m_stopwatch_second / 10 ) & 0x0f ), 0x62u, 0x30u | ( ( m_stopwatch_hour / 10 ) & 0x0f ) );

@@ -33,6 +33,7 @@ namespace espena::broadcast_clock {
     bool m_test_mode;
     bool m_message_mode;
     bool m_init_mode;
+    bool m_time_valid;
 
     uint8_t m_brightness_u1;
     uint8_t m_brightness_u2;
@@ -118,6 +119,7 @@ namespace espena::broadcast_clock {
     ~dotmatrix();
 
     void set_event_loop_handle( esp_event_loop_handle_t h ) { m_event_loop_handle = h; };
+    void set_time_valid( bool time_valid ) { m_time_valid = time_valid; };
 
     void init();
     void start();

@@ -90,6 +90,8 @@ namespace espena::broadcast_clock {
     bool is_yellow()      { return ( m_rebooting || ( m_ntp_server_ready                                                ) ) && yellow_blinker(); };
     bool is_red()         { return ( m_rebooting || ( m_got_timepulse                                                   ) ) && red_blinker();    };
 
+    bool is_valid_time()  { return m_sntp_sync || m_got_timepulse; };
+
   public:
 
     clock_status( i_indicators *indicators );

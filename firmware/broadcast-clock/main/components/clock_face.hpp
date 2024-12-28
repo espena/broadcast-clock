@@ -12,7 +12,7 @@
 
 namespace espena::broadcast_clock {
 
-  class clock_face {
+  class clock_face : public i_indicators {
 
   public:
 
@@ -97,15 +97,42 @@ namespace espena::broadcast_clock {
 
   public:
 
+    virtual void set_indicators( bool blue, bool green, bool yellow, bool red, bool time_valid ) override {
+      m_dial.set_indicators( blue, green, yellow, red, time_valid );
+      m_dotmatrix.set_time_valid( time_valid );
+    };
+    
+    virtual void set_blue_indicator( bool blue ) override {
+      m_dial.set_blue_indicator( blue );
+    };
+    
+    virtual void set_green_indicator( bool green ) override {
+      m_dial.set_green_indicator( green );
+    };
+    
+    virtual void set_yellow_indicator( bool yellow ) override {
+      m_dial.set_yellow_indicator( yellow );
+    };
+    
+    virtual void set_red_indicator( bool red ) override {
+      m_dial.set_red_indicator( red );
+    };
+    
+    virtual void set_time_valid( bool time_valid ) override {
+      m_dial.set_time_valid( true );
+      m_dotmatrix.set_time_valid( true );
+    };
+
     clock_face();
     ~clock_face();
+    
     void init();
     void test();
     void init_interval_timer();
     void set_event_loop_handle( esp_event_loop_handle_t h ) { m_event_loop_handle = h; };
     void display_ip( esp_netif_ip_info_t *ip_info );
 
-    i_indicators *get_indicators() { return &m_dial; };
+    i_indicators *get_indicators() { return &(*this); };
 
   };
 

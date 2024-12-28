@@ -9,11 +9,12 @@ namespace espena::broadcast_clock {
 
     virtual ~i_indicators() = default; // Virtual destructor for proper cleanup
 
-    virtual void set_indicators( bool, bool, bool, bool ) = 0;
+    virtual void set_indicators( bool, bool, bool, bool, bool ) = 0;
     virtual void set_blue_indicator( bool ) = 0;
     virtual void set_green_indicator( bool ) = 0;
     virtual void set_yellow_indicator( bool ) = 0;
     virtual void set_red_indicator( bool ) = 0;
+    virtual void set_time_valid( bool ) = 0;
 
   }; 
 
