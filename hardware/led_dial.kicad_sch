@@ -1,7 +1,7 @@
 (kicad_sch
-	(version 20231120)
+	(version 20250114)
 	(generator "eeschema")
-	(generator_version "8.0")
+	(generator_version "9.0")
 	(uuid "90ca966b-876f-4c41-b256-03db38bf4260")
 	(paper "A4")
 	(title_block
@@ -13,7 +13,9 @@
 	)
 	(lib_symbols
 		(symbol "Device:R"
-			(pin_numbers hide)
+			(pin_numbers
+				(hide yes)
+			)
 			(pin_names
 				(offset 0)
 			)
@@ -38,47 +40,47 @@
 			)
 			(property "Footprint" ""
 				(at -1.778 0 90)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "Datasheet" "~"
 				(at 0 0 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "Description" "Resistor"
 				(at 0 0 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "ki_keywords" "R res resistor"
 				(at 0 0 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "ki_fp_filters" "R_*"
 				(at 0 0 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(symbol "R_0_1"
@@ -132,11 +134,16 @@
 					)
 				)
 			)
+			(embedded_fonts no)
 		)
 		(symbol "Device_espena:C_Decoupling"
-			(pin_numbers hide)
+			(pin_numbers
+				(hide yes)
+			)
 			(pin_names
-				(offset 0.254) hide)
+				(offset 0.254)
+				(hide yes)
+			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
@@ -151,63 +158,63 @@
 			)
 			(property "Value" "C_Decoupling"
 				(at 0.254 -2.032 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
 					(justify left)
-					(hide yes)
 				)
 			)
 			(property "Footprint" ""
 				(at 0 0 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "Datasheet" "~"
 				(at 0 0 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "Description" "Unpolarized capacitor, small symbol"
 				(at 0 0 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "ki_keywords" "capacitor cap"
 				(at 0 0 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "ki_fp_filters" "C_*"
 				(at 0 0 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(symbol "C_Decoupling_0_1"
 				(polyline
 					(pts
-						(xy -1.016 -0.381) (xy 1.016 -0.381)
+						(xy -1.016 0.381) (xy 1.016 0.381)
 					)
 					(stroke
 						(width 0.3302)
@@ -219,7 +226,7 @@
 				)
 				(polyline
 					(pts
-						(xy -1.016 0.381) (xy 1.016 0.381)
+						(xy -1.016 -0.381) (xy 1.016 -0.381)
 					)
 					(stroke
 						(width 0.3302)
@@ -268,11 +275,16 @@
 					)
 				)
 			)
+			(embedded_fonts no)
 		)
 		(symbol "Device_espena:LED_Filled_Tiny"
-			(pin_numbers hide)
+			(pin_numbers
+				(hide yes)
+			)
 			(pin_names
-				(offset 1.016) hide)
+				(offset 1.016)
+				(hide yes)
+			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
@@ -286,59 +298,95 @@
 			)
 			(property "Value" "LED_Filled_Tiny"
 				(at 0 -9.906 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "Footprint" ""
 				(at 0 0 90)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "Datasheet" "~"
 				(at 0 0 90)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "Description" "Light emitting diode, filled shape"
 				(at 0 0 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "ki_keywords" "LED diode"
 				(at 0 0 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "ki_fp_filters" "LED* LED_SMD:* LED_THT:*"
 				(at 0 0 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(symbol "LED_Filled_Tiny_0_1"
+				(polyline
+					(pts
+						(xy -1.27 0.508) (xy -2.032 -0.254) (xy -1.778 0.254) (xy -2.032 -0.254) (xy -1.524 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.016 1.016) (xy 1.016 1.016) (xy 0 -0.762) (xy -1.016 1.016)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.016 -0.254) (xy -1.778 -1.016) (xy -1.524 -0.508) (xy -1.778 -1.016) (xy -1.27 -0.762)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
 				(polyline
 					(pts
 						(xy -1.016 -1.016) (xy 1.016 -1.016)
@@ -363,62 +411,8 @@
 						(type none)
 					)
 				)
-				(polyline
-					(pts
-						(xy -1.016 1.016) (xy 1.016 1.016) (xy 0 -0.762) (xy -1.016 1.016)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.27 0.508) (xy -2.032 -0.254) (xy -1.778 0.254) (xy -2.032 -0.254) (xy -1.524 0)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.016 -0.254) (xy -1.778 -1.016) (xy -1.524 -0.508) (xy -1.778 -1.016) (xy -1.27 -0.762)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
 			)
 			(symbol "LED_Filled_Tiny_1_1"
-				(pin passive line
-					(at 0 -2.54 90)
-					(length 1.27)
-					(name "K"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
 				(pin passive line
 					(at 0 2.54 270)
 					(length 1.27)
@@ -437,7 +431,26 @@
 						)
 					)
 				)
+				(pin passive line
+					(at 0 -2.54 90)
+					(length 1.27)
+					(name "K"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
 			)
+			(embedded_fonts no)
 		)
 		(symbol "Driver_LED_espena:TLC5940PWP"
 			(pin_names
@@ -466,49 +479,49 @@
 			)
 			(property "Footprint" "Package_SO:HTSSOP-28-1EP_4.4x9.7mm_P0.65mm_EP3.4x9.5mm_Mask2.4x6.17mm_ThermalVias"
 				(at -40.64 -88.9 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
 					(justify left)
-					(hide yes)
 				)
 			)
 			(property "Datasheet" "http://www.ti.com/lit/ds/symlink/tlc5940.pdf"
 				(at -2.54 -85.09 0)
 				(do_not_autoplace)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "Description" "16-Channel LED Driver With DOT Correction and Grayscale PWM Control, TSSOP package with thermal pad"
 				(at 0 0 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "ki_keywords" "PWM LED driver"
 				(at 0 0 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "ki_fp_filters" "HTSSOP*4.4x9.7mm*P0.65mm*"
 				(at 0 0 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(symbol "TLC5940PWP_0_1"
@@ -525,6 +538,168 @@
 				)
 			)
 			(symbol "TLC5940PWP_1_1"
+				(pin input line
+					(at -17.78 13.97 0)
+					(length 5.08)
+					(name "SIN"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin open_collector line
+					(at -17.78 8.89 0)
+					(length 5.08)
+					(name "XERR"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "23"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input clock
+					(at -17.78 6.35 0)
+					(length 5.08)
+					(name "SCLK"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -17.78 3.81 0)
+					(length 5.08)
+					(name "XLAT"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input clock
+					(at -17.78 1.27 0)
+					(length 5.08)
+					(name "GSCLK"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "25"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -17.78 -1.27 0)
+					(length 5.08)
+					(name "DCPRG"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "26"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -17.78 -3.81 0)
+					(length 5.08)
+					(name "BLANK"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -17.78 -6.35 0)
+					(length 5.08)
+					(name "VPRG"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -17.78 -15.24 0)
+					(length 5.08)
+					(name "VCC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "28"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
 				(pin power_in line
 					(at -17.78 -21.59 0)
 					(length 5.08)
@@ -536,6 +711,96 @@
 						)
 					)
 					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -17.78 -29.21 0)
+					(length 5.08)
+					(name "IREF"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "27"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin output line
+					(at -17.78 -38.1 0)
+					(length 5.08)
+					(name "SOUT"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "24"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin open_collector line
+					(at 17.78 15.24 180)
+					(length 5.08)
+					(name "OUT0"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "7"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin open_collector line
+					(at 17.78 11.43 180)
+					(length 5.08)
+					(name "OUT1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "8"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin open_collector line
+					(at 17.78 7.62 180)
+					(length 5.08)
+					(name "OUT2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "9"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -723,24 +988,6 @@
 						)
 					)
 				)
-				(pin input line
-					(at -17.78 -3.81 0)
-					(length 5.08)
-					(name "BLANK"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
 				(pin open_collector line
 					(at 17.78 -34.29 180)
 					(length 5.08)
@@ -795,257 +1042,28 @@
 						)
 					)
 				)
-				(pin open_collector line
-					(at -17.78 8.89 0)
-					(length 5.08)
-					(name "XERR"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "23"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin output line
-					(at -17.78 -38.1 0)
-					(length 5.08)
-					(name "SOUT"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "24"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input clock
-					(at -17.78 1.27 0)
-					(length 5.08)
-					(name "GSCLK"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "25"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input line
-					(at -17.78 -1.27 0)
-					(length 5.08)
-					(name "DCPRG"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "26"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input line
-					(at -17.78 -29.21 0)
-					(length 5.08)
-					(name "IREF"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "27"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin power_in line
-					(at -17.78 -15.24 0)
-					(length 5.08)
-					(name "VCC"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "28"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input line
-					(at -17.78 3.81 0)
-					(length 5.08)
-					(name "XLAT"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input clock
-					(at -17.78 6.35 0)
-					(length 5.08)
-					(name "SCLK"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "4"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input line
-					(at -17.78 13.97 0)
-					(length 5.08)
-					(name "SIN"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "5"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input line
-					(at -17.78 -6.35 0)
-					(length 5.08)
-					(name "VPRG"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "6"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin open_collector line
-					(at 17.78 15.24 180)
-					(length 5.08)
-					(name "OUT0"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "7"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin open_collector line
-					(at 17.78 11.43 180)
-					(length 5.08)
-					(name "OUT1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "8"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin open_collector line
-					(at 17.78 7.62 180)
-					(length 5.08)
-					(name "OUT2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "9"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
 			)
+			(embedded_fonts no)
 		)
 		(symbol "power:GND"
 			(power)
-			(pin_numbers hide)
+			(pin_numbers
+				(hide yes)
+			)
 			(pin_names
-				(offset 0) hide)
+				(offset 0)
+				(hide yes)
+			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "#PWR"
 				(at 0 -6.35 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "Value" "GND"
@@ -1058,38 +1076,38 @@
 			)
 			(property "Footprint" ""
 				(at 0 0 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "Datasheet" ""
 				(at 0 0 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
 				(at 0 0 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "ki_keywords" "global power"
 				(at 0 0 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(symbol "GND_0_1"
@@ -1126,22 +1144,27 @@
 					)
 				)
 			)
+			(embedded_fonts no)
 		)
 		(symbol "power_espena:+3.3V_LED"
 			(power)
-			(pin_numbers hide)
+			(pin_numbers
+				(hide yes)
+			)
 			(pin_names
-				(offset 0) hide)
+				(offset 0)
+				(hide yes)
+			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "#PWR"
 				(at 0 -3.81 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "Value" "+3.3V_LED"
@@ -1154,38 +1177,38 @@
 			)
 			(property "Footprint" ""
 				(at 0 0 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "Datasheet" ""
 				(at 0 0 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "Description" "Power symbol creates a global label with name \"+3.3V _LED\""
 				(at 0 0 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "ki_keywords" "global power"
 				(at 0 0 0)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(symbol "+3.3V_LED_0_1"
@@ -1203,7 +1226,7 @@
 				)
 				(polyline
 					(pts
-						(xy 0 0) (xy 0 2.54)
+						(xy 0 2.54) (xy 0.762 1.27)
 					)
 					(stroke
 						(width 0)
@@ -1215,7 +1238,7 @@
 				)
 				(polyline
 					(pts
-						(xy 0 2.54) (xy 0.762 1.27)
+						(xy 0 0) (xy 0 2.54)
 					)
 					(stroke
 						(width 0)
@@ -1246,7 +1269,96 @@
 					)
 				)
 			)
+			(embedded_fonts no)
 		)
+	)
+	(text "BLU"
+		(exclude_from_sim no)
+		(at 259.334 32.004 0)
+		(effects
+			(font
+				(size 0.889 0.889)
+			)
+			(justify left bottom)
+		)
+		(uuid "11f0ed00-aad8-407f-819b-853d39f49fd7")
+	)
+	(text "YEL"
+		(exclude_from_sim no)
+		(at 266.954 32.004 0)
+		(effects
+			(font
+				(size 0.889 0.889)
+			)
+			(justify left bottom)
+		)
+		(uuid "1ba27453-18be-4ce6-8c8b-07ff5fd6582b")
+	)
+	(text "HOURS SCALE"
+		(exclude_from_sim no)
+		(at 120.65 118.11 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "4b4c37b6-4bda-45e0-b97e-fa1baf6a21e3")
+	)
+	(text "SECONDS SCALE"
+		(exclude_from_sim no)
+		(at 31.75 24.13 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "5a4376c9-bdc0-474a-9c1e-fa3cd5152148")
+	)
+	(text "RED"
+		(exclude_from_sim no)
+		(at 270.764 32.004 0)
+		(effects
+			(font
+				(size 0.889 0.889)
+			)
+			(justify left bottom)
+		)
+		(uuid "5e6f04d0-657c-4d2e-9a39-049b7a366350")
+	)
+	(text "INDICATORS"
+		(exclude_from_sim no)
+		(at 260.096 24.13 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "6e31edbd-f6ed-4583-bef0-18163b40051f")
+	)
+	(text "TIME SEPARATOR"
+		(exclude_from_sim no)
+		(at 93.98 118.11 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "e4689d42-7437-4add-96e6-1b52667a0585")
+	)
+	(text "GRN"
+		(exclude_from_sim no)
+		(at 263.144 32.004 0)
+		(effects
+			(font
+				(size 0.889 0.889)
+			)
+			(justify left bottom)
+		)
+		(uuid "ea2e3d7d-1926-487b-95da-f3bdbd5e9d39")
 	)
 	(junction
 		(at 167.64 25.4)
@@ -6252,97 +6364,8 @@
 		)
 		(uuid "ff8a177d-dc9c-4af2-a95d-450c028b99c6")
 	)
-	(text "BLU"
-		(exclude_from_sim no)
-		(at 259.334 32.004 0)
-		(effects
-			(font
-				(size 0.889 0.889)
-			)
-			(justify left bottom)
-		)
-		(uuid "11f0ed00-aad8-407f-819b-853d39f49fd7")
-	)
-	(text "YEL"
-		(exclude_from_sim no)
-		(at 266.954 32.004 0)
-		(effects
-			(font
-				(size 0.889 0.889)
-			)
-			(justify left bottom)
-		)
-		(uuid "1ba27453-18be-4ce6-8c8b-07ff5fd6582b")
-	)
-	(text "HOURS SCALE"
-		(exclude_from_sim no)
-		(at 120.65 118.11 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "4b4c37b6-4bda-45e0-b97e-fa1baf6a21e3")
-	)
-	(text "SECONDS SCALE"
-		(exclude_from_sim no)
-		(at 31.75 24.13 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "5a4376c9-bdc0-474a-9c1e-fa3cd5152148")
-	)
-	(text "RED"
-		(exclude_from_sim no)
-		(at 270.764 32.004 0)
-		(effects
-			(font
-				(size 0.889 0.889)
-			)
-			(justify left bottom)
-		)
-		(uuid "5e6f04d0-657c-4d2e-9a39-049b7a366350")
-	)
-	(text "INDICATORS"
-		(exclude_from_sim no)
-		(at 260.096 24.13 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "6e31edbd-f6ed-4583-bef0-18163b40051f")
-	)
-	(text "TIME SEPARATOR"
-		(exclude_from_sim no)
-		(at 93.98 118.11 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "e4689d42-7437-4add-96e6-1b52667a0585")
-	)
-	(text "GRN"
-		(exclude_from_sim no)
-		(at 263.144 32.004 0)
-		(effects
-			(font
-				(size 0.889 0.889)
-			)
-			(justify left bottom)
-		)
-		(uuid "ea2e3d7d-1926-487b-95da-f3bdbd5e9d39")
-	)
 	(label "SOUT"
 		(at 95.25 175.26 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6353,7 +6376,6 @@
 	)
 	(label "DCPRG"
 		(at 26.67 143.51 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6364,7 +6386,6 @@
 	)
 	(label "SCLK"
 		(at 222.25 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6375,7 +6396,6 @@
 	)
 	(label "VPRG"
 		(at 127 175.26 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6386,7 +6406,6 @@
 	)
 	(label "GSCLK"
 		(at 134.62 175.26 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6397,7 +6416,6 @@
 	)
 	(label "VPRG"
 		(at 173.99 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6408,7 +6426,6 @@
 	)
 	(label "VPRG"
 		(at 52.07 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6419,7 +6436,6 @@
 	)
 	(label "GSCLK"
 		(at 44.45 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6430,7 +6446,6 @@
 	)
 	(label "SCLK"
 		(at 139.7 175.26 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6441,7 +6456,6 @@
 	)
 	(label "DCPRG"
 		(at 132.08 175.26 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6452,7 +6466,6 @@
 	)
 	(label "BLANK"
 		(at 171.45 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6463,7 +6476,6 @@
 	)
 	(label "XERR"
 		(at 26.67 128.27 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6474,7 +6486,6 @@
 	)
 	(label "DCPRG"
 		(at 107.95 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6485,7 +6496,6 @@
 	)
 	(label "SOUT"
 		(at 26.67 133.35 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6496,7 +6506,6 @@
 	)
 	(label "SCLK"
 		(at 161.29 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6507,7 +6516,6 @@
 	)
 	(label "BLANK"
 		(at 232.41 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6518,7 +6526,6 @@
 	)
 	(label "BLANK"
 		(at 49.53 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6529,7 +6536,6 @@
 	)
 	(label "DCPRG"
 		(at 46.99 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6540,7 +6546,6 @@
 	)
 	(label "SCLK"
 		(at 100.33 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6551,7 +6556,6 @@
 	)
 	(label "VPRG"
 		(at 234.95 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6562,7 +6566,6 @@
 	)
 	(label "XERR"
 		(at 219.71 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6573,7 +6576,6 @@
 	)
 	(label "XLAT"
 		(at 41.91 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6584,7 +6586,6 @@
 	)
 	(label "GSCLK"
 		(at 166.37 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6595,7 +6596,6 @@
 	)
 	(label "DCPRG"
 		(at 229.87 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6606,7 +6606,6 @@
 	)
 	(label "VPRG"
 		(at 26.67 148.59 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6617,7 +6616,6 @@
 	)
 	(label "DCPRG"
 		(at 168.91 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6628,7 +6626,6 @@
 	)
 	(label "GSCLK"
 		(at 26.67 140.97 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6639,7 +6636,6 @@
 	)
 	(label "XLAT"
 		(at 102.87 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6650,7 +6646,6 @@
 	)
 	(label "GSCLK"
 		(at 227.33 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6661,7 +6656,6 @@
 	)
 	(label "XERR"
 		(at 158.75 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6672,7 +6666,6 @@
 	)
 	(label "VPRG"
 		(at 113.03 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6683,7 +6676,6 @@
 	)
 	(label "XERR"
 		(at 142.24 175.26 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6694,7 +6686,6 @@
 	)
 	(label "SIN"
 		(at 26.67 130.81 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6705,7 +6696,6 @@
 	)
 	(label "SCLK"
 		(at 26.67 135.89 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6716,7 +6706,6 @@
 	)
 	(label "XLAT"
 		(at 137.16 175.26 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6727,7 +6716,6 @@
 	)
 	(label "SCLK"
 		(at 39.37 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6738,7 +6726,6 @@
 	)
 	(label "GSCLK"
 		(at 105.41 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6749,7 +6736,6 @@
 	)
 	(label "BLANK"
 		(at 129.54 175.26 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6760,7 +6746,6 @@
 	)
 	(label "XERR"
 		(at 97.79 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6771,7 +6756,6 @@
 	)
 	(label "XLAT"
 		(at 163.83 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6782,7 +6766,6 @@
 	)
 	(label "BLANK"
 		(at 26.67 146.05 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6793,7 +6776,6 @@
 	)
 	(label "BLANK"
 		(at 110.49 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6804,7 +6786,6 @@
 	)
 	(label "SIN"
 		(at 31.75 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6815,7 +6796,6 @@
 	)
 	(label "{XERR,SIN,SOUT,SCLK,XLAT,GSCLK,DCPRG,BLANK,VPRG}"
 		(at 27.305 177.8 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -6826,7 +6806,6 @@
 	)
 	(label "XLAT"
 		(at 26.67 138.43 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6837,7 +6816,6 @@
 	)
 	(label "XLAT"
 		(at 224.79 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6848,7 +6826,6 @@
 	)
 	(label "XERR"
 		(at 36.83 93.345 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 0.762 0.762)
@@ -6860,7 +6837,6 @@
 	(hierarchical_label "SCLK"
 		(shape input)
 		(at 59.69 135.89 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -6872,7 +6848,6 @@
 	(hierarchical_label "XLAT"
 		(shape input)
 		(at 59.69 138.43 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -6884,7 +6859,6 @@
 	(hierarchical_label "SIN"
 		(shape input)
 		(at 59.69 130.81 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -6896,7 +6870,6 @@
 	(hierarchical_label "DCPRG"
 		(shape input)
 		(at 59.69 143.51 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -6908,7 +6881,6 @@
 	(hierarchical_label "SOUT"
 		(shape output)
 		(at 59.69 133.35 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -6920,7 +6892,6 @@
 	(hierarchical_label "BLANK"
 		(shape input)
 		(at 59.69 146.05 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -6932,7 +6903,6 @@
 	(hierarchical_label "VPRG"
 		(shape input)
 		(at 59.69 148.59 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -6944,7 +6914,6 @@
 	(hierarchical_label "GSCLK"
 		(shape input)
 		(at 59.69 140.97 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -6956,7 +6925,6 @@
 	(hierarchical_label "XERR"
 		(shape output)
 		(at 59.69 128.27 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -6986,37 +6954,45 @@
 		(property "Value" "620nm"
 			(at 251.46 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 251.46 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 251.46 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 251.46 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -7055,37 +7031,45 @@
 		(property "Value" "620nm"
 			(at 175.26 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 175.26 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 175.26 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 175.26 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -7124,37 +7108,45 @@
 		(property "Value" "620nm"
 			(at 110.49 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 110.49 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 110.49 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 110.49 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -7184,10 +7176,12 @@
 		(property "Reference" "#PWR_LED018"
 			(at 238.76 82.55 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Value" "+3.3V_LED"
@@ -7201,28 +7195,34 @@
 		(property "Footprint" ""
 			(at 238.76 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" ""
 			(at 238.76 78.74 0)
 			(effects
-				(font
-					(size 1.27 1.27)
-				)
 				(hide yes)
 			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"PWR_LED\""
-			(at 238.76 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V _LED\""
+			(at 238.76 78.74 0)
+			(effects
 				(hide yes)
+			)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 			)
 		)
 		(pin "1"
@@ -7258,37 +7258,45 @@
 		(property "Value" "620nm"
 			(at 91.44 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 91.44 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 91.44 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 91.44 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -7328,37 +7336,45 @@
 		(property "Value" "620nm"
 			(at 118.11 133.096 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 118.11 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 118.11 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 118.11 123.19 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -7397,37 +7413,45 @@
 		(property "Value" "620nm"
 			(at 156.21 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 156.21 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 156.21 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 156.21 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -7467,37 +7491,45 @@
 		(property "Value" "620nm"
 			(at 91.44 133.096 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 91.44 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 91.44 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 91.44 123.19 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -7544,28 +7576,34 @@
 		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
 			(at 247.65 71.12 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 247.65 71.12 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Unpolarized capacitor, small symbol"
 			(at 247.65 71.12 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -7604,37 +7642,45 @@
 		(property "Value" "620nm"
 			(at 171.45 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 171.45 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 171.45 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 171.45 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -7681,28 +7727,34 @@
 		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
 			(at 125.73 71.12 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 125.73 71.12 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Unpolarized capacitor, small symbol"
 			(at 125.73 71.12 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -7741,37 +7793,45 @@
 		(property "Value" "620nm"
 			(at 144.78 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 144.78 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 144.78 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 144.78 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -7810,37 +7870,45 @@
 		(property "Value" "620nm"
 			(at 163.83 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 163.83 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 163.83 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 163.83 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -7870,10 +7938,12 @@
 		(property "Reference" "#PWR_LED012"
 			(at 116.84 82.55 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Value" "+3.3V_LED"
@@ -7887,28 +7957,34 @@
 		(property "Footprint" ""
 			(at 116.84 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" ""
 			(at 116.84 78.74 0)
 			(effects
-				(font
-					(size 1.27 1.27)
-				)
 				(hide yes)
 			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"PWR_LED\""
-			(at 116.84 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V _LED\""
+			(at 116.84 78.74 0)
+			(effects
 				(hide yes)
+			)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 			)
 		)
 		(pin "1"
@@ -7944,37 +8020,45 @@
 		(property "Value" "620nm"
 			(at 270.51 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_SMD:LED_0805_2012Metric"
 			(at 270.51 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 270.51 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 270.51 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -8013,37 +8097,45 @@
 		(property "Value" "620nm"
 			(at 30.48 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 30.48 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 30.48 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 30.48 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -8082,37 +8174,45 @@
 		(property "Value" "620nm"
 			(at 95.25 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 95.25 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 95.25 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 95.25 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -8152,37 +8252,45 @@
 		(property "Value" "620nm"
 			(at 140.97 133.096 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 140.97 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 140.97 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 140.97 123.19 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -8221,37 +8329,45 @@
 		(property "Value" "620nm"
 			(at 167.64 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 167.64 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 167.64 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 167.64 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -8281,10 +8397,12 @@
 		(property "Reference" "#PWR_LED015"
 			(at 177.8 82.55 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Value" "+3.3V_LED"
@@ -8298,28 +8416,34 @@
 		(property "Footprint" ""
 			(at 177.8 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" ""
 			(at 177.8 78.74 0)
 			(effects
-				(font
-					(size 1.27 1.27)
-				)
 				(hide yes)
 			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"PWR_LED\""
-			(at 177.8 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V _LED\""
+			(at 177.8 78.74 0)
+			(effects
 				(hide yes)
+			)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 			)
 		)
 		(pin "1"
@@ -8355,37 +8479,45 @@
 		(property "Value" "620nm"
 			(at 129.54 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 129.54 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 129.54 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 129.54 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -8416,10 +8548,12 @@
 		(property "Reference" "#PWR023"
 			(at 104.14 177.8 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Value" "GND"
@@ -8433,28 +8567,34 @@
 		(property "Footprint" ""
 			(at 104.14 171.45 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" ""
 			(at 104.14 171.45 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
 			(at 104.14 171.45 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -8501,28 +8641,34 @@
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 198.628 73.66 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 196.85 73.66 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Resistor"
 			(at 196.85 73.66 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -8561,37 +8707,45 @@
 		(property "Value" "620nm"
 			(at 118.11 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 118.11 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 118.11 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 118.11 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -8631,37 +8785,45 @@
 		(property "Value" "620nm"
 			(at 106.68 133.096 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 106.68 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 106.68 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 106.68 123.19 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -8701,37 +8863,45 @@
 		(property "Value" "620nm"
 			(at 121.92 133.096 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 121.92 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 121.92 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 121.92 123.19 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -8770,37 +8940,45 @@
 		(property "Value" "620nm"
 			(at 232.41 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 232.41 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 232.41 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 232.41 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -8839,37 +9017,45 @@
 		(property "Value" "470nm"
 			(at 259.08 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_SMD:LED_0805_2012Metric"
 			(at 259.08 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 259.08 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 259.08 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -8900,10 +9086,12 @@
 		(property "Reference" "#PWR_LED08"
 			(at 148.59 120.65 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Value" "+3.3V_LED"
@@ -8917,28 +9105,34 @@
 		(property "Footprint" ""
 			(at 148.59 116.84 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" ""
 			(at 148.59 116.84 0)
 			(effects
-				(font
-					(size 1.27 1.27)
-				)
 				(hide yes)
 			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"PWR_LED\""
-			(at 148.59 116.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V _LED\""
+			(at 148.59 116.84 0)
+			(effects
 				(hide yes)
+			)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 			)
 		)
 		(pin "1"
@@ -8974,37 +9168,45 @@
 		(property "Value" "620nm"
 			(at 57.15 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 57.15 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 57.15 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 57.15 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -9034,10 +9236,12 @@
 		(property "Reference" "#PWR019"
 			(at 250.19 85.09 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Value" "GND"
@@ -9051,28 +9255,34 @@
 		(property "Footprint" ""
 			(at 250.19 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" ""
 			(at 250.19 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
 			(at 250.19 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -9100,10 +9310,12 @@
 		(property "Reference" "#PWR_LED0223"
 			(at 46.99 116.84 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Value" "+3.3V_LED"
@@ -9117,28 +9329,34 @@
 		(property "Footprint" ""
 			(at 46.99 113.03 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" ""
 			(at 46.99 113.03 0)
 			(effects
-				(font
-					(size 1.27 1.27)
-				)
 				(hide yes)
 			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"PWR_LED\""
-			(at 46.99 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V _LED\""
+			(at 46.99 113.03 0)
+			(effects
 				(hide yes)
+			)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 			)
 		)
 		(pin "1"
@@ -9174,37 +9392,45 @@
 		(property "Value" "620nm"
 			(at 41.91 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 41.91 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 41.91 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 41.91 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -9250,29 +9476,35 @@
 		(property "Footprint" "Package_SO:HTSSOP-28-1EP_4.4x9.7mm_P0.65mm_EP3.4x9.5mm_Mask2.4x6.17mm_ThermalVias"
 			(at 192.405 50.165 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "http://www.ti.com/lit/ds/symlink/tlc5940.pdf"
 			(at 149.86 60.96 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "16-Channel LED Driver With DOT Correction and Grayscale PWM Control, TSSOP package with thermal pad"
 			(at 167.64 50.8 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -9389,37 +9621,45 @@
 		(property "Value" "590nm"
 			(at 266.7 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_SMD:LED_0805_2012Metric"
 			(at 266.7 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 266.7 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 266.7 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -9467,28 +9707,34 @@
 		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
 			(at 114.3 165.1 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 114.3 165.1 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Unpolarized capacitor, small symbol"
 			(at 114.3 165.1 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -9527,37 +9773,45 @@
 		(property "Value" "620nm"
 			(at 160.02 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 160.02 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 160.02 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 160.02 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -9604,28 +9858,34 @@
 		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
 			(at 64.77 71.12 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 64.77 71.12 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Unpolarized capacitor, small symbol"
 			(at 64.77 71.12 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -9664,37 +9924,45 @@
 		(property "Value" "620nm"
 			(at 83.82 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 83.82 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 83.82 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 83.82 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -9744,28 +10012,34 @@
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 76.708 73.66 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 74.93 73.66 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Resistor"
 			(at 74.93 73.66 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -9804,37 +10078,45 @@
 		(property "Value" "620nm"
 			(at 114.3 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 114.3 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 114.3 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 114.3 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -9874,37 +10156,45 @@
 		(property "Value" "620nm"
 			(at 95.25 133.096 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 95.25 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 95.25 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 95.25 123.19 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -9953,28 +10243,34 @@
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 102.362 167.64 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 104.14 167.64 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Resistor"
 			(at 104.14 167.64 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -10014,37 +10310,45 @@
 		(property "Value" "620nm"
 			(at 137.16 133.096 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 137.16 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 137.16 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 137.16 123.19 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -10074,10 +10378,12 @@
 		(property "Reference" "#PWR_LED065"
 			(at 259.08 26.035 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Value" "+3.3V_LED"
@@ -10091,28 +10397,34 @@
 		(property "Footprint" ""
 			(at 259.08 22.225 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" ""
 			(at 259.08 22.225 0)
 			(effects
-				(font
-					(size 1.27 1.27)
-				)
 				(hide yes)
 			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"PWR_LED\""
-			(at 259.08 22.225 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V _LED\""
+			(at 259.08 22.225 0)
+			(effects
 				(hide yes)
+			)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 			)
 		)
 		(pin "1"
@@ -10148,37 +10460,45 @@
 		(property "Value" "620nm"
 			(at 240.03 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 240.03 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 240.03 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 240.03 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -10217,37 +10537,45 @@
 		(property "Value" "620nm"
 			(at 106.68 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 106.68 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 106.68 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 106.68 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -10277,10 +10605,12 @@
 		(property "Reference" "#PWR013"
 			(at 128.27 85.09 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Value" "GND"
@@ -10294,28 +10624,34 @@
 		(property "Footprint" ""
 			(at 128.27 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" ""
 			(at 128.27 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
 			(at 128.27 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -10351,37 +10687,45 @@
 		(property "Value" "620nm"
 			(at 198.12 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 198.12 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 198.12 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 198.12 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -10420,37 +10764,45 @@
 		(property "Value" "620nm"
 			(at 133.35 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 133.35 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 133.35 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 133.35 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -10497,28 +10849,34 @@
 		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
 			(at 186.69 71.12 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 186.69 71.12 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Unpolarized capacitor, small symbol"
 			(at 186.69 71.12 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -10557,37 +10915,45 @@
 		(property "Value" "620nm"
 			(at 220.98 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 220.98 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 220.98 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 220.98 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -10626,37 +10992,45 @@
 		(property "Value" "620nm"
 			(at 182.88 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 182.88 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 182.88 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 182.88 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -10702,29 +11076,35 @@
 		(property "Footprint" "Package_SO:HTSSOP-28-1EP_4.4x9.7mm_P0.65mm_EP3.4x9.5mm_Mask2.4x6.17mm_ThermalVias"
 			(at 253.365 50.165 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "http://www.ti.com/lit/ds/symlink/tlc5940.pdf"
 			(at 210.82 60.96 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "16-Channel LED Driver With DOT Correction and Grayscale PWM Control, TSSOP package with thermal pad"
 			(at 228.6 50.8 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -10841,37 +11221,45 @@
 		(property "Value" "620nm"
 			(at 148.59 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 148.59 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 148.59 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 148.59 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -10921,28 +11309,34 @@
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 48.768 119.38 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 46.99 119.38 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Resistor"
 			(at 46.99 119.38 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -10981,37 +11375,45 @@
 		(property "Value" "620nm"
 			(at 72.39 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 72.39 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 72.39 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 72.39 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -11050,37 +11452,45 @@
 		(property "Value" "620nm"
 			(at 34.29 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 34.29 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 34.29 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 34.29 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -11119,37 +11529,45 @@
 		(property "Value" "620nm"
 			(at 80.01 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 80.01 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 80.01 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 80.01 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -11189,37 +11607,45 @@
 		(property "Value" "620nm"
 			(at 133.35 133.096 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 133.35 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 133.35 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 133.35 123.19 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -11258,37 +11684,45 @@
 		(property "Value" "620nm"
 			(at 68.58 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 68.58 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 68.58 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 68.58 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -11334,29 +11768,35 @@
 		(property "Footprint" "Package_SO:HTSSOP-28-1EP_4.4x9.7mm_P0.65mm_EP3.4x9.5mm_Mask2.4x6.17mm_ThermalVias"
 			(at 70.485 50.165 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "http://www.ti.com/lit/ds/symlink/tlc5940.pdf"
 			(at 27.94 60.96 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "16-Channel LED Driver With DOT Correction and Grayscale PWM Control, TSSOP package with thermal pad"
 			(at 45.72 50.8 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -11473,37 +11913,45 @@
 		(property "Value" "620nm"
 			(at 243.84 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 243.84 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 243.84 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 243.84 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -11533,10 +11981,12 @@
 		(property "Reference" "#PWR017"
 			(at 196.85 85.09 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Value" "GND"
@@ -11550,28 +12000,34 @@
 		(property "Footprint" ""
 			(at 196.85 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" ""
 			(at 196.85 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
 			(at 196.85 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -11618,28 +12074,34 @@
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 137.668 73.66 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 135.89 73.66 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Resistor"
 			(at 135.89 73.66 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -11679,37 +12141,45 @@
 		(property "Value" "620nm"
 			(at 129.54 133.096 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 129.54 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 129.54 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 129.54 123.19 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -11748,37 +12218,45 @@
 		(property "Value" "620nm"
 			(at 60.96 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 60.96 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 60.96 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 60.96 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -11818,37 +12296,45 @@
 		(property "Value" "620nm"
 			(at 144.78 133.096 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 144.78 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 144.78 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 144.78 123.19 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -11887,37 +12373,45 @@
 		(property "Value" "620nm"
 			(at 247.65 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 247.65 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 247.65 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 247.65 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -11957,37 +12451,45 @@
 		(property "Value" "620nm"
 			(at 110.49 133.096 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 110.49 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 110.49 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 110.49 123.19 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -12018,10 +12520,12 @@
 		(property "Reference" "#PWR022"
 			(at 111.76 177.8 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Value" "GND"
@@ -12035,28 +12539,34 @@
 		(property "Footprint" ""
 			(at 111.76 171.45 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" ""
 			(at 111.76 171.45 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
 			(at 111.76 171.45 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -12092,37 +12602,45 @@
 		(property "Value" "620nm"
 			(at 179.07 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 179.07 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 179.07 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 179.07 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -12172,28 +12690,34 @@
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 259.588 73.66 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 257.81 73.66 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Resistor"
 			(at 257.81 73.66 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -12239,29 +12763,35 @@
 		(property "Footprint" "Package_SO:HTSSOP-28-1EP_4.4x9.7mm_P0.65mm_EP3.4x9.5mm_Mask2.4x6.17mm_ThermalVias"
 			(at 131.445 50.165 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "http://www.ti.com/lit/ds/symlink/tlc5940.pdf"
 			(at 88.9 60.96 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "16-Channel LED Driver With DOT Correction and Grayscale PWM Control, TSSOP package with thermal pad"
 			(at 106.68 50.8 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -12369,10 +12899,12 @@
 		(property "Reference" "#PWR011"
 			(at 74.93 85.09 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Value" "GND"
@@ -12386,28 +12918,34 @@
 		(property "Footprint" ""
 			(at 74.93 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" ""
 			(at 74.93 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
 			(at 74.93 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -12443,37 +12981,45 @@
 		(property "Value" "620nm"
 			(at 121.92 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 121.92 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 121.92 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 121.92 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -12512,37 +13058,45 @@
 		(property "Value" "620nm"
 			(at 49.53 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 49.53 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 49.53 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 49.53 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -12590,28 +13144,34 @@
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 42.037 119.38 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 43.815 119.38 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Resistor"
 			(at 43.815 119.38 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -12650,37 +13210,45 @@
 		(property "Value" "620nm"
 			(at 255.27 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 255.27 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 255.27 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 255.27 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -12719,37 +13287,45 @@
 		(property "Value" "620nm"
 			(at 217.17 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 217.17 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 217.17 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 217.17 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -12788,37 +13364,45 @@
 		(property "Value" "620nm"
 			(at 64.77 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 64.77 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 64.77 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 64.77 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -12857,37 +13441,45 @@
 		(property "Value" "620nm"
 			(at 38.1 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 38.1 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 38.1 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 38.1 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -12926,37 +13518,45 @@
 		(property "Value" "620nm"
 			(at 201.93 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 201.93 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 201.93 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 201.93 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -12995,37 +13595,45 @@
 		(property "Value" "620nm"
 			(at 99.06 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 99.06 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 99.06 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 99.06 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -13065,37 +13673,45 @@
 		(property "Value" "620nm"
 			(at 125.73 133.096 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 125.73 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 125.73 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 125.73 123.19 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -13126,10 +13742,12 @@
 		(property "Reference" "#PWR_LED0224"
 			(at 95.25 120.65 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Value" "+3.3V_LED"
@@ -13143,28 +13761,34 @@
 		(property "Footprint" ""
 			(at 95.25 116.84 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" ""
 			(at 95.25 116.84 0)
 			(effects
-				(font
-					(size 1.27 1.27)
-				)
 				(hide yes)
 			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"PWR_LED\""
-			(at 95.25 116.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V _LED\""
+			(at 95.25 116.84 0)
+			(effects
 				(hide yes)
+			)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 			)
 		)
 		(pin "1"
@@ -13200,37 +13824,45 @@
 		(property "Value" "620nm"
 			(at 194.31 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 194.31 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 194.31 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 194.31 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -13260,10 +13892,12 @@
 		(property "Reference" "#PWR010"
 			(at 67.31 85.09 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Value" "GND"
@@ -13277,28 +13911,34 @@
 		(property "Footprint" ""
 			(at 67.31 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" ""
 			(at 67.31 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
 			(at 67.31 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -13334,37 +13974,45 @@
 		(property "Value" "620nm"
 			(at 53.34 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 53.34 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 53.34 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 53.34 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -13394,10 +14042,12 @@
 		(property "Reference" "#PWR_LED07"
 			(at 30.48 26.035 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Value" "+3.3V_LED"
@@ -13411,28 +14061,34 @@
 		(property "Footprint" ""
 			(at 30.48 22.225 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" ""
 			(at 30.48 22.225 0)
 			(effects
-				(font
-					(size 1.27 1.27)
-				)
 				(hide yes)
 			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"PWR_LED\""
-			(at 30.48 22.225 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V _LED\""
+			(at 30.48 22.225 0)
+			(effects
 				(hide yes)
+			)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 			)
 		)
 		(pin "1"
@@ -13469,37 +14125,45 @@
 		(property "Value" "620nm"
 			(at 114.3 133.096 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 114.3 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 114.3 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 114.3 123.19 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -13530,10 +14194,12 @@
 		(property "Reference" "#PWR_LED021"
 			(at 123.19 176.53 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Value" "+3.3V_LED"
@@ -13547,28 +14213,34 @@
 		(property "Footprint" ""
 			(at 123.19 172.72 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" ""
 			(at 123.19 172.72 0)
 			(effects
-				(font
-					(size 1.27 1.27)
-				)
 				(hide yes)
 			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"PWR_LED\""
-			(at 123.19 172.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V _LED\""
+			(at 123.19 172.72 0)
+			(effects
 				(hide yes)
+			)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 			)
 		)
 		(pin "1"
@@ -13612,29 +14284,35 @@
 		(property "Footprint" "Package_SO:HTSSOP-28-1EP_4.4x9.7mm_P0.65mm_EP3.4x9.5mm_Mask2.4x6.17mm_ThermalVias"
 			(at 108.585 144.145 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "http://www.ti.com/lit/ds/symlink/tlc5940.pdf"
 			(at 151.13 154.94 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "16-Channel LED Driver With DOT Correction and Grayscale PWM Control, TSSOP package with thermal pad"
 			(at 133.35 144.78 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -13751,37 +14429,45 @@
 		(property "Value" "620nm"
 			(at 236.22 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 236.22 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 236.22 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 236.22 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -13820,37 +14506,45 @@
 		(property "Value" "620nm"
 			(at 224.79 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 224.79 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 224.79 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 224.79 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -13889,37 +14583,45 @@
 		(property "Value" "620nm"
 			(at 137.16 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 137.16 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 137.16 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 137.16 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -13958,37 +14660,45 @@
 		(property "Value" "620nm"
 			(at 152.4 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 152.4 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 152.4 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 152.4 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -14018,10 +14728,12 @@
 		(property "Reference" "#PWR014"
 			(at 135.89 85.09 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Value" "GND"
@@ -14035,28 +14747,34 @@
 		(property "Footprint" ""
 			(at 135.89 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" ""
 			(at 135.89 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
 			(at 135.89 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -14092,37 +14810,45 @@
 		(property "Value" "620nm"
 			(at 205.74 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 205.74 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 205.74 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 205.74 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -14161,37 +14887,45 @@
 		(property "Value" "620nm"
 			(at 213.36 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 213.36 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 213.36 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 213.36 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -14230,37 +14964,45 @@
 		(property "Value" "620nm"
 			(at 125.73 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 125.73 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 125.73 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 125.73 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -14299,37 +15041,45 @@
 		(property "Value" "620nm"
 			(at 87.63 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 87.63 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 87.63 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 87.63 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -14368,37 +15118,45 @@
 		(property "Value" "620nm"
 			(at 76.2 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 76.2 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 76.2 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 76.2 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -14437,37 +15195,45 @@
 		(property "Value" "620nm"
 			(at 190.5 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 190.5 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 190.5 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 190.5 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -14497,10 +15263,12 @@
 		(property "Reference" "#PWR016"
 			(at 189.23 85.09 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Value" "GND"
@@ -14514,28 +15282,34 @@
 		(property "Footprint" ""
 			(at 189.23 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" ""
 			(at 189.23 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
 			(at 189.23 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -14562,10 +15336,12 @@
 		(property "Reference" "#PWR_LED09"
 			(at 55.88 82.55 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Value" "+3.3V_LED"
@@ -14579,28 +15355,34 @@
 		(property "Footprint" ""
 			(at 55.88 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" ""
 			(at 55.88 78.74 0)
 			(effects
-				(font
-					(size 1.27 1.27)
-				)
 				(hide yes)
 			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"PWR_LED\""
-			(at 55.88 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V _LED\""
+			(at 55.88 78.74 0)
+			(effects
 				(hide yes)
+			)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 			)
 		)
 		(pin "1"
@@ -14636,37 +15418,45 @@
 		(property "Value" "620nm"
 			(at 140.97 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 140.97 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 140.97 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 140.97 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -14696,10 +15486,12 @@
 		(property "Reference" "#PWR020"
 			(at 257.81 85.09 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Value" "GND"
@@ -14713,28 +15505,34 @@
 		(property "Footprint" ""
 			(at 257.81 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" ""
 			(at 257.81 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
 			(at 257.81 78.74 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -14770,37 +15568,45 @@
 		(property "Value" "620nm"
 			(at 228.6 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 228.6 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 228.6 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 228.6 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -14839,37 +15645,45 @@
 		(property "Value" "620nm"
 			(at 102.87 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 102.87 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 102.87 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 102.87 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -14908,37 +15722,45 @@
 		(property "Value" "620nm"
 			(at 209.55 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 209.55 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 209.55 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 209.55 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -14977,37 +15799,45 @@
 		(property "Value" "620nm"
 			(at 45.72 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 45.72 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 45.72 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 45.72 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -15046,37 +15876,45 @@
 		(property "Value" "620nm"
 			(at 186.69 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 186.69 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 186.69 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 186.69 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -15115,37 +15953,45 @@
 		(property "Value" "570nm"
 			(at 262.89 39.116 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_SMD:LED_0805_2012Metric"
 			(at 262.89 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 262.89 29.21 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 262.89 29.21 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
@@ -15185,37 +16031,45 @@
 		(property "Value" "620nm"
 			(at 148.59 133.096 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "LED_THT_espena:LED_D5.0mm_p2.54"
 			(at 148.59 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Datasheet" "~"
 			(at 148.59 123.19 90)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Description" "Light emitting diode, filled shape"
 			(at 148.59 123.19 0)
 			(effects
+				(hide yes)
+			)
+			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(pin "1"
