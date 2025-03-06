@@ -24,12 +24,12 @@
 using namespace espena;
 
 const char *broadcast_clock::http_server::m_component_name = "http_server";
-const esp_event_base_t broadcast_clock::http_server::m_event_base = "http_server_EVENT";
+const esp_event_base_t broadcast_clock::http_server::m_event_base = "http_server_event";
 
 broadcast_clock::http_server::http_server() : m_message_queue( nullptr ),
-                                                              m_server( nullptr ),
-                                                              m_event_loop_handle( nullptr ),
-                                                              m_gnss_state( nullptr )
+                                              m_server( nullptr ),
+                                              m_event_loop_handle( nullptr ),
+                                              m_gnss_state( nullptr )
 {    
   m_cfg.uri_match_fn = httpd_uri_match_wildcard;
   m_cfg.lru_purge_enable = true;

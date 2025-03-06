@@ -75,7 +75,6 @@ server_loop() {
 
 void broadcast_clock::captive_portal_dns::
 on_message( captive_portal_dns_task_message msg, void *arg ) {
-  captive_portal_dns_task_queue_item *item = nullptr;
   switch( msg ) {
     case captive_portal_dns_task_message::init:
       init_sync();
@@ -175,12 +174,17 @@ on_receive( struct sockaddr_in *from,
     uint8_t *answer_count = reinterpret_cast<uint8_t *>( &rhdr->ancount );
     uint8_t *p = udp_msg + sizeof( dns_header );
     esp_netif_ip_info_t ipcfg;
-    esp_netif_get_ip_info( esp_netif_next( nullptr ), &ipcfg );
-    for( int i = 0; i < ntohs( reinterpret_cast<uint16_t *>( &hdr->qdcount ) ); i++ ) {
+    esp_netif_get_ip_info( esp_netif_next_unsafe( nullptr ), &ipcfg );
+    uint16_t qdcount = 0;
+    memcpy( &qdcount, &hdr->qdcount, sizeof( qdcount ) ); // Circumvent potential alignment issues
+    for( int i = 0; i < ntohs( reinterpret_cast<uint16_t *>( &qdcount ) ); i++ ) {
       std::string label = get_label( udp_msg, p, len );
       dns_question_footer *question_footer = reinterpret_cast<dns_question_footer *>( p );
       p += sizeof( dns_question_footer );
-      switch( static_cast<qtype>( ntohs( &question_footer->type ) ) ) {
+      uint16_t hdr_qtype = 0;
+      memcpy( &hdr_qtype, &question_footer->type, sizeof( hdr_qtype ) ); // Circumvent potential alignment issues
+      uint16_t ancount = 0;
+      switch( static_cast<qtype>( ntohs( &hdr_qtype ) ) ) {
         case qtype::a:
           put_label( label,
                      reply_insertion_point,
@@ -198,7 +202,8 @@ on_receive( struct sockaddr_in *from,
           *reply_insertion_point++ = ip4_addr3( &ipcfg.ip );  // IP octet 3
           *reply_insertion_point++ = ip4_addr4( &ipcfg.ip );  // IP octet 4
 
-          put_n16( answer_count, ntohs( &rhdr->ancount ) + 1 );
+          memcpy( &ancount, &rhdr->ancount, sizeof( ancount ) ); // Circumvent potential alignment issues
+          put_n16( answer_count, ntohs( &ancount ) + 1 ); // Starts at 1
 
           sendto( m_sock,
                   reply,

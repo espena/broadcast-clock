@@ -306,11 +306,6 @@ on_interval_timer( void* arg ) {
 }
 
 void broadcast_clock::clock_face::
-update_indicators() {
-  // deprecated
-}
-
-void broadcast_clock::clock_face::
 init() {
   clock_face_task_queue_item item = { clock_face_task_message::init, nullptr };
   xQueueSend( m_task_queue, &item, 10 );

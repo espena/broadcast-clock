@@ -16,7 +16,7 @@
             "intelliSenseMode": "macos-clang-arm64",
             "browse": {
                 "path": [
-                    "~/esp-idf/components",
+                    "~/esp-idf/components/**",
                     "${workspaceFolder}/**"
                 ]
             }

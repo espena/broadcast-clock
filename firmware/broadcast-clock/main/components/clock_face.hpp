@@ -84,7 +84,6 @@ namespace espena::broadcast_clock {
     static void on_interval_timer( void* arg );
 
     void check_ambient_light();
-    void update_indicators();
 
     esp_timer_handle_t m_interval_timer;
 

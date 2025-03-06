@@ -14,8 +14,3 @@ namespace espena::utils {
 }
 
 #endif // __REPLACE_SUBSTRING__
-
-
-
-
-
