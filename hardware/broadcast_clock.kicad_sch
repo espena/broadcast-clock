@@ -1,7 +1,7 @@
 (kicad_sch
-	(version 20231120)
+	(version 20250114)
 	(generator "eeschema")
-	(generator_version "8.0")
+	(generator_version "9.0")
 	(uuid "40ecfd14-7e3d-4342-87f4-c464dfcd4cdf")
 	(paper "A4")
 	(title_block
@@ -13,9 +13,13 @@
 	)
 	(lib_symbols
 		(symbol "Device_espena:Antenna_GPS_Active"
-			(pin_numbers hide)
+			(pin_numbers
+				(hide yes)
+			)
 			(pin_names
-				(offset 1.016) hide)
+				(offset 1.016)
+				(hide yes)
+			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
@@ -111,6 +115,30 @@
 				)
 				(polyline
 					(pts
+						(xy -5.715 0) (xy -10.795 0) (xy -10.795 8.89) (xy -9.525 11.43)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -5.715 -5.08) (xy -5.715 5.08) (xy 4.445 0) (xy -5.715 -5.08)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
 						(xy 0 8.89) (xy 0 2.2352)
 					)
 					(stroke
@@ -147,8 +175,92 @@
 				)
 				(polyline
 					(pts
-						(xy 10.16 -1.905) (xy 9.525 -2.54)
+						(xy 5.715 3.81) (xy 5.715 -3.81) (xy 13.335 -3.81) (xy 13.335 3.81) (xy 5.715 3.81)
 					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 7.62 8.89)
+					(mid 7.806 9.339)
+					(end 8.255 9.525)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 8.255 9.525)
+					(mid 8.704 9.339)
+					(end 8.89 8.89)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 6.985 1.905)
+					(mid 8.255 2.431)
+					(end 9.525 1.905)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 6.985 0.0001)
+					(mid 8.255 0.5261)
+					(end 9.525 0.0001)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 6.985 -1.9049)
+					(mid 8.255 -1.3789)
+					(end 9.525 -1.9049)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 8.89 8.89)
+					(mid 9.076 9.339)
+					(end 9.525 9.525)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 9.525 9.525)
+					(mid 9.974 9.339)
+					(end 10.16 8.89)
 					(stroke
 						(width 0)
 						(type default)
@@ -171,7 +283,103 @@
 				)
 				(polyline
 					(pts
-						(xy 15.24 0) (xy 13.335 0)
+						(xy 10.16 -1.905) (xy 9.525 -2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 10.795 9.525)
+					(mid 11.2408 9.3373)
+					(end 11.43 8.89)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 12.065 1.905)
+					(mid 10.795 1.379)
+					(end 9.525 1.905)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 12.065 0.0001)
+					(mid 10.795 -0.5259)
+					(end 9.525 0.0001)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 12.065 -1.9049)
+					(mid 10.795 -2.4309)
+					(end 9.525 -1.9049)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 10.16 8.89)
+					(mid 10.3457 9.3408)
+					(end 10.795 9.525)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 12.065 9.525)
+					(mid 12.5108 9.3373)
+					(end 12.7 8.89)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 11.43 8.89)
+					(mid 11.6157 9.3408)
+					(end 12.065 9.525)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 12.7 8.89) (xy 18.415 8.89) (xy 18.415 0)
 					)
 					(stroke
 						(width 0)
@@ -187,6 +395,18 @@
 					)
 					(stroke
 						(width 0.5)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 15.24 0) (xy 13.335 0)
+					)
+					(stroke
+						(width 0)
 						(type default)
 					)
 					(fill
@@ -229,16 +449,15 @@
 						(type none)
 					)
 				)
-				(polyline
-					(pts
-						(xy 29.21 -1.905) (xy 22.86 -1.905)
-					)
+				(circle
+					(center 18.415 0)
+					(radius 0.254)
 					(stroke
-						(width 0)
+						(width -0.0001)
 						(type default)
 					)
 					(fill
-						(type none)
+						(type outline)
 					)
 				)
 				(polyline
@@ -253,224 +472,8 @@
 						(type none)
 					)
 				)
-				(polyline
-					(pts
-						(xy 12.7 8.89) (xy 18.415 8.89) (xy 18.415 0)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -5.715 -5.08) (xy -5.715 5.08) (xy 4.445 0) (xy -5.715 -5.08)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -5.715 0) (xy -10.795 0) (xy -10.795 8.89) (xy -9.525 11.43)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 5.715 3.81) (xy 5.715 -3.81) (xy 13.335 -3.81) (xy 13.335 3.81) (xy 5.715 3.81)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 8.255 9.525)
-					(mid 7.806 9.339)
-					(end 7.62 8.89)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 8.89 8.89)
-					(mid 8.704 9.339)
-					(end 8.255 9.525)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 9.525 -1.9049)
-					(mid 8.255 -1.3789)
-					(end 6.985 -1.9049)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 9.525 -1.9049)
-					(mid 10.795 -2.4309)
-					(end 12.065 -1.9049)
-					(stroke
-						(width 0)
-						(type solid)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 9.525 0.0001)
-					(mid 8.255 0.5261)
-					(end 6.985 0.0001)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 9.525 0.0001)
-					(mid 10.795 -0.5259)
-					(end 12.065 0.0001)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 9.525 1.905)
-					(mid 8.255 2.431)
-					(end 6.985 1.905)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 9.525 1.905)
-					(mid 10.795 1.379)
-					(end 12.065 1.905)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 9.525 9.525)
-					(mid 9.076 9.339)
-					(end 8.89 8.89)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 10.16 8.89)
-					(mid 9.974 9.339)
-					(end 9.525 9.525)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 10.795 9.525)
-					(mid 10.346 9.339)
-					(end 10.16 8.89)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 11.43 8.89)
-					(mid 11.244 9.339)
-					(end 10.795 9.525)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 12.065 9.525)
-					(mid 11.616 9.339)
-					(end 11.43 8.89)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 12.7 8.89)
-					(mid 12.514 9.339)
-					(end 12.065 9.525)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
 				(circle
-					(center 18.415 0)
+					(center 29.21 1.905)
 					(radius 0.254)
 					(stroke
 						(width -0.0001)
@@ -482,25 +485,14 @@
 				)
 				(arc
 					(start 27.305 0)
-					(mid 27.863 -1.347)
-					(end 29.21 -1.905)
+					(mid 27.863 1.347)
+					(end 29.21 1.905)
 					(stroke
 						(width 0)
 						(type default)
 					)
 					(fill
 						(type none)
-					)
-				)
-				(circle
-					(center 29.21 -1.905)
-					(radius 0.254)
-					(stroke
-						(width -0.0001)
-						(type default)
-					)
-					(fill
-						(type outline)
 					)
 				)
 				(circle
@@ -515,8 +507,8 @@
 					)
 				)
 				(arc
-					(start 29.21 1.905)
-					(mid 27.863 1.347)
+					(start 29.21 -1.905)
+					(mid 27.863 -1.347)
 					(end 27.305 0)
 					(stroke
 						(width 0)
@@ -526,8 +518,20 @@
 						(type none)
 					)
 				)
+				(polyline
+					(pts
+						(xy 29.21 -1.905) (xy 22.86 -1.905)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
 				(circle
-					(center 29.21 1.905)
+					(center 29.21 -1.905)
 					(radius 0.254)
 					(stroke
 						(width -0.0001)
@@ -584,12 +588,17 @@
 					)
 				)
 			)
+			(embedded_fonts no)
 		)
 		(symbol "power:GND"
 			(power)
-			(pin_numbers hide)
+			(pin_numbers
+				(hide yes)
+			)
 			(pin_names
-				(offset 0) hide)
+				(offset 0)
+				(hide yes)
+			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
@@ -680,6 +689,7 @@
 					)
 				)
 			)
+			(embedded_fonts no)
 		)
 	)
 	(wire
@@ -4587,6 +4597,10 @@
 	(sheet
 		(at 162.56 49.53)
 		(size 35.56 19.05)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
 		(fields_autoplaced yes)
 		(stroke
 			(width 0.1524)
@@ -4625,6 +4639,10 @@
 	(sheet
 		(at 210.82 49.53)
 		(size 25.4 90.17)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
 		(fields_autoplaced yes)
 		(stroke
 			(width 0.1524)
@@ -4654,153 +4672,153 @@
 		)
 		(pin "DISP_DIN" input
 			(at 210.82 82.55 180)
+			(uuid "3ba17e25-40bb-455a-9104-ad28f66854e1")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
 			)
-			(uuid "3ba17e25-40bb-455a-9104-ad28f66854e1")
 		)
 		(pin "DISP_DOUT" output
 			(at 210.82 86.36 180)
+			(uuid "1d107265-e3cf-474b-a898-555a697dc1f4")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
 			)
-			(uuid "1d107265-e3cf-474b-a898-555a697dc1f4")
 		)
 		(pin "DIAL_GSCLK" input
 			(at 210.82 128.27 180)
+			(uuid "d7ca6e52-1b5e-45f3-a709-0e5e03748cc2")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
 			)
-			(uuid "d7ca6e52-1b5e-45f3-a709-0e5e03748cc2")
 		)
 		(pin "DIAL_DCPRG" input
 			(at 210.82 109.22 180)
+			(uuid "027b1514-8a0d-4444-8df4-1186b2ed6653")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
 			)
-			(uuid "027b1514-8a0d-4444-8df4-1186b2ed6653")
 		)
 		(pin "DIAL_SCLK" input
 			(at 210.82 113.03 180)
+			(uuid "3527d39c-acf2-4659-9450-d0bc5cff0b5d")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
 			)
-			(uuid "3527d39c-acf2-4659-9450-d0bc5cff0b5d")
 		)
 		(pin "DIAL_XLAT" input
 			(at 210.82 124.46 180)
+			(uuid "fc9dc654-f87a-4636-8646-d960a233a69d")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
 			)
-			(uuid "fc9dc654-f87a-4636-8646-d960a233a69d")
 		)
 		(pin "DIAL_BLANK" input
 			(at 210.82 135.89 180)
+			(uuid "0768c876-fa2e-4cab-9e68-98791f54772e")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
 			)
-			(uuid "0768c876-fa2e-4cab-9e68-98791f54772e")
 		)
 		(pin "DISP_CLK" input
 			(at 210.82 90.17 180)
+			(uuid "098f6ed0-6a8d-40fc-a7f4-068605aefa1b")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
 			)
-			(uuid "098f6ed0-6a8d-40fc-a7f4-068605aefa1b")
 		)
 		(pin "~{DISP_CS}" input
 			(at 210.82 78.74 180)
+			(uuid "94a2e640-6a15-4259-aae4-3327ba5e9b0d")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
 			)
-			(uuid "94a2e640-6a15-4259-aae4-3327ba5e9b0d")
 		)
 		(pin "DIAL_VPRG" input
 			(at 210.82 132.08 180)
+			(uuid "6eb3e73b-b413-453c-b89d-0e17913b82c3")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
 			)
-			(uuid "6eb3e73b-b413-453c-b89d-0e17913b82c3")
 		)
 		(pin "DIAL_SIN" input
 			(at 210.82 120.65 180)
+			(uuid "c73876f9-67b6-44da-ab2b-03e59965f64f")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
 			)
-			(uuid "c73876f9-67b6-44da-ab2b-03e59965f64f")
 		)
 		(pin "DIAL_SOUT" output
 			(at 210.82 116.84 180)
+			(uuid "382c578e-cd6d-4381-9ead-964b2238288a")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
 			)
-			(uuid "382c578e-cd6d-4381-9ead-964b2238288a")
 		)
 		(pin "DIAL_XERR" output
 			(at 210.82 105.41 180)
+			(uuid "d31636bc-ba71-4aff-84d7-fdb72679e4b0")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
 			)
-			(uuid "d31636bc-ba71-4aff-84d7-fdb72679e4b0")
 		)
 		(pin "DISP_U2BLINK" output
 			(at 210.82 97.79 180)
+			(uuid "e7859b3a-c203-4cb0-be62-4da618ec60e0")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
 			)
-			(uuid "e7859b3a-c203-4cb0-be62-4da618ec60e0")
 		)
 		(pin "DISP_U1BLINK" output
 			(at 210.82 93.98 180)
+			(uuid "97dac8cf-eda9-40e0-895a-ea613c4ab648")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
 			)
-			(uuid "97dac8cf-eda9-40e0-895a-ea613c4ab648")
 		)
 		(instances
 			(project "broadcast_clock"
@@ -4813,6 +4831,10 @@
 	(sheet
 		(at 111.76 74.93)
 		(size 38.1 26.67)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
 		(fields_autoplaced yes)
 		(stroke
 			(width 0.1524)
@@ -4842,43 +4864,43 @@
 		)
 		(pin "GPS_TIMEPULSE" output
 			(at 149.86 86.36 0)
+			(uuid "fbbfa657-11b9-41f5-9d8d-ecb69e04b004")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify right)
 			)
-			(uuid "fbbfa657-11b9-41f5-9d8d-ecb69e04b004")
 		)
 		(pin "GPS_I2C_SDA" bidirectional
 			(at 149.86 78.74 0)
+			(uuid "3af5c060-60f5-4d8c-9383-926c3e84c1c7")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify right)
 			)
-			(uuid "3af5c060-60f5-4d8c-9383-926c3e84c1c7")
 		)
 		(pin "GPS_I2C_SCL" input
 			(at 149.86 82.55 0)
+			(uuid "2d487e86-a36e-4da2-8fcc-726610f88a8f")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify right)
 			)
-			(uuid "2d487e86-a36e-4da2-8fcc-726610f88a8f")
 		)
 		(pin "GPS_ANTENNA" input
 			(at 111.76 90.17 180)
+			(uuid "abf59408-a535-4279-9919-55baf7ae2f6b")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
 			)
-			(uuid "abf59408-a535-4279-9919-55baf7ae2f6b")
 		)
 		(instances
 			(project "broadcast_clock"
@@ -4891,6 +4913,10 @@
 	(sheet
 		(at 162.56 74.93)
 		(size 35.56 64.77)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
 		(fields_autoplaced yes)
 		(stroke
 			(width 0.1524)
@@ -4920,183 +4946,183 @@
 		)
 		(pin "DISP_SPI_MOSI" output
 			(at 198.12 82.55 0)
+			(uuid "e453be8d-383d-479b-8d1d-656c625e056f")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify right)
 			)
-			(uuid "e453be8d-383d-479b-8d1d-656c625e056f")
 		)
 		(pin "DISP_SPI_MISO" input
 			(at 198.12 86.36 0)
+			(uuid "8145022d-dbb5-4049-a657-04eff9152349")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify right)
 			)
-			(uuid "8145022d-dbb5-4049-a657-04eff9152349")
 		)
 		(pin "~{DISP_SPI_CS}" output
 			(at 198.12 78.74 0)
+			(uuid "cb78d994-591c-4bea-839a-7d9b2bd9e56c")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify right)
 			)
-			(uuid "cb78d994-591c-4bea-839a-7d9b2bd9e56c")
 		)
 		(pin "DISP_SPI_CLK" output
 			(at 198.12 90.17 0)
+			(uuid "29fb90ef-0bc4-4d7b-b340-dd206c582e82")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify right)
 			)
-			(uuid "29fb90ef-0bc4-4d7b-b340-dd206c582e82")
 		)
 		(pin "DIAL_SOUT" output
 			(at 198.12 120.65 0)
+			(uuid "0bdafdbc-1717-459f-9428-9d9b6b0462c7")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify right)
 			)
-			(uuid "0bdafdbc-1717-459f-9428-9d9b6b0462c7")
 		)
 		(pin "DIAL_SCLK" output
 			(at 198.12 113.03 0)
+			(uuid "0411fbbf-0056-4f9c-9d3f-fea5f24de899")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify right)
 			)
-			(uuid "0411fbbf-0056-4f9c-9d3f-fea5f24de899")
 		)
 		(pin "DIAL_XLAT" output
 			(at 198.12 124.46 0)
+			(uuid "7f887bdc-a917-4687-a8a2-bc0991d77f17")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify right)
 			)
-			(uuid "7f887bdc-a917-4687-a8a2-bc0991d77f17")
 		)
 		(pin "DIAL_GSCLK" output
 			(at 198.12 128.27 0)
+			(uuid "35651eef-2064-42be-a37e-8bb7169ba69a")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify right)
 			)
-			(uuid "35651eef-2064-42be-a37e-8bb7169ba69a")
 		)
 		(pin "DIAL_VPRG" output
 			(at 198.12 132.08 0)
+			(uuid "84c373af-bd35-4112-b30d-be118ed55de1")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify right)
 			)
-			(uuid "84c373af-bd35-4112-b30d-be118ed55de1")
 		)
 		(pin "DIAL_BLANK" output
 			(at 198.12 135.89 0)
+			(uuid "c391462d-c92a-43eb-8460-7ba844700c28")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify right)
 			)
-			(uuid "c391462d-c92a-43eb-8460-7ba844700c28")
 		)
 		(pin "DIAL_DCPRG" output
 			(at 198.12 109.22 0)
+			(uuid "c6ec81aa-ffd1-40be-8f58-69335c14c885")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify right)
 			)
-			(uuid "c6ec81aa-ffd1-40be-8f58-69335c14c885")
 		)
 		(pin "SDA" bidirectional
 			(at 162.56 78.74 180)
+			(uuid "3b24eaa3-1f2e-43fa-b74f-3918da31708c")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
 			)
-			(uuid "3b24eaa3-1f2e-43fa-b74f-3918da31708c")
 		)
 		(pin "SCL" output
 			(at 162.56 82.55 180)
+			(uuid "0cfdc5c3-8a06-46ee-b216-5946f916ad77")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
 			)
-			(uuid "0cfdc5c3-8a06-46ee-b216-5946f916ad77")
 		)
 		(pin "GPS_TIMEPULSE" input
 			(at 162.56 86.36 180)
+			(uuid "f7243b70-ab2a-42c8-a587-18bdf2276ae0")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
 			)
-			(uuid "f7243b70-ab2a-42c8-a587-18bdf2276ae0")
 		)
 		(pin "DIAL_SIN" input
 			(at 198.12 116.84 0)
+			(uuid "3f96e8f6-6f4f-41a7-8869-75775e6e16fe")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify right)
 			)
-			(uuid "3f96e8f6-6f4f-41a7-8869-75775e6e16fe")
 		)
 		(pin "DIAL_XERR" input
 			(at 198.12 105.41 0)
+			(uuid "8826e7e4-8c1d-49bb-b88c-53cd23613f11")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify right)
 			)
-			(uuid "8826e7e4-8c1d-49bb-b88c-53cd23613f11")
 		)
 		(pin "DISP_U1BLINK" input
 			(at 198.12 93.98 0)
+			(uuid "61c40272-da66-4623-9f84-430a133f7dfc")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify right)
 			)
-			(uuid "61c40272-da66-4623-9f84-430a133f7dfc")
 		)
 		(pin "DISP_U2BLINK" input
 			(at 198.12 97.79 0)
+			(uuid "13dc70c2-cfd7-41d5-a15e-8b7457f7e9be")
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify right)
 			)
-			(uuid "13dc70c2-cfd7-41d5-a15e-8b7457f7e9be")
 		)
 		(instances
 			(project "broadcast_clock"
@@ -5111,4 +5137,5 @@
 			(page "1")
 		)
 	)
+	(embedded_fonts no)
 )
